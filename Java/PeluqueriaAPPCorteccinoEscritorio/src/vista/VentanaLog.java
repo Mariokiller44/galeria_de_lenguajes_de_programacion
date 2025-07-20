@@ -6,37 +6,19 @@ package vista;
 
 import com.formdev.flatlaf.FlatLightLaf;
 import controlador.ConexionBD;
-import java.awt.Color;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import controlador.Configuracion;
+import java.awt.*;
 import java.sql.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.Action;
-import javax.swing.JOptionPane;
-import javax.swing.ImageIcon;
+import java.awt.event.*;
+import java.io.*;
+import java.nio.file.*;
+import java.security.*;
+import java.text.*;
+import java.util.*;
 import java.util.Date;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import java.util.logging.*;
+import javax.swing.*;
+import modelo.Usuario;
 import styles.GestionProductosStyle;
 
 /**
@@ -45,33 +27,15 @@ import styles.GestionProductosStyle;
  *
  * @author Mario
  */
-public class VentanaLog extends javax.swing.JFrame {
-
-    private static String DATABASE_NAME = "bd_alcorteccino";
-    private static String folderpath = "src\\bd";
-    private static String DATABASE_PASSWORD = "123pelu";
-    private static String DATABASE_USERNAME = "admin";
-    private static String BACKUP_FOLDER;
-    private static String savepath = "";
-    private static String DATABASE_FOLDER = "src\\bd";
-    private static String DATABASE_PREFIX = "bd_alcorteccino";
+public class VentanaLog extends JFrame {
 
     /**
      * Creates new form VentanaLog
      */
-    private ConexionBD conexion;
     private Connection con;
     private Logger logger;
-    private String tipoUsu;
-    private int id;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
+    private Usuario usu;
+    private static String SAVEPATH="";
 
     public VentanaLog() {
         initComponents();
@@ -119,16 +83,16 @@ public class VentanaLog extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "No se pudo hacer copia de la base de datos. Esta vacía", "Copia de seguridad", JOptionPane.WARNING_MESSAGE);
         } else {
             // Nombre del archivo de copia de seguridad
-            String nombreArchivoBackup = DATABASE_NAME + "_" + fechaActual;
-            savepath = "\"" + folderpath + "\\" + "" + nombreArchivoBackup + ".sql\"";
-            String execudecmd = "mysqldump -u" + DATABASE_USERNAME + " -p" + DATABASE_PASSWORD + " --database " + DATABASE_NAME + " -r " + savepath;
+            String nombreArchivoBackup = Configuracion.DB_NAME + "_" + fechaActual;
+            SAVEPATH = "\"" + Configuracion.DB_FOLDER + "\\" + "" + nombreArchivoBackup + ".sql\"";
+            String execudecmd = "mysqldump -u" + Configuracion.DB_USER + " -p" + Configuracion.DB_PASSWORD + " --database " + Configuracion.DB_NAME + " -r " + SAVEPATH;
 
             // Ruta completa del archivo de copia de seguridad
             String rutaArchivoBackup = nombreArchivoBackup;
 
             try {
                 // Comando para realizar la copia de seguridad
-                String comando = "mysql --user=" + DATABASE_USERNAME + " --password=" + DATABASE_PASSWORD + " " + DATABASE_NAME + " > " + rutaArchivoBackup;
+                String comando = "mysql --user=" + Configuracion.DB_USER + " --password=" + Configuracion.DB_PASSWORD + " " + Configuracion.DB_NAME + " > " + rutaArchivoBackup;
 
                 // Ejecutar el comando en el sistema operativo
                 Process proceso = Runtime.getRuntime().exec(execudecmd);
@@ -146,12 +110,11 @@ public class VentanaLog extends javax.swing.JFrame {
     }
 
     private static void importarBaseDatos() {
-        String url = "jdbc:mysql://localhost:3306/bd_alcorteccino";
-        String usuario = "admin";
-        String contraseña = "123pelu";
+       
+        try {
 
-        try (Connection conn = DriverManager.getConnection(url, usuario, contraseña); Statement stmt = conn.createStatement()) {
-
+            Connection conn = ConexionBD.conectarSinLogin();
+            Statement stmt = conn.createStatement();
             String archivoSQL = "src/bd/bd_alcorteccino.sql";
 
             try (BufferedReader br = new BufferedReader(new FileReader(archivoSQL))) {
@@ -643,7 +606,6 @@ public class VentanaLog extends javax.swing.JFrame {
 
     private void botonAceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonAceptarActionPerformed
         // TODO add your handling code here:
-
         if (textoUsuario.getText().isEmpty() || textoUsuario.getText().contains("Introduce usuario")) {
             JOptionPane.showMessageDialog(null, "Usuario incompleto");
         } else if (textoContrasenia.getText().isEmpty()) {
@@ -735,12 +697,10 @@ public class VentanaLog extends javax.swing.JFrame {
     private static boolean isDatabaseEmpty() {
         // Lógica para verificar si la base de datos está vacía
         boolean isEmpty = false;
-
         // Conexión a la base de datos
         Connection connection = null;
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bd_alcorteccino", "admin", "123pelu");
-
+            connection = ConexionBD.conectarSinLogin();
             // Consulta SQL para contar el número de registros en una tabla
             String query = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'bd_alcorteccino';";
             PreparedStatement statement = connection.prepareStatement(query);
@@ -774,7 +734,7 @@ public class VentanaLog extends javax.swing.JFrame {
         // Conexión a la base de datos
         Connection connection = null;
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bd_alcorteccino", "admin", "123pelu");
+            connection = ConexionBD.conectarSinLogin();
 
             // Consulta SQL para realizar una operación que identifique la corrupción
             // Puedes realizar una consulta específica según tu SGBD
@@ -806,8 +766,8 @@ public class VentanaLog extends javax.swing.JFrame {
     }
 
     private static void renameAndImportLatestBackup() {
-        File folder = new File(DATABASE_FOLDER);
-        FilenameFilter filter = (dir, name) -> name.startsWith(DATABASE_PREFIX);
+        File folder = new File(Configuracion.DB_FOLDER);
+        FilenameFilter filter = (dir, name) -> name.startsWith(Configuracion.DB_NAME);
 
         File[] backupFiles = folder.listFiles(filter);
         if (backupFiles == null || backupFiles.length == 0) {
@@ -823,7 +783,7 @@ public class VentanaLog extends javax.swing.JFrame {
         String sobreescribirArchivo = "bd_alcorteccino.sql";
         File nuevoArchivo = new File(sobreescribirArchivo);
         Path sourcePath = latestBackup.toPath();
-        Path targetPath = new File(DATABASE_FOLDER + File.separator + nuevoArchivo).toPath();
+        Path targetPath = new File(Configuracion.DB_FOLDER + File.separator + nuevoArchivo).toPath();
 
         try {
             Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
@@ -890,35 +850,31 @@ public class VentanaLog extends javax.swing.JFrame {
     /**
      *
      */
-    private void iniciarSesion() {
+    private boolean iniciarSesion() {
+        boolean devo=false;
+        String passwd,contraseniaMD5,usuario,contrasenia;
         try {
-            String usuario = textoUsuario.getText().toString();
-            String contrasenia = textoContrasenia.getText();
-            conexion = new ConexionBD(usuario, contrasenia);
-            con = conexion.getConnection();
-            String passwd = obtenerContrasenia(usuario);
-            String contraseniaMD5 = calcularMD5(contrasenia);
+            usuario=textoUsuario.getText();
+            contrasenia=textoContrasenia.getPassword().toString();
+            con = ConexionBD.conectarSinLogin();
+            passwd = obtenerContrasenia(usuario);
+            contraseniaMD5 = calcularMD5(contrasenia);
             if (contraseniaMD5.contains(passwd)) {
-                String sql = "SELECT * FROM usuario WHERE CUENTA LIKE ? AND CONTRASENIA LIKE ?";
-                PreparedStatement stmt = con.prepareStatement(sql);
-                stmt.setString(1, usuario);
-                stmt.setString(2, contraseniaMD5);
-                ResultSet resul = stmt.executeQuery();
-                if (!resul.next()) {
+                usu=Usuario.buscarPorCuentaYContrasenia(usuario,contraseniaMD5,con);
+                if (usu==null) {
                     JOptionPane.showMessageDialog(null, "Usuario o contraseña no validos");
                     textoContrasenia.setText("");
                     textoUsuario.setText("");
                 } else {
-                    setId(resul.getInt("id"));
-                    JOptionPane.showMessageDialog(null, "Bienvenido " + resul.getString("nombre"));
-                    tipoUsu = resul.getString("tipo_de_usuario");
+                    JOptionPane.showMessageDialog(null, "Bienvenido " + usu.getNombre());
                     try {
-                        if (tipoUsu.contains("Personal")) {
-                            dispose();
+                        if (usu.getTipo_de_usuario().contains("Personal")) {
+                            this.dispose();
                             VentanaPrincipal vc = new VentanaPrincipal();
-                            vc.setValor(id);
-                            vc.setTipoUsu(resul.getString("Nombre"));
+                            vc.setValor(usu.getId());
+                            vc.setTipoUsu(usu.getTipo_de_usuario());
                             vc.setVisible(true);
+                            devo=true;
                         } else {
                             throw new ClassCastException("Esta aplicación solo la puede utilizar el personal. Pruebe nuestra aplicación Android");
                         }
@@ -926,16 +882,19 @@ public class VentanaLog extends javax.swing.JFrame {
                         JOptionPane.showMessageDialog(null, cse.getMessage());
                     }
                 }
-                conexion.cerrarConnection();
+                con.close();
             }
-
         } catch (NullPointerException npe) {
             JOptionPane.showMessageDialog(null, "Error intentando conectar a la base de datos");
+            devo=false;
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Hubo un problema con la base de datos.");
+            devo=false;
         } catch (NoSuchAlgorithmException ex) {
             JOptionPane.showMessageDialog(null, "Falló la comprobación de contraseña");
+            devo=false;
         }
+        return devo;
     }
 
     /**
@@ -968,17 +927,11 @@ public class VentanaLog extends javax.swing.JFrame {
      */
     private String obtenerContrasenia(String usuario) {
         String contrasenia = null;
+        Usuario usuarioEncontrado=null;
         try {
-            conexion = new ConexionBD("usuario", "passwd");
-            con = conexion.getConnection();
-            String sql = "SELECT CONTRASENIA FROM USUARIO WHERE CUENTA LIKE ?";
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, usuario);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                contrasenia = rs.getString("contrasenia");
-            }
-        } catch (SQLException ex) {
+            usuarioEncontrado=Usuario.buscarPorCuenta(usuario, con);
+            contrasenia=usuarioEncontrado.getContrasenia();
+        } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Error en la conexion.");
         }
         return contrasenia;
