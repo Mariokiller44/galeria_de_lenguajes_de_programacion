@@ -525,8 +525,7 @@ public class VentanaRegistro extends javax.swing.JFrame {
     private void insertarUsuario() throws NumberFormatException, HeadlessException {
         String usuario = textoCuenta.getText();
         try {
-            conexion = new ConexionBD("admin", "123pelu");
-            con = conexion.getConnection();
+            con = ConexionBD.conectarSinLogin();
             String sql = "SELECT * FROM USUARIO WHERE CUENTA LIKE ?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, textoCuenta.getText());

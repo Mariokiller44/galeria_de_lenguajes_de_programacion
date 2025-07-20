@@ -15,6 +15,9 @@ import java.sql.ResultSet;
  * @author Mario
  */
 public class Usuario {
+
+    
+    
     private int id; // ID del usuario
     private int telefono; // Número de teléfono del usuario
     private String nombre; // Nombre del usuario
@@ -308,6 +311,54 @@ public class Usuario {
 
         return devo;
     }
+    
+    
+     public Usuario buscarPorId(int id,Connection conexion) {
+        Usuario devo = null;
+        try {
+            devo=new Usuario(id, conexion);
+            devo.inicializarDesdeBD();
+        } catch (Exception e) {
+            devo = null;
+        }
+        return devo;
+    }
+     
+     public static Usuario buscarPorCuentaYContrasenia(String usuario, String contrasenia, Connection con) {
+        Usuario devo = null;
+        String sql="SELECT id FROM usuario WHERE cuenta LIKE ? AND CONTRASENIA LIKE ?";
+        try {
+            PreparedStatement ps=con.prepareStatement(sql);
+            ps.setString(1, usuario);
+            ps.setString(1, contrasenia);
+            ResultSet rs=ps.executeQuery();
+            while (rs.next()) {
+                devo=new Usuario(rs.getInt("id"), con);
+                devo.inicializarDesdeBD();
+            }
+        } catch (Exception e) {
+            devo = null;
+        }
+        return devo;
+    }
+     public static Usuario buscarPorCuenta(String usuario, Connection con) {
+        Usuario devo = null;
+        String sql="SELECT id FROM usuario WHERE cuenta LIKE ?";
+        try {
+            PreparedStatement ps=con.prepareStatement(sql);
+            ps.setString(1, usuario);
+            ResultSet rs=ps.executeQuery();
+            while (rs.next()) {
+                devo=new Usuario(rs.getInt("id"), con);
+                devo.inicializarDesdeBD();
+            }
+        } catch (Exception e) {
+            devo = null;
+        }
+        return devo;
+    }
+
+
 
     /*
      * Sobrescritura del método toString() para representar el objeto como una
