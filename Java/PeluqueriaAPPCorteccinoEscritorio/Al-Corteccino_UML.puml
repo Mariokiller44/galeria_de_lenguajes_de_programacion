@@ -1,0 +1,188 @@
+@startuml
+annotation java.lang.Override
+annotation java.lang.SuppressWarnings
+class com.github.lgooddatepicker.components.DatePicker
+class com.github.lgooddatepicker.components.TimePicker
+class controlador.ConexionBD
+class controlador.ConsultasPersonal
+class java.awt.BorderLayout
+class java.awt.Color
+class java.awt.Cursor
+class java.awt.Dimension
+class java.awt.GridLayout
+class java.awt.HeadlessException
+class java.awt.Image
+class java.awt.Point
+class java.awt.Rectangle
+class java.awt.Toolkit
+class java.awt.event.ActionEvent
+class java.awt.event.ActionListener
+class java.awt.event.KeyEvent
+class java.awt.event.MouseAdapter
+class java.awt.event.MouseEvent
+class java.awt.event.MouseListener
+class java.awt.event.MouseMotionAdapter
+class java.awt.event.WindowAdapter
+class java.awt.event.WindowEvent
+class java.text.SimpleDateFormat
+class java.time.LocalDate
+class java.time.LocalDateTime
+class java.time.LocalTime
+class java.util.Calendar
+class java.util.Date
+class java.util.logging.Level
+class java.util.logging.Logger
+class javax.swing.Action
+class javax.swing.ButtonGroup
+class javax.swing.DefaultCellEditor
+class javax.swing.DefaultComboBoxModel
+class javax.swing.ImageIcon
+class javax.swing.JComboBox
+class javax.swing.JFrame
+class javax.swing.JLabel
+class javax.swing.JMenuItem
+class javax.swing.JOptionPane
+class javax.swing.JPanel
+class javax.swing.JPopupMenu
+class javax.swing.JScrollPane
+class javax.swing.JSpinner
+class javax.swing.JTable
+class javax.swing.JTextField
+class javax.swing.LookAndFeel
+class javax.swing.SwingUtilities
+class javax.swing.Timer
+class javax.swing.UIManager
+class javax.swing.UnsupportedLookAndFeelException
+class javax.swing.table.DefaultTableCellRenderer
+class javax.swing.table.DefaultTableModel
+class javax.swing.table.JTableHeader
+class javax.swing.table.TableCellEditor
+class modelo.Cita
+class modelo.Horario
+class modelo.Personal
+class modelo.Servicio
+class modelo.Usuario
+class style.GestionDeProductos
+class vista.GestionCitasVentana
+class vista.GestionProductosVentana
+class vista.JFrame
+class vista.VentanaLog
+class vista.VentanaPrincipal
+class vista.VentanaRegistro
+vista.GestionCitasVentana ..> java.lang.Override
+vista.GestionCitasVentana ..> java.lang.SuppressWarnings
+vista.GestionCitasVentana ..> com.github.lgooddatepicker.components.DatePicker
+vista.GestionCitasVentana ..> com.github.lgooddatepicker.components.TimePicker
+vista.GestionCitasVentana ..> controlador.ConexionBD
+vista.GestionCitasVentana ..> controlador.ConsultasPersonal
+vista.GestionCitasVentana ..> java.awt.GridLayout
+vista.GestionCitasVentana ..> java.awt.HeadlessException
+vista.GestionCitasVentana ..> java.awt.Image
+vista.GestionCitasVentana ..> java.awt.Toolkit
+vista.GestionCitasVentana ..> java.text.SimpleDateFormat
+vista.GestionCitasVentana ..> java.time.LocalDate
+vista.GestionCitasVentana ..> java.time.LocalDateTime
+vista.GestionCitasVentana ..> java.time.LocalTime
+vista.GestionCitasVentana ..> java.util.Date
+vista.GestionCitasVentana ..> java.util.logging.Level
+vista.GestionCitasVentana ..> java.util.logging.Logger
+vista.GestionCitasVentana ..> javax.swing.DefaultComboBoxModel
+vista.GestionCitasVentana ..> javax.swing.JComboBox
+vista.GestionCitasVentana --|> javax.swing.JFrame
+vista.GestionCitasVentana ..> javax.swing.JLabel
+vista.GestionCitasVentana ..> javax.swing.JOptionPane
+vista.GestionCitasVentana ..> javax.swing.JPanel
+vista.GestionCitasVentana ..> javax.swing.JSpinner
+vista.GestionCitasVentana ..> javax.swing.JTable
+vista.GestionCitasVentana ..> javax.swing.LookAndFeel
+vista.GestionCitasVentana ..> javax.swing.SwingUtilities
+vista.GestionCitasVentana ..> javax.swing.UIManager
+vista.GestionCitasVentana ..> javax.swing.UnsupportedLookAndFeelException
+vista.GestionCitasVentana ..> javax.swing.table.DefaultTableModel
+vista.GestionCitasVentana ..> modelo.Cita
+vista.GestionCitasVentana ..> modelo.Horario
+vista.GestionCitasVentana ..> modelo.Personal
+vista.GestionCitasVentana ..> modelo.Servicio
+vista.GestionCitasVentana ..> modelo.Usuario
+vista.GestionProductosVentana ..> java.lang.Override
+vista.GestionProductosVentana ..> controlador.ConsultasPersonal
+vista.GestionProductosVentana ..> java.awt.event.ActionEvent
+vista.GestionProductosVentana ..> java.awt.event.ActionListener
+vista.GestionProductosVentana ..> java.awt.event.WindowAdapter
+vista.GestionProductosVentana ..> java.awt.event.WindowEvent
+vista.GestionProductosVentana ..> javax.swing.table.DefaultTableCellRenderer
+vista.GestionProductosVentana ..> javax.swing.table.DefaultTableModel
+vista.GestionProductosVentana ..> javax.swing.table.JTableHeader
+vista.GestionProductosVentana ..> style.GestionDeProductos
+vista.GestionProductosVentana --|> vista.JFrame
+vista.VentanaLog ..> java.lang.Override
+vista.VentanaLog ..> java.lang.SuppressWarnings
+vista.VentanaLog ..> controlador.ConexionBD
+vista.VentanaLog ..> java.awt.Color
+vista.VentanaLog ..> java.awt.event.ActionEvent
+vista.VentanaLog ..> java.awt.event.ActionListener
+vista.VentanaLog ..> java.awt.event.KeyEvent
+vista.VentanaLog ..> java.awt.event.MouseListener
+vista.VentanaLog ..> java.util.logging.Level
+vista.VentanaLog ..> java.util.logging.Logger
+vista.VentanaLog ..> javax.swing.Action
+vista.VentanaLog ..> javax.swing.ImageIcon
+vista.VentanaLog --|> javax.swing.JFrame
+vista.VentanaLog ..> javax.swing.JOptionPane
+vista.VentanaPrincipal ..> java.lang.Override
+vista.VentanaPrincipal ..> java.lang.SuppressWarnings
+vista.VentanaPrincipal ..> com.github.lgooddatepicker.components.DatePicker
+vista.VentanaPrincipal ..> controlador.ConsultasPersonal
+vista.VentanaPrincipal ..> java.awt.BorderLayout
+vista.VentanaPrincipal ..> java.awt.Color
+vista.VentanaPrincipal ..> java.awt.Cursor
+vista.VentanaPrincipal ..> java.awt.Dimension
+vista.VentanaPrincipal ..> java.awt.HeadlessException
+vista.VentanaPrincipal ..> java.awt.Image
+vista.VentanaPrincipal ..> java.awt.Point
+vista.VentanaPrincipal ..> java.awt.Rectangle
+vista.VentanaPrincipal ..> java.awt.Toolkit
+vista.VentanaPrincipal ..> java.awt.event.ActionEvent
+vista.VentanaPrincipal ..> java.awt.event.ActionListener
+vista.VentanaPrincipal ..> java.awt.event.MouseAdapter
+vista.VentanaPrincipal ..> java.awt.event.MouseEvent
+vista.VentanaPrincipal ..> java.awt.event.MouseListener
+vista.VentanaPrincipal ..> java.awt.event.MouseMotionAdapter
+vista.VentanaPrincipal ..> java.awt.event.WindowAdapter
+vista.VentanaPrincipal ..> java.awt.event.WindowEvent
+vista.VentanaPrincipal ..> java.time.LocalDate
+vista.VentanaPrincipal ..> java.time.LocalDateTime
+vista.VentanaPrincipal ..> java.util.Calendar
+vista.VentanaPrincipal ..> java.util.logging.Level
+vista.VentanaPrincipal ..> java.util.logging.Logger
+vista.VentanaPrincipal ..> javax.swing.DefaultCellEditor
+vista.VentanaPrincipal ..> javax.swing.ImageIcon
+vista.VentanaPrincipal --|> javax.swing.JFrame
+vista.VentanaPrincipal ..> javax.swing.JLabel
+vista.VentanaPrincipal ..> javax.swing.JMenuItem
+vista.VentanaPrincipal ..> javax.swing.JOptionPane
+vista.VentanaPrincipal ..> javax.swing.JPanel
+vista.VentanaPrincipal ..> javax.swing.JPopupMenu
+vista.VentanaPrincipal ..> javax.swing.JScrollPane
+vista.VentanaPrincipal ..> javax.swing.JTable
+vista.VentanaPrincipal ..> javax.swing.JTextField
+vista.VentanaPrincipal ..> javax.swing.SwingUtilities
+vista.VentanaPrincipal ..> javax.swing.Timer
+vista.VentanaPrincipal ..> javax.swing.UIManager
+vista.VentanaPrincipal ..> javax.swing.table.DefaultTableCellRenderer
+vista.VentanaPrincipal ..> javax.swing.table.DefaultTableModel
+vista.VentanaPrincipal ..> javax.swing.table.TableCellEditor
+vista.VentanaPrincipal ..> modelo.Usuario
+vista.VentanaRegistro ..> java.lang.Override
+vista.VentanaRegistro ..> java.lang.SuppressWarnings
+vista.VentanaRegistro ..> controlador.ConexionBD
+vista.VentanaRegistro ..> java.awt.Color
+vista.VentanaRegistro ..> java.awt.HeadlessException
+vista.VentanaRegistro ..> java.awt.event.ActionEvent
+vista.VentanaRegistro ..> java.awt.event.ActionListener
+vista.VentanaRegistro ..> java.util.logging.Level
+vista.VentanaRegistro ..> java.util.logging.Logger
+vista.VentanaRegistro ..> javax.swing.ButtonGroup
+vista.VentanaRegistro --|> javax.swing.JFrame
+vista.VentanaRegistro ..> javax.swing.JOptionPane
+@enduml

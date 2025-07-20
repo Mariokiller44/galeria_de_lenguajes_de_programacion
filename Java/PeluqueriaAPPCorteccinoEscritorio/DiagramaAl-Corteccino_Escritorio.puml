@@ -1,0 +1,28 @@
+@startuml
+class controlador.ConexionBD
+class controlador.ConsultasPersonal
+class java.sql.Connection
+class java.util.ArrayList
+class java.util.logging.Level
+class java.util.logging.Logger
+class javax.swing.JOptionPane
+class logger.Logger
+class modelo.Cita
+class modelo.Horario
+class modelo.Personal
+class modelo.Servicio
+class modelo.Usuario
+interface controlador.Configuracion
+controlador.ConexionBD ..> logger.Logger
+controlador.ConexionBD --|> controlador.Configuracion
+controlador.ConsultasPersonal ..> java.sql.Connection
+controlador.ConsultasPersonal ..> java.util.ArrayList
+controlador.ConsultasPersonal ..> java.util.logging.Level
+controlador.ConsultasPersonal ..> java.util.logging.Logger
+controlador.ConsultasPersonal ..> javax.swing.JOptionPane
+controlador.ConsultasPersonal ..> modelo.Cita
+controlador.ConsultasPersonal ..> modelo.Horario
+controlador.ConsultasPersonal ..> modelo.Personal
+controlador.ConsultasPersonal ..> modelo.Servicio
+controlador.ConsultasPersonal ..> modelo.Usuario
+@enduml
