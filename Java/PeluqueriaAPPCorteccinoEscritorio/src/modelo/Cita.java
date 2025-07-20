@@ -5,6 +5,7 @@
 package modelo;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 /**
  * Clase Cita: representa una cita con sus atributos.
@@ -144,6 +145,144 @@ public class Cita {
         } catch (Exception e) {
             // TODO: handle exception
             devo = false;
+        }
+        return devo;
+    }
+
+    public boolean inicializarDesdeBD() {
+        boolean devo = false;
+        try {
+            String sql = "SELECT * FROM cita WHERE id = ?";
+            PreparedStatement ps = conexion.prepareStatement(sql);
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                idCliente = rs.getInt("id_cliente");
+                idHorario = rs.getInt("id_horario");
+                getHorario(); // Cargar el horario asociado
+                getCliente(); // Cargar el cliente asociado
+                devo = true;
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            System.out.println("Error al inicializar. " + e.getMessage());
+            devo = false;
+        }
+        return devo;
+    }
+
+    public boolean aniadirCita() {
+        boolean devo = false;
+        try {
+            String sql = "INSERT INTO cita (id_cliente, id_horario) VALUES (?, ?)";
+            PreparedStatement ps = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, idCliente);
+            ps.setInt(2, idHorario);
+            int filasAfectadas = ps.executeUpdate();
+            if (filasAfectadas > 0) {
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    id = rs.getInt(1); // Obtener el ID generado
+                    devo = true;
+                }
+                rs.close();
+            }
+            ps.close();
+        } catch (SQLException e) {
+            System.out.println("Error al añadir Cita. " + e.getMessage());
+            devo = false;
+        }
+        return devo;
+    }
+
+    public boolean actualizarCita() {
+        boolean devo = false;
+        try {
+            String sql = "UPDATE cita SET id_cliente = ?, id_horario = ? WHERE id = ?";
+            PreparedStatement ps = conexion.prepareStatement(sql);
+            ps.setInt(1, idCliente);
+            ps.setInt(2, idHorario);
+            ps.setInt(3, id);
+            int filasAfectadas = ps.executeUpdate();
+            if (filasAfectadas > 0) {
+                devo = true;
+            }
+            ps.close();
+        } catch (SQLException e) {
+            System.out.println("Error al actualizar Cita. " + e.getMessage());
+            devo = false;
+        }
+        return devo;
+    }
+
+    public boolean eliminarCita() {
+        boolean devo = false;
+        try {
+            String sql = "DELETE FROM cita WHERE id = ?";
+            PreparedStatement ps = conexion.prepareStatement(sql);
+            ps.setInt(1, id);
+            int filasAfectadas = ps.executeUpdate();
+            if (filasAfectadas > 0) {
+                devo = true;
+            }
+            ps.close();
+        } catch (SQLException e) {
+            System.out.println("Error al elminar Cita. " + e.getMessage());
+            devo = false;
+        }
+        return devo;
+    }
+
+    public static Cita buscarPorId(int id, Connection conexionBD) {
+        Cita cita = new Cita(id, conexionBD);
+        if (cita.inicializarDesdeBD()) {
+            return cita;
+        } else {
+            return null; // No se encontró la cita
+        }
+    }
+
+    public static ArrayList<Cita> buscarPorCliente(int idCliente, Connection conexionBD) {
+        ArrayList<Cita> devo = new ArrayList<>();
+        try {
+            String sql = "SELECT * FROM cita WHERE id_cliente = ?";
+            PreparedStatement ps = conexionBD.prepareStatement(sql);
+            ps.setInt(1, idCliente);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Cita cita = new Cita(rs.getInt("id"), conexionBD);
+                cita.inicializarDesdeBD(); // Inicializar la cita
+                
+                // Añadir la cita a la lista
+                devo.add(cita);
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            System.out.println("Error al buscar Cita por cliente. " + e.getMessage());
+            devo = null;
+        }
+        return devo;
+    }
+
+    public static ArrayList<Cita> buscarPorHorario(int idHorario, Connection conexionBD) {
+        ArrayList<Cita> devo = new ArrayList<>();
+        try {
+            String sql = "SELECT * FROM cita WHERE id_horario = ?";
+            PreparedStatement ps = conexionBD.prepareStatement(sql);
+            ps.setInt(1, idHorario);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Cita cita = new Cita(rs.getInt("id"), conexionBD);
+                cita.inicializarDesdeBD(); // Inicializar la cita
+                devo.add(cita); // Se encontró al menos una cita para el horario
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            System.out.println("Error al buscar Cita por horario. " + e.getMessage());
+            devo = null;
         }
         return devo;
     }
