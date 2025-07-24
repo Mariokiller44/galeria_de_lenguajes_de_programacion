@@ -132,18 +132,18 @@ public class Usuario {
     protected boolean inicializarDesdeBD() {
         boolean devo = false;
         try {
-            String sql = "SELECT * FROM USUARIO";
-            PreparedStatement rs = conexionBaseDatos.prepareStatement(sql);
-            ResultSet resultSet = rs.executeQuery();
-            if (resultSet.next()) {
-                setId(resultSet.getInt("ID"));
-                setNombre(resultSet.getString("NOMBRE"));
-                setApellidos(resultSet.getString("APELLIDOS"));
-                setEmail(resultSet.getString("EMAIL"));
-                setTelefono(resultSet.getInt("TELEFONO"));
-                setCuenta(resultSet.getString("CUENTA"));
-                setContrasenia(resultSet.getString("CONTRASENIA"));
-                tipo_de_usuario=resultSet.getString("TIPO_DE_USUARIO");
+            String sql = "SELECT * FROM usuario WHERE ID = ?";
+            PreparedStatement ps = conexionBaseDatos.prepareStatement(sql);
+            ps.setInt(1, getId());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                setNombre(rs.getString("NOMBRE"));
+                setApellidos(rs.getString("APELLIDOS"));
+                setEmail(rs.getString("EMAIL"));
+                setTelefono(rs.getInt("TELEFONO"));
+                setCuenta(rs.getString("CUENTA"));
+                setContrasenia(rs.getString("CONTRASENIA"));
+                tipo_de_usuario=rs.getString("TIPO_DE_USUARIO");
                 devo = true;
             } else {
                 System.out.println("No se encontró el usuario con ID: " + this.id);
@@ -341,7 +341,7 @@ public class Usuario {
         }
         return devo;
     }
-     public static Usuario buscarPorCuenta(String usuario, Connection con) {
+    public static Usuario buscarPorCuenta(String usuario, Connection con) {
         Usuario devo = null;
         String sql="SELECT id FROM usuario WHERE cuenta LIKE ?";
         try {

@@ -20,6 +20,7 @@ import java.util.logging.*;
 import javax.swing.*;
 import modelo.Usuario;
 import styles.GestionProductosStyle;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Clase VentanaLog (Representa el inicio de sesion) Es la ventana principal de
@@ -32,10 +33,10 @@ public class VentanaLog extends JFrame {
     /**
      * Creates new form VentanaLog
      */
-    private Connection con;
+    private static Connection con;
     private Logger logger;
     private Usuario usu;
-    private static String SAVEPATH="";
+    private static String SAVEPATH = "";
 
     public VentanaLog() {
         initComponents();
@@ -66,10 +67,9 @@ public class VentanaLog extends JFrame {
 
     @Override
     public Image getIconImage() {
-        ImageIcon icono=new ImageIcon("src/images/iconoDeAppEscritorio.png");
-        return  icono.getImage();// Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+        ImageIcon icono = new ImageIcon("src/images/iconoDeAppEscritorio.png");
+        return icono.getImage();// Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
     }
-    
 
     /**
      * Realiza una copia de seguridad de la base de datos.
@@ -98,9 +98,9 @@ public class VentanaLog extends JFrame {
                 Process proceso = Runtime.getRuntime().exec(execudecmd);
                 int resultado = proceso.waitFor();
                 if (resultado == 0) {
-                    JOptionPane.showMessageDialog(null,"Copia de seguridad creada correctamente");
+                    JOptionPane.showMessageDialog(null, "Copia de seguridad creada correctamente");
                 } else {
-                    JOptionPane.showMessageDialog(null, "Error al hacer copia de seguridad","Error",JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Error al hacer copia de seguridad", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
             } catch (IOException | InterruptedException e) {
@@ -110,7 +110,7 @@ public class VentanaLog extends JFrame {
     }
 
     private static void importarBaseDatos() {
-       
+
         try {
 
             Connection conn = ConexionBD.conectarSinLogin();
@@ -810,7 +810,8 @@ public class VentanaLog extends JFrame {
      */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
-        
+
+        con = ConexionBD.conectarSinLogin();
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -851,17 +852,17 @@ public class VentanaLog extends JFrame {
      *
      */
     private boolean iniciarSesion() {
-        boolean devo=false;
-        String passwd,contraseniaMD5,usuario,contrasenia;
+        boolean devo = false;
+        String passwd, contraseniaMD5, usuario, contrasenia;
         try {
-            usuario=textoUsuario.getText();
-            contrasenia=textoContrasenia.getPassword().toString();
-            con = ConexionBD.conectarSinLogin();
+            usuario = textoUsuario.getText();
+            char[] passwordChars = textoContrasenia.getPassword();
+            contrasenia= new String(passwordChars);
             passwd = obtenerContrasenia(usuario);
             contraseniaMD5 = calcularMD5(contrasenia);
             if (contraseniaMD5.contains(passwd)) {
-                usu=Usuario.buscarPorCuentaYContrasenia(usuario,contraseniaMD5,con);
-                if (usu==null) {
+                usu = Usuario.buscarPorCuentaYContrasenia(usuario, contraseniaMD5, con);
+                if (usu == null) {
                     JOptionPane.showMessageDialog(null, "Usuario o contraseña no validos");
                     textoContrasenia.setText("");
                     textoUsuario.setText("");
@@ -874,7 +875,7 @@ public class VentanaLog extends JFrame {
                             vc.setValor(usu.getId());
                             vc.setTipoUsu(usu.getTipo_de_usuario());
                             vc.setVisible(true);
-                            devo=true;
+                            devo = true;
                         } else {
                             throw new ClassCastException("Esta aplicación solo la puede utilizar el personal. Pruebe nuestra aplicación Android");
                         }
@@ -886,13 +887,13 @@ public class VentanaLog extends JFrame {
             }
         } catch (NullPointerException npe) {
             JOptionPane.showMessageDialog(null, "Error intentando conectar a la base de datos");
-            devo=false;
+            devo = false;
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Hubo un problema con la base de datos.");
-            devo=false;
+            devo = false;
         } catch (NoSuchAlgorithmException ex) {
             JOptionPane.showMessageDialog(null, "Falló la comprobación de contraseña");
-            devo=false;
+            devo = false;
         }
         return devo;
     }
@@ -905,7 +906,7 @@ public class VentanaLog extends JFrame {
      */
     public String calcularMD5(String texto) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("MD5");
-        byte[] hashBytes = md.digest(texto.getBytes());
+        byte[] hashBytes = md.digest(texto.getBytes(StandardCharsets.UTF_8));
 
         StringBuilder sb = new StringBuilder();
         for (byte b : hashBytes) {
@@ -927,10 +928,10 @@ public class VentanaLog extends JFrame {
      */
     private String obtenerContrasenia(String usuario) {
         String contrasenia = null;
-        Usuario usuarioEncontrado=null;
+        Usuario usuarioEncontrado = null;
         try {
-            usuarioEncontrado=Usuario.buscarPorCuenta(usuario, con);
-            contrasenia=usuarioEncontrado.getContrasenia();
+            usuarioEncontrado = Usuario.buscarPorCuenta(usuario, con);
+            contrasenia = usuarioEncontrado.getContrasenia();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Error en la conexion.");
         }
