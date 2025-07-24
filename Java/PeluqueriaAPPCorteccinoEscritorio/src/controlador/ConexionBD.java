@@ -46,7 +46,7 @@ public class ConexionBD implements Configuracion{
      */
     public static Connection getConnection(String usuario, String password) {
         try {
-            DriverManager.getConnection(URL,usuario,password);
+            conexion=DriverManager.getConnection(URL,usuario,password);
         } catch (Exception e) {
             // TODO: handle exception
             conexion= null;
