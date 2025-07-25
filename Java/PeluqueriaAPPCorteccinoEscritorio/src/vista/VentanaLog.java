@@ -34,7 +34,6 @@ public class VentanaLog extends JFrame {
      * Creates new form VentanaLog
      */
     private static Connection con;
-    private Logger logger;
     private Usuario usu;
     private static String SAVEPATH = "";
 
@@ -109,8 +108,8 @@ public class VentanaLog extends JFrame {
         }
     }
 
-    private static void importarBaseDatos() {
-
+    private static boolean importarBaseDatos() {
+        boolean devo = false;
         try {
 
             Connection conn = ConexionBD.conectarSinLogin();
@@ -153,8 +152,11 @@ public class VentanaLog extends JFrame {
             crearTriggerInsertarUsuario(stmt);
 
             JOptionPane.showMessageDialog(null, "Archivo SQL importado correctamente");
+            devo = true;
         } catch (Exception e) {
+            devo = false;
         }
+        return devo;
     }
 
     private static void crearTriggerActualizarFechaHorarios(Statement stmt) {
@@ -857,7 +859,7 @@ public class VentanaLog extends JFrame {
         try {
             usuario = textoUsuario.getText();
             char[] passwordChars = textoContrasenia.getPassword();
-            contrasenia= new String(passwordChars);
+            contrasenia = new String(passwordChars);
             passwd = obtenerContrasenia(usuario);
             contraseniaMD5 = calcularMD5(contrasenia);
             if (contraseniaMD5.contains(passwd)) {
@@ -883,13 +885,9 @@ public class VentanaLog extends JFrame {
                         JOptionPane.showMessageDialog(null, cse.getMessage());
                     }
                 }
-                con.close();
             }
         } catch (NullPointerException npe) {
             JOptionPane.showMessageDialog(null, "Error intentando conectar a la base de datos");
-            devo = false;
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Hubo un problema con la base de datos.");
             devo = false;
         } catch (NoSuchAlgorithmException ex) {
             JOptionPane.showMessageDialog(null, "Falló la comprobación de contraseña");
@@ -931,7 +929,11 @@ public class VentanaLog extends JFrame {
         Usuario usuarioEncontrado = null;
         try {
             usuarioEncontrado = Usuario.buscarPorCuenta(usuario, con);
-            contrasenia = usuarioEncontrado.getContrasenia();
+            if (usuarioEncontrado != null) {
+                contrasenia = usuarioEncontrado.getContrasenia();
+            } else {
+                JOptionPane.showMessageDialog(null, "No se ha encontrado ningun usuario con ese nombre.");
+            }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Error en la conexion.");
         }

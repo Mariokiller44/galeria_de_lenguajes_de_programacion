@@ -330,7 +330,7 @@ public class Usuario {
         try {
             PreparedStatement ps=con.prepareStatement(sql);
             ps.setString(1, usuario);
-            ps.setString(1, contrasenia);
+            ps.setString(2, contrasenia);
             ResultSet rs=ps.executeQuery();
             while (rs.next()) {
                 devo=new Usuario(rs.getInt("id"), con);
