@@ -4,7 +4,6 @@
  */
 package vista;
 
-import com.formdev.flatlaf.FlatLightLaf;
 import controlador.ConexionBD;
 import controlador.Configuracion;
 import java.awt.*;
@@ -16,10 +15,8 @@ import java.security.*;
 import java.text.*;
 import java.util.*;
 import java.util.Date;
-import java.util.logging.*;
 import javax.swing.*;
 import modelo.Usuario;
-import styles.GestionProductosStyle;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -31,12 +28,15 @@ import java.nio.charset.StandardCharsets;
 public class VentanaLog extends JFrame {
 
     /**
-     * Creates new form VentanaLog
+     * Inicialización de atributos
      */
     private static Connection con;
     private Usuario usu;
     private static String SAVEPATH = "";
 
+    /**
+     * Creates new form VentanaLog
+     */
     public VentanaLog() {
         initComponents();
         setIconImage(getIconImage());
@@ -44,10 +44,10 @@ public class VentanaLog extends JFrame {
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setTitle("Inicio de sesión");
-        jCheckBox1.addActionListener(new ActionListener() {
+        checkMostrarContrasenia.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (jCheckBox1.isSelected()) {
+                if (checkMostrarContrasenia.isSelected()) {
                     textoContrasenia.setEchoChar('\u0000');
                 } else {
                     textoContrasenia.setEchoChar('\u2022');
@@ -73,47 +73,150 @@ public class VentanaLog extends JFrame {
     /**
      * Realiza una copia de seguridad de la base de datos.
      */
-    private static void realizarCopiaDeSeguridad() {
-        // Obtener la fecha actual
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_HH-mm-ss");
-        String fechaActual = dateFormat.format(new Date());
+    private static boolean realizarCopiaDeSeguridad() {
+        boolean exito = false;
+        File configFile = null;
+        try {
+            // Verificar si la base de datos está vacía
+            if (isDatabaseEmpty()) {
+                JOptionPane.showMessageDialog(null,
+                        "No se pudo hacer copia de la base de datos. Está vacía",
+                        "Copia de seguridad",
+                        JOptionPane.WARNING_MESSAGE);
+                throw new Exception("La base de datos está vacía; no se puede crear una copia de seguridad.");
+            }
 
-        if (isDatabaseEmpty()) {
-            JOptionPane.showMessageDialog(null, "No se pudo hacer copia de la base de datos. Esta vacía", "Copia de seguridad", JOptionPane.WARNING_MESSAGE);
-        } else {
-            // Nombre del archivo de copia de seguridad
-            String nombreArchivoBackup = Configuracion.DB_NAME + "_" + fechaActual;
-            SAVEPATH = "\"" + Configuracion.DB_FOLDER + "\\" + "" + nombreArchivoBackup + ".sql\"";
-            String execudecmd = "mysqldump -u" + Configuracion.DB_USER + " -p" + Configuracion.DB_PASSWORD + " --database " + Configuracion.DB_NAME + " -r " + SAVEPATH;
+            // Crear archivo de configuración temporal
+            configFile = crearArchivoConfiguracionTemporal();
 
-            // Ruta completa del archivo de copia de seguridad
-            String rutaArchivoBackup = nombreArchivoBackup;
+            // Obtener la fecha actual
+            SimpleDateFormat formatoFecha = new SimpleDateFormat("dd-MM-yyyy_HH-mm-ss");
+            String fechaActual = formatoFecha.format(new Date());
 
-            try {
-                // Comando para realizar la copia de seguridad
-                String comando = "mysql --user=" + Configuracion.DB_USER + " --password=" + Configuracion.DB_PASSWORD + " " + Configuracion.DB_NAME + " > " + rutaArchivoBackup;
+            // Obtener ruta base del proyecto (src/bd)
+            String proyectoPath = new File("").getAbsolutePath();
+            String bdFolderPath = proyectoPath + File.separator + "src" + File.separator + "bd";
 
-                // Ejecutar el comando en el sistema operativo
-                Process proceso = Runtime.getRuntime().exec(execudecmd);
-                int resultado = proceso.waitFor();
-                if (resultado == 0) {
-                    JOptionPane.showMessageDialog(null, "Copia de seguridad creada correctamente");
-                } else {
-                    JOptionPane.showMessageDialog(null, "Error al hacer copia de seguridad", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
+            // Construir el nombre del archivo de copia
+            String nombreArchivoBackup = Configuracion.DB_NAME + "_" + fechaActual + ".sql";
+            File directorioBackup = new File(bdFolderPath);
+
+            // Crear directorio si no existe
+            if (!directorioBackup.exists()) {
+                if (!directorioBackup.mkdirs()) {
+                    JOptionPane.showMessageDialog(null,
+                            "No se pudo crear el directorio de backup: " + bdFolderPath,
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    throw new Exception("Error creando directorio de backup");
                 }
-            } catch (IOException | InterruptedException e) {
-                System.err.println("Error al crear la copia de seguridad: " + e.getMessage());
+            }
+
+            File archivoBackup = new File(directorioBackup, nombreArchivoBackup);
+            String rutaBackup = archivoBackup.getAbsolutePath();
+
+            // Detectar sistema operativo
+            String sistemaOperativo = System.getProperty("os.name").toLowerCase();
+            boolean esWindows = sistemaOperativo.contains("win");
+
+            // Construir el comando mysqldump
+            String[] comando;
+            if (esWindows) {
+                // Windows necesita rutas con comillas y barras invertidas
+                String rutaWindows = rutaBackup.replace("/", "\\");
+                comando = new String[]{
+                    "cmd.exe", "/c",
+                    "mysqldump",
+                    "--host=" + Configuracion.DB_SERVER,
+                    "--port=" + Configuracion.SERVER_PORT,
+                    "--user=" + Configuracion.DB_USER,
+                    "--password=" + Configuracion.DB_PASSWORD,
+                    "--protocol=TCP",
+                    "--databases",
+                    Configuracion.DB_NAME,
+                    "--result-file=\"" + rutaWindows + "\""
+                };
+            } else {
+                // Linux/Mac
+                comando = new String[]{
+                    "mysqldump",
+                    "--host=" + Configuracion.DB_SERVER,
+                    "--port=" + Configuracion.SERVER_PORT,
+                    "--user=" + Configuracion.DB_USER,
+                    "--password=" + Configuracion.DB_PASSWORD,
+                    "--protocol=TCP",
+                    "--databases",
+                    Configuracion.DB_NAME,
+                    "--result-file=" + rutaBackup
+                };
+            }
+
+            // Ejecutar el comando
+            Process proceso = Runtime.getRuntime().exec(comando);
+            int resultado = proceso.waitFor();
+
+            // Leer errores si los hay
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(proceso.getErrorStream()));
+            StringBuilder errores = new StringBuilder();
+            String linea;
+            while ((linea = errorReader.readLine()) != null) {
+                errores.append(linea).append("\n");
+            }
+
+            if (resultado == 0) {
+                JOptionPane.showMessageDialog(null,
+                        "Copia de seguridad creada correctamente:\n" + rutaBackup);
+                exito = true;
+            } else {
+                JOptionPane.showMessageDialog(null,
+                        "Error al hacer copia de seguridad:\n" + errores.toString(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                // Eliminar archivo vacío si hubo error
+                if (archivoBackup.exists()) {
+                    archivoBackup.delete();
+                }
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null,
+                    "Excepción al crear la copia de seguridad:\n" + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            exito = false;
+        } finally {
+            if (configFile != null && configFile.exists()) {
+                configFile.delete();
             }
         }
+        return exito;
+    }
+
+    private static File crearArchivoConfiguracionTemporal() throws IOException {
+        File configFile = File.createTempFile("mysql_config_", ".cnf");
+        configFile.deleteOnExit(); // Asegurar que se elimine al salir
+
+        try (PrintWriter writer = new PrintWriter(configFile)) {
+            writer.println("[client]");
+            writer.println("host=" + Configuracion.DB_SERVER);
+            writer.println("port=" + Configuracion.SERVER_PORT);
+            writer.println("user=" + Configuracion.DB_USER);
+            writer.println("password=" + Configuracion.DB_PASSWORD);
+        }
+
+        // Establecer permisos seguros (solo para el propietario)
+        configFile.setReadable(false, false);
+        configFile.setReadable(true, true);
+        configFile.setWritable(false, false);
+        configFile.setWritable(true, true);
+
+        return configFile;
     }
 
     private static boolean importarBaseDatos() {
         boolean devo = false;
         try {
-
-            Connection conn = ConexionBD.conectarSinLogin();
-            Statement stmt = conn.createStatement();
+            Statement stmt = con.createStatement();
             String archivoSQL = "src/bd/bd_alcorteccino.sql";
 
             try (BufferedReader br = new BufferedReader(new FileReader(archivoSQL))) {
@@ -301,7 +404,7 @@ public class VentanaLog extends JFrame {
         jLabel5 = new javax.swing.JLabel();
         textoUsuario = new javax.swing.JTextField();
         textoContrasenia = new javax.swing.JPasswordField();
-        jCheckBox1 = new javax.swing.JCheckBox();
+        checkMostrarContrasenia = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -362,9 +465,6 @@ public class VentanaLog extends JFrame {
             }
         });
         botonAceptar.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                botonAceptarKeyPressed(evt);
-            }
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 botonAceptarKeyTyped(evt);
             }
@@ -586,9 +686,9 @@ public class VentanaLog extends JFrame {
 
         panelCentral.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 202, -1, -1));
 
-        jCheckBox1.setBackground(new java.awt.Color(18, 189, 201));
-        jCheckBox1.setText("mostrarContraseña");
-        panelCentral.add(jCheckBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 300, 130, -1));
+        checkMostrarContrasenia.setBackground(new java.awt.Color(18, 189, 201));
+        checkMostrarContrasenia.setText("mostrarContraseña");
+        panelCentral.add(checkMostrarContrasenia, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 300, 130, -1));
 
         panelGeneral.add(panelCentral, java.awt.BorderLayout.CENTER);
 
@@ -616,10 +716,6 @@ public class VentanaLog extends JFrame {
             iniciarSesion();
         }
     }//GEN-LAST:event_botonAceptarActionPerformed
-
-    private void botonAceptarKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_botonAceptarKeyPressed
-
-    }//GEN-LAST:event_botonAceptarKeyPressed
 
     private void botonRegistrarseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonRegistrarseActionPerformed
         // TODO add your handling code here:
@@ -679,33 +775,33 @@ public class VentanaLog extends JFrame {
     }//GEN-LAST:event_panelGeneralKeyTyped
 
     private void botonCargarDatosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCargarDatosActionPerformed
-        try {
-            // TODO add your handling code here:
-            checkAndImportDatabase();
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-        }
+        // TODO add your handling code here:
+        checkAndImportDatabase();
     }//GEN-LAST:event_botonCargarDatosActionPerformed
-    public static void checkAndImportDatabase() throws IOException, SQLException {
-        if (isDatabaseEmpty() || isDatabaseCorrupted()) {
-            renameAndImportLatestBackup();
-            importarBaseDatos();
-        }
 
+    public static boolean checkAndImportDatabase() {
+        boolean devo = false;
+        try {
+            if (isDatabaseEmpty() || isDatabaseCorrupted()) {
+                renameAndImportLatestBackup();
+                importarBaseDatos();
+            }
+            devo = true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return devo;
     }
 
     private static boolean isDatabaseEmpty() {
         // Lógica para verificar si la base de datos está vacía
         boolean isEmpty = false;
         // Conexión a la base de datos
-        Connection connection = null;
         try {
-            connection = ConexionBD.conectarSinLogin();
+
             // Consulta SQL para contar el número de registros en una tabla
             String query = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'bd_alcorteccino';";
-            PreparedStatement statement = connection.prepareStatement(query);
+            PreparedStatement statement = con.prepareStatement(query);
 
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -716,14 +812,6 @@ public class VentanaLog extends JFrame {
             resultSet.close();
             statement.close();
         } catch (SQLException e) {
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
 
         return isEmpty;
@@ -811,12 +899,11 @@ public class VentanaLog extends JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
 
-        con = ConexionBD.conectarSinLogin();
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
+                con = ConexionBD.conectarSinLogin();
                 new VentanaLog().setVisible(true);
             }
         });
@@ -827,7 +914,7 @@ public class VentanaLog extends JFrame {
     private javax.swing.JButton botonCargarDatos;
     private javax.swing.JButton botonRegistrarse;
     private javax.swing.JButton botonSalir;
-    private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JCheckBox checkMostrarContrasenia;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -852,6 +939,11 @@ public class VentanaLog extends JFrame {
 
     /**
      *
+     * Método para iniciar sesión.
+     *
+     * @return true si se ha podido iniciar sesión. Acto seguido dependiendo del
+     * tipo de usuario, muestra o no la Ventana Principal. Devuelve falso en
+     * caso contrario.
      */
     private boolean iniciarSesion() {
         boolean devo = false;
@@ -898,13 +990,15 @@ public class VentanaLog extends JFrame {
 
     /**
      *
-     * @param texto
-     * @return
-     * @throws NoSuchAlgorithmException
+     * @param contrasenia.
+     * @return Devuelve el texto codificado a MD5 con los standards de
+     * codificación UTF-8.
+     * @throws NoSuchAlgorithmException. Excepción si no es capaz de ejecutar el
+     * algoritmo de MD5.
      */
-    public String calcularMD5(String texto) throws NoSuchAlgorithmException {
+    public String calcularMD5(String contrasenia) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("MD5");
-        byte[] hashBytes = md.digest(texto.getBytes(StandardCharsets.UTF_8));
+        byte[] hashBytes = md.digest(contrasenia.getBytes(StandardCharsets.UTF_8));
 
         StringBuilder sb = new StringBuilder();
         for (byte b : hashBytes) {
@@ -914,15 +1008,24 @@ public class VentanaLog extends JFrame {
         return sb.toString();
     }
 
-    private void irARegistro() {
-        VentanaRegistro vr = new VentanaRegistro();
-        vr.setVisible(true);
+    private boolean irARegistro() {
+        boolean devo = false;
+        try {
+            VentanaRegistro vr = new VentanaRegistro();
+            vr.setVisible(true);
+            devo = true;
+        } catch (Exception e) {
+            System.err.println("Error al iniciar la ventana del registro. " + e.getMessage());
+            devo = false;
+        }
+        return devo;
     }
 
     /**
      *
-     * @param usuario
-     * @return
+     * @param Nombre de la cuenta del Usuario
+     * @return la contraseña obtenida de la base de datos. Si no encuentra el
+     * usuario, muestra mensaje de error y devuelve valor nulo.
      */
     private String obtenerContrasenia(String usuario) {
         String contrasenia = null;
