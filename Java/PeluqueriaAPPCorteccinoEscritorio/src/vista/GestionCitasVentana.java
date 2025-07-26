@@ -62,27 +62,9 @@ public class GestionCitasVentana extends javax.swing.JFrame {
     // Variables de instancia
     private ConexionBD conexion; // Objeto de conexión a la base de datos
     private Connection con; // Conexión a la base de datos
-    private String servicio, nombre, descripcion; // Variables para almacenar información de servicio, nombre y descripción
-    private String fecha; // Variable para almacenar la fecha de la cita
     private int id; // Identificador de la cita
     private String[] columnas = {"Fecha", "Hora", "Servicio", "Precio", "Cliente"}; // Arreglo de nombres de columnas para la tabla
     private String[] columnasAdmin = {"Fecha", "Hora", "Servicio", "Precio", "Cliente", "Personal"}; // Arreglo de nombres de columnas para la tabla de administrador
-    private String hora; // Variable para almacenar la hora de la cita
-    private JComboBox comboBox; // Cuadro de lista desplegable
-    private ArrayList<String> listaDatos = new ArrayList<>(); // Lista para almacenar datos
-    private String datoServ; // Variable para almacenar un dato de servicio
-    private String servicioEscogido; // Variable para almacenar el servicio escogido
-    private String serviciocompleto; // Variable para almacenar el servicio completo
-    private String descripcionServicio; // Variable para almacenar la descripción del servicio
-    private String precioServicio; // Variable para almacenar el precio del servicio
-    private int idServ; // Identificador del servicio
-    private int idHorario; // Identificador del horario
-    private String servicioCitado; // Variable para almacenar el servicio citado
-    private String nuevoServicioCitado; // Variable para almacenar el nuevo servicio citado
-    private JComboBox<String> comboBoxDatos; // Cuadro de lista desplegable para datos
-    private static ArrayList<Horario> horarios = new ArrayList<>(); // Lista estática de objetos Horario
-    private static ArrayList<Usuario> clientes = new ArrayList<>(); // Lista estática de objetos Usuario
-    private JComboBox<String> comboBoxEmpleado; // Cuadro de lista desplegable para empleados
     private ConsultasPersonal consultas = new ConsultasPersonal(); // Objeto para realizar consultas relacionadas con el personal
     private VentanaPrincipal vc; // Objeto de la clase VentanaPrincipal
     private String tipoUsu; // Variable para almacenar el tipo de usuario
@@ -97,6 +79,13 @@ public class GestionCitasVentana extends javax.swing.JFrame {
     private String clienteH;
     private String personalH;
     private String precio;
+    private Cita citaElegida;
+    private Personal empleadoEscogido;
+    private Horario horarioEscogido,horarioNuevo;
+    private ArrayList<Cita> listadoCitas;
+    private ArrayList<Personal> listaEmpleados;
+    private ArrayList<Horario> listaHorario;
+    
 
     /**
      * Método para obtener el valor de la variable idS.
@@ -166,6 +155,17 @@ public class GestionCitasVentana extends javax.swing.JFrame {
         setTitle("Gestionar citas");
     }
 
+    public GestionCitasVentana(Personal personal,Connection conexionBaseData) {
+        try {
+            con = conexionBaseData;
+        } catch (Exception e) {
+            System.err.println("Error al iniciar la ventana de gestión de Citas: "+e.getMessage());
+        }
+    }
+
+    
+    
+    
     /**
      * Método para obtener la imagen del icono de la aplicación.
      */

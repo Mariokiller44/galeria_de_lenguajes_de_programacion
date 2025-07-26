@@ -4,48 +4,14 @@
  */
 package vista;
 
-import com.github.lgooddatepicker.components.DatePicker;
 import controlador.ConsultasPersonal;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.HeadlessException;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionAdapter;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.*;
+import java.awt.event.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Calendar;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.Timer;
-import javax.swing.UIManager;
 import java.sql.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.DefaultCellEditor;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellEditor;
+import javax.swing.*;
+import javax.swing.table.*;
+import modelo.Personal;
 import modelo.Usuario;
 
 /**
@@ -53,7 +19,7 @@ import modelo.Usuario;
  *
  * @author Mario
  */
-public class VentanaPrincipal extends javax.swing.JFrame {
+public class VentanaPrincipal extends JFrame {
 
     private int posicionActual, id; // Variables para controlar la posición y el ID
     private int posicionFinal; // Variable para la posición final
@@ -63,7 +29,9 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private Usuario usu; // Objeto para representar al usuario
     private String tipoUsu; // Tipo de usuario
     private VentanaLog ventanaLog; // Referencia a la ventana de inicio de sesión
-    private JTable tablaDatosUsuario; 
+    private JTable tablaDatosUsuario;
+    private Connection conexion;
+    private Personal empleado;
 
     /**
      * Obtiene el ID.
@@ -145,6 +113,33 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         });
     }
 
+    public VentanaPrincipal(Usuario usuario, Connection con) {
+        initComponents(); // Inicializar componentes de la ventana
+        setIconImage(getIconImage()); // Establecer la imagen del ícono de la ventana
+        setTitle("Ventana Principal");
+        panelOpciones.setVisible(true); // Mostrar el panel de opciones
+
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE); // Configurar el comportamiento al cerrar la ventana
+        setLocationRelativeTo(null); // Mostrar la ventana en el centro de la pantalla
+        setResizable(false); // Deshabilitar la capacidad de redimensionar la ventana
+        ventanaLog = new VentanaLog(); // Crear una instancia de la ventana de inicio de sesión
+        usu = usuario;
+        conexion = con;
+        inicializarDatos();
+        // Agregar un WindowListener para controlar el cierre de la ventana
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                // Abre la otra ventana en lugar de cerrar el programa
+                int decision = JOptionPane.showConfirmDialog(null, "¿Seguro que quieres salir?", "Cerrar Sesión", JOptionPane.YES_NO_OPTION);
+                if (decision == JOptionPane.YES_OPTION) {
+                    dispose(); // Cerrar la ventana actual
+                    ventanaLog.setVisible(true); // Mostrar la ventana de inicio de sesión
+                }
+            }
+        });
+    }
+
     /**
      * Sobrescribe el método getIconImage para obtener la imagen del ícono de la
      * aplicación.
@@ -192,9 +187,9 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         menuConsultas = new javax.swing.JLabel();
         cerrarSesion = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
-        jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
-        jMenu2 = new javax.swing.JMenu();
+        barraNav = new javax.swing.JMenuBar();
+        menuDatosPersonales = new javax.swing.JMenu();
+        menuCitas = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -355,93 +350,66 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 
         getContentPane().add(panelBienvenida, java.awt.BorderLayout.CENTER);
 
-        jMenuBar1.setBackground(new java.awt.Color(71, 40, 184));
-        jMenuBar1.setName(""); // NOI18N
-        jMenuBar1.setOpaque(false);
-        jMenuBar1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                jMenuBar1MouseReleased(evt);
-            }
-        });
+        barraNav.setBackground(new java.awt.Color(71, 40, 184));
+        barraNav.setName(""); // NOI18N
+        barraNav.setOpaque(false);
 
-        jMenu1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/home.png"))); // NOI18N
-        jMenu1.setName(""); // NOI18N
-        jMenu1.setToolTipText("Home");
-        jMenu1.addMenuListener(new javax.swing.event.MenuListener() {
-            public void menuCanceled(javax.swing.event.MenuEvent evt) {
-            }
-            public void menuDeselected(javax.swing.event.MenuEvent evt) {
-                jMenu1MenuDeselected(evt);
-            }
-            public void menuSelected(javax.swing.event.MenuEvent evt) {
-            }
-        });
-        jMenu1.addMouseListener(new java.awt.event.MouseAdapter() {
+        menuDatosPersonales.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/home.png"))); // NOI18N
+        menuDatosPersonales.setName(""); // NOI18N
+        menuDatosPersonales.setToolTipText("Home");
+        menuDatosPersonales.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jMenu1MouseClicked(evt);
+                menuDatosPersonalesMouseClicked(evt);
             }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                jMenu1MouseEntered(evt);
+                menuDatosPersonalesMouseEntered(evt);
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                jMenu1MouseExited(evt);
+                menuDatosPersonalesMouseExited(evt);
             }
         });
-        jMenu1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenu1ActionPerformed(evt);
-            }
-        });
-        jMenuBar1.add(jMenu1);
+        barraNav.add(menuDatosPersonales);
 
-        jMenu2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/cita.png"))); // NOI18N
-        jMenu2.setToolTipText("Citas");
-        jMenu2.addMouseListener(new java.awt.event.MouseAdapter() {
+        menuCitas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/cita.png"))); // NOI18N
+        menuCitas.setToolTipText("Citas");
+        menuCitas.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jMenu2MouseClicked(evt);
+                menuCitasMouseClicked(evt);
             }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                jMenu2MouseEntered(evt);
+                menuCitasMouseEntered(evt);
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                jMenu2MouseExited(evt);
+                menuCitasMouseExited(evt);
             }
         });
-        jMenu2.addActionListener(new java.awt.event.ActionListener() {
+        menuCitas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenu2ActionPerformed(evt);
+                menuCitasActionPerformed(evt);
             }
         });
-        jMenuBar1.add(jMenu2);
+        barraNav.add(menuCitas);
 
-        setJMenuBar(jMenuBar1);
+        setJMenuBar(barraNav);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jMenu1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu1MouseEntered
-        jMenu1.setSelected(false);
-    }//GEN-LAST:event_jMenu1MouseEntered
+    private void menuDatosPersonalesMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuDatosPersonalesMouseEntered
+        menuDatosPersonales.setSelected(false);
+    }//GEN-LAST:event_menuDatosPersonalesMouseEntered
 
-    private void jMenuBar1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenuBar1MouseReleased
-
-    }//GEN-LAST:event_jMenuBar1MouseReleased
-
-    private void jMenu1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu1ActionPerformed
-
-    }//GEN-LAST:event_jMenu1ActionPerformed
-
-    private void jMenu1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu1MouseClicked
-        jMenu1.setSelected(false); // Desactiva la selección del menú jMenu1
+    private void menuDatosPersonalesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuDatosPersonalesMouseClicked
+        menuDatosPersonales.setSelected(false); // Desactiva la selección del menú jMenu1
         // Verifica si el número de clics del evento es menor o igual a 1
         if (evt.getClickCount() <= 1) {
             menuConsultas.setText("-> Consultar mis datos"); // Establece el texto del elemento de menú "menuConsultas" como "-> Consultar mis datos"
             cerrarSesion.setText("-> Cerrar sesión"); // Establece el texto del elemento de menú "cerrarSesion" como "-> Cerrar sesión"
         }
-    }//GEN-LAST:event_jMenu1MouseClicked
+    }//GEN-LAST:event_menuDatosPersonalesMouseClicked
 
-    private void jMenu2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu2MouseClicked
-        jMenu2.setSelected(false); // Desactiva la selección del menú jMenu2
+    private void menuCitasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuCitasMouseClicked
+        menuCitas.setSelected(false); // Desactiva la selección del menú jMenu2
         // Verifica si el texto del elemento de menú "menuConsultas" contiene la cadena "Consultar citas"
         // y si el texto del elemento de menú "cerrarSesion" no contiene la cadena "-> Cerrar sesión"
         if (menuConsultas.getText().contains("Consultar citas") && !cerrarSesion.getText().contains("-> Cerrar sesión")) {
@@ -452,27 +420,23 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         }
         mostrarPanelOculto(); // Llama al método mostrarPanelOculto() para mostrar un panel oculto
 
-    }//GEN-LAST:event_jMenu2MouseClicked
+    }//GEN-LAST:event_menuCitasMouseClicked
 
-    private void jMenu1MenuDeselected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_jMenu1MenuDeselected
+    private void menuDatosPersonalesMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuDatosPersonalesMouseExited
+        menuDatosPersonales.setSelected(false);// Desactiva la selección del menú jMenu1
+    }//GEN-LAST:event_menuDatosPersonalesMouseExited
 
-    }//GEN-LAST:event_jMenu1MenuDeselected
+    private void menuCitasMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuCitasMouseEntered
+        menuCitas.setSelected(false);// Desactiva la selección del menú jMenu2
+    }//GEN-LAST:event_menuCitasMouseEntered
 
-    private void jMenu1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu1MouseExited
-        jMenu1.setSelected(false);// Desactiva la selección del menú jMenu1
-    }//GEN-LAST:event_jMenu1MouseExited
+    private void menuCitasMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuCitasMouseExited
+        menuCitas.setSelected(false);// Desactiva la selección del menú jMenu2
+    }//GEN-LAST:event_menuCitasMouseExited
 
-    private void jMenu2MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu2MouseEntered
-        jMenu2.setSelected(false);// Desactiva la selección del menú jMenu2
-    }//GEN-LAST:event_jMenu2MouseEntered
+    private void menuCitasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuCitasActionPerformed
 
-    private void jMenu2MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu2MouseExited
-        jMenu2.setSelected(false);// Desactiva la selección del menú jMenu2
-    }//GEN-LAST:event_jMenu2MouseExited
-
-    private void jMenu2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu2ActionPerformed
-
-    }//GEN-LAST:event_jMenu2ActionPerformed
+    }//GEN-LAST:event_menuCitasActionPerformed
 
     private void panelOpcionesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_panelOpcionesMouseClicked
 
@@ -705,6 +669,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuBar barraNav;
     private com.github.lgooddatepicker.components.CalendarPanel calendarPanel1;
     private javax.swing.JLabel cerrarSesion;
     private javax.swing.JLabel jLabel1;
@@ -712,9 +677,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -722,7 +684,9 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JSeparator jSeparator5;
     private javax.swing.JSeparator jSeparator6;
+    private javax.swing.JMenu menuCitas;
     private javax.swing.JLabel menuConsultas;
+    private javax.swing.JMenu menuDatosPersonales;
     private javax.swing.JPanel panelBienvenida;
     private javax.swing.JPanel panelOpciones;
     // End of variables declaration//GEN-END:variables
@@ -730,14 +694,39 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     /**
      * Muestra el panel oculto.
      */
-    private void mostrarPanelOculto() {
-        panelOpciones.setVisible(true); // Establece la visibilidad del panelOpciones como true para mostrarlo
+    private boolean mostrarPanelOculto() {
+        boolean devo = false;
+        try {
+            panelOpciones.setVisible(true); // Establece la visibilidad del panelOpciones como true para mostrarlo
+            devo = true;
+        } catch (Exception e) {
+            devo = false;
+        }
+        return devo;
     }
 
     /**
      * Vacia el panel de opciones.
      */
-    private void vaciarPanelOpciones() {
-        menuConsultas.setText("                    "); // Establece el texto del elemento de menú "menuConsultas" como una cadena vacía con espacios en blanco para vaciarlo visualmente
+    private boolean vaciarPanelOpciones() {
+        boolean devo = false;
+        try {
+            menuConsultas.setText("                    "); // Establece el texto del elemento de menú "menuConsultas" como una cadena vacía con espacios en blanco para vaciarlo visualmente
+            devo = true;
+        } catch (Exception e) {
+            devo = false;
+        }
+        return devo;
+    }
+
+    private boolean inicializarDatos() {
+        boolean devo = false;
+        try {
+            empleado = Personal.obtenerPersonalPorId(usu.getId(), conexion);
+        } catch (Exception e) {
+            System.err.println("Error al inicializar datos: " + e.getMessage());
+            devo = false;
+        }
+        return devo;
     }
 }

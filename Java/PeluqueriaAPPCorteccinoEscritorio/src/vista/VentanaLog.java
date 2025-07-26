@@ -526,6 +526,7 @@ public class VentanaLog extends JFrame {
     private javax.swing.JLabel titulo;
     // End of variables declaration//GEN-END:variables
 
+    //<editor-fold defaultstate="collapsed" desc="Métodos para gestionar el inicio o el registro del usuario">
     /**
      *
      * Método para iniciar sesión.
@@ -576,7 +577,7 @@ public class VentanaLog extends JFrame {
         }
         return devo;
     }
-
+    
     /**
      *
      * @param contrasenia.
@@ -588,15 +589,15 @@ public class VentanaLog extends JFrame {
     public String calcularMD5(String contrasenia) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("MD5");
         byte[] hashBytes = md.digest(contrasenia.getBytes(StandardCharsets.UTF_8));
-
+        
         StringBuilder sb = new StringBuilder();
         for (byte b : hashBytes) {
             sb.append(String.format("%02x", b));
         }
-
+        
         return sb.toString();
     }
-
+    
     private boolean irARegistro() {
         boolean devo = false;
         try {
@@ -609,7 +610,7 @@ public class VentanaLog extends JFrame {
         }
         return devo;
     }
-
+    
     /**
      *
      * @param Nombre de la cuenta del Usuario
@@ -631,4 +632,6 @@ public class VentanaLog extends JFrame {
         }
         return contrasenia;
     }
+//</editor-fold>
+    
 }
