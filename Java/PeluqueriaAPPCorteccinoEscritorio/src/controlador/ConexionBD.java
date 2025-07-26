@@ -10,7 +10,7 @@ import java.sql.*;
  * @author Mario
  * @version 1.0.1
  */
-public class ConexionBD implements Configuracion{
+public class ConexionBD implements Configurable{
     /*
      * Atributos de la clase ConexionBD:
      */
@@ -32,7 +32,7 @@ public class ConexionBD implements Configuracion{
     public static boolean conectar(String usu, String pass) {
         usuario = usu;
         password = pass;
-        URL=Configuracion.URL; // Establecemos la URL de la base de datos a la predeterminada en la interfaz Configuracion.
+        URL=Configurable.URL; // Establecemos la URL de la base de datos a la predeterminada en la interfaz Configuracion.
         try {
             conexion=getConnection(usuario, password);
             return true;

@@ -9,7 +9,7 @@ package controlador;
  * Interfaz para la conexion con la base de datos
  * @author Mario
  */
-public interface Configuracion {
+public interface Configurable {
     String DB_NAME="bd_alcorteccino";
     String DB_USER="admin";
     String DB_PASSWORD="123pelu";
