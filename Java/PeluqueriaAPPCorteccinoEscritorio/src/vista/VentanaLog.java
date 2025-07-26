@@ -4,40 +4,21 @@
  */
 package vista;
 
-import com.formdev.flatlaf.FlatLightLaf;
+import controlador.BDManager;
 import controlador.ConexionBD;
-import java.awt.Color;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
 import java.sql.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.Action;
-import javax.swing.JOptionPane;
-import javax.swing.ImageIcon;
+import java.awt.event.*;
+import java.io.*;
+import java.nio.file.*;
+import java.security.*;
+import java.text.*;
+import java.util.*;
 import java.util.Date;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import styles.GestionProductosStyle;
+import javax.swing.*;
+import modelo.Usuario;
+import java.nio.charset.StandardCharsets;
+import controlador.Configurable;
 
 /**
  * Clase VentanaLog (Representa el inicio de sesion) Es la ventana principal de
@@ -45,34 +26,18 @@ import styles.GestionProductosStyle;
  *
  * @author Mario
  */
-public class VentanaLog extends javax.swing.JFrame {
+public class VentanaLog extends JFrame {
 
-    private static String DATABASE_NAME = "bd_alcorteccino";
-    private static String folderpath = "src\\bd";
-    private static String DATABASE_PASSWORD = "123pelu";
-    private static String DATABASE_USERNAME = "admin";
-    private static String BACKUP_FOLDER;
-    private static String savepath = "";
-    private static String DATABASE_FOLDER = "src\\bd";
-    private static String DATABASE_PREFIX = "bd_alcorteccino";
+    /**
+     * Inicialización de atributos
+     */
+    private static Connection con;
+    private Usuario usu;
+    private static String SAVEPATH = "";
 
     /**
      * Creates new form VentanaLog
      */
-    private ConexionBD conexion;
-    private Connection con;
-    private Logger logger;
-    private String tipoUsu;
-    private int id;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public VentanaLog() {
         initComponents();
         setIconImage(getIconImage());
@@ -80,10 +45,10 @@ public class VentanaLog extends javax.swing.JFrame {
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setTitle("Inicio de sesión");
-        jCheckBox1.addActionListener(new ActionListener() {
+        checkMostrarContrasenia.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (jCheckBox1.isSelected()) {
+                if (checkMostrarContrasenia.isSelected()) {
                     textoContrasenia.setEchoChar('\u0000');
                 } else {
                     textoContrasenia.setEchoChar('\u2022');
@@ -93,7 +58,7 @@ public class VentanaLog extends javax.swing.JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                realizarCopiaDeSeguridad();
+                BDManager.realizarCopiaDeSeguridad();
             }
 
         });
@@ -102,206 +67,11 @@ public class VentanaLog extends javax.swing.JFrame {
 
     @Override
     public Image getIconImage() {
-        ImageIcon icono=new ImageIcon("src/images/iconoDeAppEscritorio.png");
-        return  icono.getImage();// Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
-    }
-    
-
-    /**
-     * Realiza una copia de seguridad de la base de datos.
-     */
-    private static void realizarCopiaDeSeguridad() {
-        // Obtener la fecha actual
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_HH-mm-ss");
-        String fechaActual = dateFormat.format(new Date());
-
-        if (isDatabaseEmpty()) {
-            JOptionPane.showMessageDialog(null, "No se pudo hacer copia de la base de datos. Esta vacía", "Copia de seguridad", JOptionPane.WARNING_MESSAGE);
-        } else {
-            // Nombre del archivo de copia de seguridad
-            String nombreArchivoBackup = DATABASE_NAME + "_" + fechaActual;
-            savepath = "\"" + folderpath + "\\" + "" + nombreArchivoBackup + ".sql\"";
-            String execudecmd = "mysqldump -u" + DATABASE_USERNAME + " -p" + DATABASE_PASSWORD + " --database " + DATABASE_NAME + " -r " + savepath;
-
-            // Ruta completa del archivo de copia de seguridad
-            String rutaArchivoBackup = nombreArchivoBackup;
-
-            try {
-                // Comando para realizar la copia de seguridad
-                String comando = "mysql --user=" + DATABASE_USERNAME + " --password=" + DATABASE_PASSWORD + " " + DATABASE_NAME + " > " + rutaArchivoBackup;
-
-                // Ejecutar el comando en el sistema operativo
-                Process proceso = Runtime.getRuntime().exec(execudecmd);
-                int resultado = proceso.waitFor();
-                if (resultado == 0) {
-                    JOptionPane.showMessageDialog(null,"Copia de seguridad creada correctamente");
-                } else {
-                    JOptionPane.showMessageDialog(null, "Error al hacer copia de seguridad","Error",JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-            } catch (IOException | InterruptedException e) {
-                System.err.println("Error al crear la copia de seguridad: " + e.getMessage());
-            }
-        }
+        ImageIcon icono = new ImageIcon("src/images/iconoDeAppEscritorio.png");
+        return icono.getImage();// Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
     }
 
-    private static void importarBaseDatos() {
-        String url = "jdbc:mysql://localhost:3306/bd_alcorteccino";
-        String usuario = "admin";
-        String contraseña = "123pelu";
-
-        try (Connection conn = DriverManager.getConnection(url, usuario, contraseña); Statement stmt = conn.createStatement()) {
-
-            String archivoSQL = "src/bd/bd_alcorteccino.sql";
-
-            try (BufferedReader br = new BufferedReader(new FileReader(archivoSQL))) {
-                StringBuilder sentencia = new StringBuilder();
-                String linea;
-                while ((linea = br.readLine()) != null) {
-                    linea = linea.trim();
-                    if (!linea.startsWith("--") && !linea.isEmpty()) {
-                        if (linea.endsWith(";")) {
-                            sentencia.append(linea, 0, linea.length() - 1);
-                            String sqlStatement = sentencia.toString();
-
-                            if (sqlStatement.startsWith("DELIMITER")) {
-                                sentencia.setLength(0);
-                                continue;
-                            }
-
-                            try {
-                                stmt.executeUpdate(sqlStatement);
-                            } catch (SQLException e) {
-                            }
-
-                            sentencia.setLength(0);
-                        } else {
-                            sentencia.append(linea);
-                        }
-                    }
-                }
-            }
-
-            // Crear los triggers que presentaron errores
-            crearTriggerActualizarFechaHorarios(stmt);
-            crearTriggerControlFechaInsert(stmt);
-            crearTriggerMantenerHorariosSemana(stmt);
-            crearTriggerCodificarMD5(stmt);
-            crearTriggerInsertarUsuario(stmt);
-
-            JOptionPane.showMessageDialog(null, "Archivo SQL importado correctamente");
-        } catch (Exception e) {
-        }
-    }
-
-    private static void crearTriggerActualizarFechaHorarios(Statement stmt) {
-        String triggerSQL = "DELIMITER //\n"
-                + "CREATE TRIGGER control_fecha_insert BEFORE INSERT ON horario\n"
-                + "FOR EACH ROW\n"
-                + "BEGIN\n"
-                + "IF NEW.fecha < CURDATE() THEN\n"
-                + "SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No se puede insertar un horario con fecha anterior a hoy';\n"
-                + "END IF;\n"
-                + "END //\n"
-                + "DELIMITER ;";
-        try {
-            stmt.executeUpdate(triggerSQL);
-        } catch (SQLException e) {
-        }
-    }
-
-    private static void crearTriggerControlFechaInsert(Statement stmt) {
-        String triggerSQL = "DELIMITER //\n"
-                + "CREATE TRIGGER control_fecha_insert BEFORE INSERT ON horario\n"
-                + "FOR EACH ROW\n"
-                + "BEGIN\n"
-                + "IF NEW.fecha < CURDATE() THEN\n"
-                + "SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No se puede insertar un horario con fecha anterior a hoy';\n"
-                + "END IF;\n"
-                + "END //\n"
-                + "DELIMITER ;";
-        try {
-            stmt.executeUpdate(triggerSQL);
-        } catch (SQLException e) {
-
-        }
-    }
-
-    private static void crearTriggerMantenerHorariosSemana(Statement stmt) {
-        String triggerSQL = "DELIMITER //"
-                + "CREATE TRIGGER mantener_horarios_semana BEFORE INSERT ON horario "
-                + "FOR EACH ROW "
-                + "BEGIN "
-                + "DECLARE fecha_inicio_semana_actual DATE; "
-                + "DECLARE fecha_fin_semana_actual DATE; "
-                + "DECLARE dia_semana_actual INT; "
-                + "DECLARE hora_asignada TIME; "
-                + "SET @fecha_actual = CURDATE(); "
-                + "SET @fecha_inicio_semana_actual = @fecha_actual - INTERVAL WEEKDAY(@fecha_actual) DAY; "
-                + "SET @fecha_fin_semana_actual = @fecha_inicio_semana_actual + INTERVAL 6 DAY; "
-                + "SET @dia_semana_actual = WEEKDAY(NEW.fecha) + 1; "
-                + "SELECT hora INTO hora_asignada FROM horarios_asignados "
-                + "WHERE id_personal = NEW.id_personal "
-                + "AND fecha_inicio_semana = @fecha_inicio_semana_actual "
-                + "AND fecha_fin_semana = @fecha_fin_semana_actual "
-                + "AND dia_semana = @dia_semana_actual; "
-                + "IF hora_asignada IS NOT NULL THEN "
-                + "SET NEW.hora = hora_asignada; "
-                + "END IF; "
-                + "END; //"
-                + "DELIMITER ;";
-        try {
-            stmt.executeUpdate(triggerSQL);
-        } catch (SQLException e) {
-
-        }
-    }
-
-    private static void crearTriggerCodificarMD5(Statement stmt) {
-        String triggerSQL = "CREATE TRIGGER codificar_md5 BEFORE INSERT ON usuario "
-                + "FOR EACH ROW "
-                + "BEGIN "
-                + "SET NEW.contrasenia = MD5(NEW.contrasenia); "
-                + "END";
-        try {
-            stmt.executeUpdate(triggerSQL);
-        } catch (SQLException e) {
-            ;
-        }
-    }
-
-    private static void crearTriggerInsertarUsuario(Statement stmt) {
-        String triggerSQL = "DELIMITER //\n"
-                + "CREATE TRIGGER insertar_usuario AFTER INSERT ON usuario\n"
-                + "FOR EACH ROW\n"
-                + "BEGIN\n"
-                + "IF NEW.tipo_de_usuario = 'Cliente' THEN\n"
-                + "INSERT INTO cliente (id) VALUES (NEW.id);\n"
-                + "ELSEIF NEW.tipo_de_usuario = 'Personal' THEN\n"
-                + "INSERT INTO personal (id) VALUES (NEW.id);\n"
-                + "END IF;\n"
-                + "END //\n"
-                + "DELIMITER ;";
-        try {
-            stmt.executeUpdate(triggerSQL);
-        } catch (SQLException e) {
-
-        }
-    }
-
-    private static String obtenerNombreTabla(String createTableStatement) {
-        // Extraer el nombre de la tabla de la sentencia CREATE TABLE
-        int startIndex = createTableStatement.indexOf("`") + 1;
-        int endIndex = createTableStatement.indexOf("`", startIndex);
-        return createTableStatement.substring(startIndex, endIndex);
-    }
-
-    private static boolean existeTabla(Connection conn, String tableName) throws SQLException {
-        // Verificar si una tabla existe en la base de datos
-        DatabaseMetaData metaData = conn.getMetaData();
-        ResultSet resultSet = metaData.getTables(null, null, tableName, null);
-        return resultSet.next();
-    }
+   
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -336,7 +106,7 @@ public class VentanaLog extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         textoUsuario = new javax.swing.JTextField();
         textoContrasenia = new javax.swing.JPasswordField();
-        jCheckBox1 = new javax.swing.JCheckBox();
+        checkMostrarContrasenia = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -397,9 +167,6 @@ public class VentanaLog extends javax.swing.JFrame {
             }
         });
         botonAceptar.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                botonAceptarKeyPressed(evt);
-            }
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 botonAceptarKeyTyped(evt);
             }
@@ -621,9 +388,9 @@ public class VentanaLog extends javax.swing.JFrame {
 
         panelCentral.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 202, -1, -1));
 
-        jCheckBox1.setBackground(new java.awt.Color(18, 189, 201));
-        jCheckBox1.setText("mostrarContraseña");
-        panelCentral.add(jCheckBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 300, 130, -1));
+        checkMostrarContrasenia.setBackground(new java.awt.Color(18, 189, 201));
+        checkMostrarContrasenia.setText("mostrarContraseña");
+        panelCentral.add(checkMostrarContrasenia, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 300, 130, -1));
 
         panelGeneral.add(panelCentral, java.awt.BorderLayout.CENTER);
 
@@ -643,7 +410,6 @@ public class VentanaLog extends javax.swing.JFrame {
 
     private void botonAceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonAceptarActionPerformed
         // TODO add your handling code here:
-
         if (textoUsuario.getText().isEmpty() || textoUsuario.getText().contains("Introduce usuario")) {
             JOptionPane.showMessageDialog(null, "Usuario incompleto");
         } else if (textoContrasenia.getText().isEmpty()) {
@@ -652,10 +418,6 @@ public class VentanaLog extends javax.swing.JFrame {
             iniciarSesion();
         }
     }//GEN-LAST:event_botonAceptarActionPerformed
-
-    private void botonAceptarKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_botonAceptarKeyPressed
-
-    }//GEN-LAST:event_botonAceptarKeyPressed
 
     private void botonRegistrarseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonRegistrarseActionPerformed
         // TODO add your handling code here:
@@ -680,7 +442,7 @@ public class VentanaLog extends javax.swing.JFrame {
 
     private void botonSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonSalirActionPerformed
         // TODO add your handling code here:
-        realizarCopiaDeSeguridad();
+        BDManager.realizarCopiaDeSeguridad();
         System.exit(0);
     }//GEN-LAST:event_botonSalirActionPerformed
 
@@ -715,145 +477,22 @@ public class VentanaLog extends javax.swing.JFrame {
     }//GEN-LAST:event_panelGeneralKeyTyped
 
     private void botonCargarDatosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCargarDatosActionPerformed
-        try {
-            // TODO add your handling code here:
-            checkAndImportDatabase();
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-        }
+        // TODO add your handling code here:
+        BDManager.importarBD();
     }//GEN-LAST:event_botonCargarDatosActionPerformed
-    public static void checkAndImportDatabase() throws IOException, SQLException {
-        if (isDatabaseEmpty() || isDatabaseCorrupted()) {
-            renameAndImportLatestBackup();
-            importarBaseDatos();
-        }
-
-    }
-
-    private static boolean isDatabaseEmpty() {
-        // Lógica para verificar si la base de datos está vacía
-        boolean isEmpty = false;
-
-        // Conexión a la base de datos
-        Connection connection = null;
-        try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bd_alcorteccino", "admin", "123pelu");
-
-            // Consulta SQL para contar el número de registros en una tabla
-            String query = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'bd_alcorteccino';";
-            PreparedStatement statement = connection.prepareStatement(query);
-
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                int count = resultSet.getInt(1);
-                isEmpty = (count == 0);
-            }
-
-            resultSet.close();
-            statement.close();
-        } catch (SQLException e) {
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return isEmpty;
-    }
-
-    private static boolean isDatabaseCorrupted() {
-        // Lógica para verificar si la base de datos está corrupta
-        boolean isCorrupted = false;
-
-        // Conexión a la base de datos
-        Connection connection = null;
-        try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bd_alcorteccino", "admin", "123pelu");
-
-            // Consulta SQL para realizar una operación que identifique la corrupción
-            // Puedes realizar una consulta específica según tu SGBD
-            // Ejemplo: Verificar la existencia de una tabla particular
-            String query = "SELECT 1";
-            PreparedStatement statement = connection.prepareStatement(query);
-
-            ResultSet resultSet = statement.executeQuery();
-            isCorrupted = !resultSet.next(); // Si no hay resultados, se considera que la base de datos está corrupta
-
-            resultSet.close();
-            statement.close();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Base de datos corrupta o no existente", "Error", JOptionPane.ERROR_MESSAGE);
-            isCorrupted = true; // Se considera que la base de datos está corrupta si hay una excepción SQL
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return isCorrupted;
-        // Devuelve true si está corrupta, false en caso contrario
-
-    }
-
-    private static void renameAndImportLatestBackup() {
-        File folder = new File(DATABASE_FOLDER);
-        FilenameFilter filter = (dir, name) -> name.startsWith(DATABASE_PREFIX);
-
-        File[] backupFiles = folder.listFiles(filter);
-        if (backupFiles == null || backupFiles.length == 0) {
-            System.out.println("No se encontraron archivos de respaldo de la base de datos.");
-            return;
-        }
-
-        Arrays.sort(backupFiles, Comparator.comparing(File::lastModified).reversed());
-
-        File latestBackup = backupFiles[0];
-        String newFileName = getNewFileName(latestBackup.getName());
-
-        String sobreescribirArchivo = "bd_alcorteccino.sql";
-        File nuevoArchivo = new File(sobreescribirArchivo);
-        Path sourcePath = latestBackup.toPath();
-        Path targetPath = new File(DATABASE_FOLDER + File.separator + nuevoArchivo).toPath();
-
-        try {
-            Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("Archivo renombrado y movido con éxito.");
-
-            // Lógica para importar el archivo a la base de datos
-        } catch (IOException e) {
-            System.out.println("Error al renombrar y mover el archivo: " + e.getMessage());
-        }
-    }
-
-    private static String getNewFileName(String oldFileName) {
-        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_HH-mm-ss");
-        Date currentDate = new Date();
-
-        String formattedDate = dateFormat.format(currentDate);
-        String newFileName = oldFileName.split("\\.")[0] + "_" + formattedDate + ".sql";
-
-        return newFileName;
-    }
+    
+    
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        
+
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
+                con = ConexionBD.conectarSinLogin();
+                new BDManager().conectarBD(con);
                 new VentanaLog().setVisible(true);
             }
         });
@@ -864,7 +503,7 @@ public class VentanaLog extends javax.swing.JFrame {
     private javax.swing.JButton botonCargarDatos;
     private javax.swing.JButton botonRegistrarse;
     private javax.swing.JButton botonSalir;
-    private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JCheckBox checkMostrarContrasenia;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -889,36 +528,37 @@ public class VentanaLog extends javax.swing.JFrame {
 
     /**
      *
+     * Método para iniciar sesión.
+     *
+     * @return true si se ha podido iniciar sesión. Acto seguido dependiendo del
+     * tipo de usuario, muestra o no la Ventana Principal. Devuelve falso en
+     * caso contrario.
      */
-    private void iniciarSesion() {
+    private boolean iniciarSesion() {
+        boolean devo = false;
+        String passwd, contraseniaMD5, usuario, contrasenia;
         try {
-            String usuario = textoUsuario.getText().toString();
-            String contrasenia = textoContrasenia.getText();
-            conexion = new ConexionBD(usuario, contrasenia);
-            con = conexion.getConnection();
-            String passwd = obtenerContrasenia(usuario);
-            String contraseniaMD5 = calcularMD5(contrasenia);
+            usuario = textoUsuario.getText();
+            char[] passwordChars = textoContrasenia.getPassword();
+            contrasenia = new String(passwordChars);
+            passwd = obtenerContrasenia(usuario);
+            contraseniaMD5 = calcularMD5(contrasenia);
             if (contraseniaMD5.contains(passwd)) {
-                String sql = "SELECT * FROM usuario WHERE CUENTA LIKE ? AND CONTRASENIA LIKE ?";
-                PreparedStatement stmt = con.prepareStatement(sql);
-                stmt.setString(1, usuario);
-                stmt.setString(2, contraseniaMD5);
-                ResultSet resul = stmt.executeQuery();
-                if (!resul.next()) {
+                usu = Usuario.buscarPorCuentaYContrasenia(usuario, contraseniaMD5, con);
+                if (usu == null) {
                     JOptionPane.showMessageDialog(null, "Usuario o contraseña no validos");
                     textoContrasenia.setText("");
                     textoUsuario.setText("");
                 } else {
-                    setId(resul.getInt("id"));
-                    JOptionPane.showMessageDialog(null, "Bienvenido " + resul.getString("nombre"));
-                    tipoUsu = resul.getString("tipo_de_usuario");
+                    JOptionPane.showMessageDialog(null, "Bienvenido " + usu.getNombre());
                     try {
-                        if (tipoUsu.contains("Personal")) {
-                            dispose();
+                        if (usu.getTipo_de_usuario().contains("Personal")) {
+                            this.dispose();
                             VentanaPrincipal vc = new VentanaPrincipal();
-                            vc.setValor(id);
-                            vc.setTipoUsu(resul.getString("Nombre"));
+                            vc.setValor(usu.getId());
+                            vc.setTipoUsu(usu.getTipo_de_usuario());
                             vc.setVisible(true);
+                            devo = true;
                         } else {
                             throw new ClassCastException("Esta aplicación solo la puede utilizar el personal. Pruebe nuestra aplicación Android");
                         }
@@ -926,27 +566,28 @@ public class VentanaLog extends javax.swing.JFrame {
                         JOptionPane.showMessageDialog(null, cse.getMessage());
                     }
                 }
-                conexion.cerrarConnection();
             }
-
         } catch (NullPointerException npe) {
             JOptionPane.showMessageDialog(null, "Error intentando conectar a la base de datos");
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Hubo un problema con la base de datos.");
+            devo = false;
         } catch (NoSuchAlgorithmException ex) {
             JOptionPane.showMessageDialog(null, "Falló la comprobación de contraseña");
+            devo = false;
         }
+        return devo;
     }
 
     /**
      *
-     * @param texto
-     * @return
-     * @throws NoSuchAlgorithmException
+     * @param contrasenia.
+     * @return Devuelve el texto codificado a MD5 con los standards de
+     * codificación UTF-8.
+     * @throws NoSuchAlgorithmException. Excepción si no es capaz de ejecutar el
+     * algoritmo de MD5.
      */
-    public String calcularMD5(String texto) throws NoSuchAlgorithmException {
+    public String calcularMD5(String contrasenia) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("MD5");
-        byte[] hashBytes = md.digest(texto.getBytes());
+        byte[] hashBytes = md.digest(contrasenia.getBytes(StandardCharsets.UTF_8));
 
         StringBuilder sb = new StringBuilder();
         for (byte b : hashBytes) {
@@ -956,29 +597,36 @@ public class VentanaLog extends javax.swing.JFrame {
         return sb.toString();
     }
 
-    private void irARegistro() {
-        VentanaRegistro vr = new VentanaRegistro();
-        vr.setVisible(true);
+    private boolean irARegistro() {
+        boolean devo = false;
+        try {
+            VentanaRegistro vr = new VentanaRegistro();
+            vr.setVisible(true);
+            devo = true;
+        } catch (Exception e) {
+            System.err.println("Error al iniciar la ventana del registro. " + e.getMessage());
+            devo = false;
+        }
+        return devo;
     }
 
     /**
      *
-     * @param usuario
-     * @return
+     * @param Nombre de la cuenta del Usuario
+     * @return la contraseña obtenida de la base de datos. Si no encuentra el
+     * usuario, muestra mensaje de error y devuelve valor nulo.
      */
     private String obtenerContrasenia(String usuario) {
         String contrasenia = null;
+        Usuario usuarioEncontrado = null;
         try {
-            conexion = new ConexionBD("usuario", "passwd");
-            con = conexion.getConnection();
-            String sql = "SELECT CONTRASENIA FROM USUARIO WHERE CUENTA LIKE ?";
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, usuario);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                contrasenia = rs.getString("contrasenia");
+            usuarioEncontrado = Usuario.buscarPorCuenta(usuario, con);
+            if (usuarioEncontrado != null) {
+                contrasenia = usuarioEncontrado.getContrasenia();
+            } else {
+                JOptionPane.showMessageDialog(null, "No se ha encontrado ningun usuario con ese nombre.");
             }
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Error en la conexion.");
         }
         return contrasenia;

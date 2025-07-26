@@ -29,53 +29,6 @@ public class ConsultasPersonal {
     private Connection con;
 
     /**
-     * Obtiene los horarios con citas asociadas para un personal específico.
-     *
-     * @param id El ID del personal.
-     * @return Una lista de horarios con citas en formato de cadena.
-     */
-    public ArrayList<String> obtenerHorariosConCita(int id) {
-        // Crear una lista para almacenar los horarios con citas
-        ArrayList<String> horariosConCita = new ArrayList<>();
-        try {
-            // Realizar la conexión a la base de datos
-            realizarConexion();
-
-            // Consulta SQL para obtener los horarios con citas asociadas al personal identificado por el ID
-            String mostrarCitas = "SELECT DISTINCT cita.id, horario.fecha_es AS fecha, horario.hora_es AS hora, servicios.descripcion, servicios.precio, CONCAT(usuario.nombre, ' ', usuario.apellidos) AS cliente FROM horario JOIN personal ON horario.id_personal = personal.id JOIN servicios ON horario.id_servicio = servicios.id LEFT JOIN cita ON horario.id = cita.ID_HORARIO LEFT JOIN usuario ON cita.ID_CLIENTE = usuario.ID WHERE personal.id = ? AND cita.id IS NOT NULL;";
-
-            // Preparar la sentencia SQL con el parámetro ID
-            PreparedStatement stmt = con.prepareStatement(mostrarCitas);
-            stmt.setInt(1, id);
-
-            // Ejecutar la consulta y obtener el resultado
-            ResultSet resultado = stmt.executeQuery();
-
-            // Recorrer los resultados de la consulta
-            while (resultado.next()) {
-                // Obtener los valores de cada columna de la fila actual
-                String fecha = resultado.getString("fecha");
-                String hora = resultado.getString("hora");
-                String descripcion = resultado.getString("descripcion");
-                String precio = resultado.getString("precio");
-                String cliente = resultado.getString("cliente");
-
-                // Crear una cadena de texto con los valores obtenidos
-                String horarioConCita = "Fecha: " + fecha + ", Hora: " + hora + ", Descripción: " + descripcion + ", Precio: " + precio + ", Cliente: " + cliente;
-
-                // Agregar la cadena de texto a la lista horariosConCita
-                horariosConCita.add(horarioConCita);
-            }
-        } catch (SQLException ex) {
-            // Mostrar un mensaje de error si ocurre una excepción de SQL
-            JOptionPane.showMessageDialog(null, "No se pudo hacer la consulta");
-        }
-
-        // Retornar la lista de horarios con citas
-        return horariosConCita;
-    }
-
-    /**
      * Consulta los horarios disponibles para un cliente específico.
      *
      * @param idCliente El ID del cliente.
@@ -263,7 +216,7 @@ public class ConsultasPersonal {
 
     public ConexionBD realizarConexion() {
         ConexionBD conexion = new ConexionBD("admin", "123pelu");
-        con = conexion.getConnection();
+        //con = conexion.getConnection();
         return conexion;
     }
 
@@ -435,8 +388,8 @@ public class ConsultasPersonal {
                 int id = resultSet.getInt("id");
                 String descripcion = resultSet.getString("descripcion");
 
-                Servicio servicio = new Servicio(id, descripcion);
-                servicios.add(servicio);
+                //Servicio servicio = new Servicio(id, descripcion);
+                //servicios.add(servicio);
             }
 
             resultSet.close();
