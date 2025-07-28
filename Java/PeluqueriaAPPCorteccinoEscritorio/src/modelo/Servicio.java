@@ -213,7 +213,7 @@ public class Servicio {
         }
         return servicio;
     }
-
+    
     public static ArrayList<Servicio> buscarPorDescripcionYPrecioYProducto(
             boolean usarDescripcion, String filtroDescripcion,
             boolean usarPrecio, double precio,

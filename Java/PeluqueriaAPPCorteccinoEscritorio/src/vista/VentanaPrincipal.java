@@ -448,9 +448,7 @@ public class VentanaPrincipal extends JFrame {
             // Si el texto del elemento de menú contiene la subcadena "Consultar citas"
             JOptionPane.showMessageDialog(null, "Abriendo el menú de consultas"); // Muestra un mensaje de diálogo indicando que se está abriendo el menú de consultas
             dispose(); // Cierra la ventana actual
-            GestionCitasVentana gc = new GestionCitasVentana(); // Crea una instancia de la clase GestionCitasVentana
-            gc.setValor(id); // Establece el valor de "id" en la instancia de GestionCitasVentana
-            gc.setTipoUsu(tipoUsu); // Establece el valor de "tipoUsu" en la instancia de GestionCitasVentana
+            GestionCitasVentana gc = new GestionCitasVentana(empleado, conexion); // Crea una instancia de la clase GestionCitasVentana
             gc.modificarDiseño(); // Modifica el diseño de la ventana de GestionCitasVentana
             gc.comprobarTabla(); // Comprueba la tabla en la ventana de GestionCitasVentana
             gc.setVisible(true); // Hace visible la ventana de GestionCitasVentana

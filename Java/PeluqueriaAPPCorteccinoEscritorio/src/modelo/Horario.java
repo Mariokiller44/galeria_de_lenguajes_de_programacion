@@ -12,10 +12,11 @@ import controlador.ConexionBD;
 /**
  *
  * Clase Horario: representa un horario con sus atributos.
- * 
+ *
  * @author Mario
  */
 public class Horario {
+
     // Atributos
     private int id, idPersonal, idServicio; // ID del horario
     private String fecha; // Fecha del horario
@@ -51,6 +52,9 @@ public class Horario {
         this.conexionBD = connect;
     }
 
+    public Horario() {
+    }
+
     public Horario(int id, String fecha, String hora, String descripcion) {
         this.id = id;
         this.fecha = fecha;
@@ -67,6 +71,15 @@ public class Horario {
     public int getId() {
         return id;
     }
+
+    public int getIdPersonal() {
+        return idPersonal;
+    }
+
+    public int getIdServicio() {
+        return idServicio;
+    }
+    
 
     public String getFecha() {
         return fecha;
@@ -108,6 +121,14 @@ public class Horario {
 
     // Métodos de modificación (setters)
     public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setIdPersonal(int idPersonal) {
+        this.idPersonal = idPersonal;
+    }
+
+    public void setIdServicio(int idServicio) {
         this.id = id;
     }
 
@@ -169,7 +190,7 @@ public class Horario {
                 devo = true;
             }
         } catch (Exception e) {
-            devo=false;
+            devo = false;
         }
         return devo;
     }
@@ -270,25 +291,33 @@ public class Horario {
             boolean filtrarIdServicio, int idServicio, Connection conn) {
         ArrayList<Horario> lista = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT * FROM horario WHERE 1=1");
-        if (filtrarFecha)
+        if (filtrarFecha) {
             sql.append(" AND fecha = ?");
-        if (filtrarHora)
+        }
+        if (filtrarHora) {
             sql.append(" AND hora = ?");
-        if (filtrarIdPersonal)
+        }
+        if (filtrarIdPersonal) {
             sql.append(" AND ID_PERSONAL = ?");
-        if (filtrarIdServicio)
+        }
+        if (filtrarIdServicio) {
             sql.append(" AND ID_SERVICIO = ?");
+        }
         try {
             PreparedStatement ps = conn.prepareStatement(sql.toString());
             int idx = 1;
-            if (filtrarFecha)
+            if (filtrarFecha) {
                 ps.setString(idx++, fecha);
-            if (filtrarHora)
+            }
+            if (filtrarHora) {
                 ps.setString(idx++, hora);
-            if (filtrarIdPersonal)
+            }
+            if (filtrarIdPersonal) {
                 ps.setInt(idx++, idPersonal);
-            if (filtrarIdServicio)
+            }
+            if (filtrarIdServicio) {
                 ps.setInt(idx++, idServicio);
+            }
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Horario h = new Horario(rs.getInt("id"), conn);
@@ -300,6 +329,94 @@ public class Horario {
             lista = null;
         }
         return lista;
+    }
+
+    /**
+     * Método alternativo que devuelve una lista de objetos Horario
+     *
+     * @return ArrayList<Horario> lista con todos los horarios, null si hay
+     * error
+     */
+    public ArrayList<Horario> obtenerListaHorarios() {
+        ArrayList<Horario> listaHorarios;
+
+        try {
+            String consulta = "SELECT horario.id, horario.fecha_es AS fecha, horario.hora_es AS hora, "
+                    + "horario.id_personal, horario.id_servicio, "
+                    + "IFNULL(CONCAT(cliente.nombre, ' ', cliente.apellidos), 'No hay cliente') AS cliente, "
+                    + "CONCAT(personal.nombre, ' ', personal.apellidos) AS empleado "
+                    + "FROM horario "
+                    + "LEFT JOIN cita ON horario.id = cita.ID_HORARIO "
+                    + "LEFT JOIN usuario AS cliente ON cita.ID_CLIENTE = cliente.ID "
+                    + "JOIN usuario AS personal ON horario.id_personal = personal.id "
+                    + "JOIN servicios ON horario.id_servicio = servicios.id "
+                    + "ORDER BY horario.fecha DESC";
+            listaHorarios= new ArrayList<>();
+            try (Statement statement = conexionBD.createStatement(); ResultSet resultado = statement.executeQuery(consulta)) {
+
+                while (resultado.next()) {
+                    Horario horario = new Horario();
+                    horario.setId(resultado.getInt("id"));
+                    horario.setFecha(resultado.getString("fecha"));
+                    horario.setHora(resultado.getString("hora"));
+                    horario.setIdPersonal(resultado.getInt("id_personal"));
+                    horario.setIdServicio(resultado.getInt("id_servicio"));
+                    horario.setServicio(getServicio());
+                    horario.setPersonal(getPersonal());
+                    
+                    listaHorarios.add(horario);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener lista de horarios: " + e.getMessage());
+            listaHorarios =null;
+        }
+        return listaHorarios;
+    }
+
+    /**
+     * Método para obtener horarios filtrados por empleado
+     *
+     * @param idPersonal ID del empleado
+     * @param modeloGeneral DefaultTableModel donde se cargarán los datos
+     * @return boolean true si se obtuvieron datos, false si está vacío o hay
+     * error
+     */
+    public boolean obtenerHorariosPorEmpleado(int idPersonal) {
+        boolean devo = false;
+        try {
+
+            String consulta = "SELECT DISTINCT horario.fecha_es AS fecha, horario.hora_es AS hora, "
+                    + "servicios.descripcion, servicios.precio, "
+                    + "IFNULL(CONCAT(cliente.nombre, ' ', cliente.apellidos), 'No hay cliente') AS cliente "
+                    + "FROM horario "
+                    + "JOIN personal ON horario.id_personal = personal.id "
+                    + "LEFT JOIN cita ON horario.id = cita.ID_HORARIO "
+                    + "LEFT JOIN usuario AS cliente ON cita.ID_CLIENTE = cliente.ID "
+                    + "JOIN servicios ON horario.id_servicio = servicios.id "
+                    + "WHERE personal.id = ? "
+                    + "ORDER BY horario.fecha DESC";
+
+            try (PreparedStatement statement = conexionBD.prepareStatement(consulta)) {
+                statement.setInt(1, idPersonal);
+
+                try (ResultSet resultado = statement.executeQuery()) {
+                    while (resultado.next()) {
+                        String fecha = resultado.getString("fecha");
+                        String hora = resultado.getString("hora");
+                        String descripcion = resultado.getString("descripcion");
+                        String precio = resultado.getString("precio");
+                        String cliente = resultado.getString("cliente");
+
+                    }
+                }
+            }
+            devo = true;
+        } catch (SQLException e) {
+            System.err.println("Error al obtener horarios por empleado: " + e.getMessage());
+            devo = false;
+        }
+        return devo;
     }
 
     @Override
