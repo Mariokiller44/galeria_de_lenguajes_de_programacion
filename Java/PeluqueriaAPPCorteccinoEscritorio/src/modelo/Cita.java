@@ -265,6 +265,27 @@ public class Cita {
         }
         return devo;
     }
+    
+    public static ArrayList<Cita> buscarTodas(Connection conexionBD) {
+        ArrayList<Cita> devo = new ArrayList<>();
+        try {
+            String sql = "SELECT * FROM cita";
+            PreparedStatement ps = conexionBD.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Cita cita = new Cita(rs.getInt("id"), conexionBD);
+                cita.inicializarDesdeBD(); // Inicializar la cita
+                // Añadir la cita a la lista
+                devo.add(cita);
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            System.out.println("Error al buscar Cita por cliente. " + e.getMessage());
+            devo = null;
+        }
+        return devo;
+    }
 
     public static ArrayList<Cita> buscarPorHorario(int idHorario, Connection conexionBD) {
         ArrayList<Cita> devo = new ArrayList<>();
@@ -278,8 +299,6 @@ public class Cita {
                 cita.inicializarDesdeBD(); // Inicializar la cita
                 devo.add(cita); // Se encontró al menos una cita para el horario
             }
-            rs.close();
-            ps.close();
         } catch (SQLException e) {
             System.out.println("Error al buscar Cita por horario. " + e.getMessage());
             devo = null;

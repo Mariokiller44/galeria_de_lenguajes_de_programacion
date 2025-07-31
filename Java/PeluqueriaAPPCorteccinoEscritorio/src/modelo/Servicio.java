@@ -13,10 +13,11 @@ import java.util.ArrayList;
 /**
  *
  * Clase Servicio: representa un servicio con sus atributos.
- * 
+ *
  * @author Mario
  */
 public class Servicio {
+
     // Atributos
     private int id; // ID del servicio
     private String descripcion; // Descripción del servicio
@@ -156,7 +157,7 @@ public class Servicio {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            String sql = "SELECT * FROM servicio WHERE ID = ?";
+            String sql = "SELECT * FROM servicios WHERE ID = ?";
             stmt = conexionBD.prepareStatement(sql);
             stmt.setInt(1, id);
             rs = stmt.executeQuery();
@@ -165,7 +166,7 @@ public class Servicio {
                 setId(rs.getInt("ID"));
                 setDescripcion(rs.getString("DESCRIPCION"));
                 setPrecio(rs.getDouble("PRECIO"));
-                setIdProducto(rs.getInt("ID_PRODUCTO"));
+                setIdProducto(rs.getInt("PRODUCTO_ID"));
                 getProducto();
             }
             exito = true;
@@ -173,13 +174,15 @@ public class Servicio {
             exito = false;
         } finally {
             try {
-                if (rs != null)
+                if (rs != null) {
                     rs.close();
+                }
             } catch (SQLException e) {
             }
             try {
-                if (stmt != null)
+                if (stmt != null) {
                     stmt.close();
+                }
             } catch (SQLException e) {
             }
         }
@@ -187,13 +190,77 @@ public class Servicio {
         return exito;
     }
 
+    public boolean crearServicio() {
+        boolean exito = false;
+        try {
+            String sql = "INSERT INTO servicios (descripcion, precio, producto_id) VALUES (?, ?, ?)";
+            PreparedStatement ps = conexionBD.prepareStatement(sql);
+            ps.setString(1, descripcion);
+            ps.setDouble(2, precio);
+            ps.setInt(3, idProducto);
+            int rows = ps.executeUpdate();
+            exito = rows > 0;
+        } catch (Exception e) {
+            exito = false;
+        }
+        return exito;
+    }
+
+    public boolean actualizarServicio() {
+        boolean exito = false;
+        try {
+            StringBuilder sql = new StringBuilder("UPDATE servicios SET ");
+            if (descripcion != null) {
+                sql.append(" descripcion= ?, ");
+            }
+            if (precio != 0) {
+                sql.append(" precio = ?, ");
+            }
+            if (idProducto != 0) {
+                sql.append(" producto_id = ? ");
+            }
+            sql.append(" WHERE id=? ");
+            PreparedStatement ps = conexionBD.prepareStatement(sql.toString());
+            int idx = 1;
+            if (descripcion != null) {
+                ps.setString(idx++, descripcion);
+            }
+            if (precio != 0) {
+                ps.setDouble(idx++, precio);
+            }
+            if (idProducto != 0) {
+                ps.setInt(idx++, idProducto);
+            }
+            ps.setInt(idx + 1, id);
+            int rows = ps.executeUpdate();
+            exito = rows > 0;
+        } catch (Exception e) {
+            exito = false;
+        }
+        return exito;
+    }
+
+    public boolean eliminarServicio() {
+        boolean exito = false;
+        try {
+            String sql = "DELETE FROM servicios WHERE id = ?";
+            PreparedStatement ps = conexionBD.prepareStatement(sql);
+            ps.setInt(1, id);
+            int rows = ps.executeUpdate();
+            exito = rows > 0;
+        } catch (Exception e) {
+            exito = false;
+        }
+        return exito;
+    }
+
     // Obtener un servicio por ID
-    public static Servicio obtenerServicioPorId(int idServicio, Connection conexionBD) {
+    public static Servicio obtenerServicioPorId(int id, Connection conexionBD) {
         Servicio servicio = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            servicio = new Servicio(idServicio, conexionBD);
+            servicio = new Servicio(id, conexionBD);
             if (servicio.inicializarDesdeBD()) {
                 return servicio;
             }
@@ -201,20 +268,34 @@ public class Servicio {
             System.err.println("Error al obtener el servicio: " + e.getMessage());
         } finally {
             try {
-                if (rs != null)
+                if (rs != null) {
                     rs.close();
+                }
             } catch (SQLException e) {
             }
             try {
-                if (stmt != null)
+                if (stmt != null) {
                     stmt.close();
+                }
             } catch (SQLException e) {
             }
         }
         return servicio;
     }
-    
-    public static ArrayList<Servicio> buscarPorDescripcionYPrecioYProducto(
+
+    // Obtener todos los servicios
+    public static ArrayList<Servicio> obtenerTodos(Connection conexionBD) {
+        ArrayList<Servicio> servicio = new ArrayList<>();
+        try {
+            servicio = Servicio.buscarServiciosFiltrado(false, null, false, 0, false, 0, conexionBD);
+        } catch (Exception e) {
+            System.err.println("Error al obtener el servicio: " + e.getMessage());
+            servicio = null;
+        }
+        return servicio;
+    }
+
+    public static ArrayList<Servicio> buscarServiciosFiltrado(
             boolean usarDescripcion, String filtroDescripcion,
             boolean usarPrecio, double precio,
             boolean usarIdProducto, int idProducto,
@@ -225,7 +306,7 @@ public class Servicio {
         ResultSet rs = null;
         try {
             StringBuilder sql = new StringBuilder(
-                    "SELECT ID, DESCRIPCION, PRECIO, ID_PRODUCTO FROM servicio WHERE 1=1");
+                    "SELECT ID, DESCRIPCION, PRECIO, producto_id FROM servicios WHERE 1=1");
 
             if (usarDescripcion && filtroDescripcion != null && !filtroDescripcion.isEmpty()) {
                 sql.append(" AND DESCRIPCION LIKE ?");
@@ -234,7 +315,7 @@ public class Servicio {
                 sql.append(" AND PRECIO = ?");
             }
             if (usarIdProducto) {
-                sql.append(" AND ID_PRODUCTO = ?");
+                sql.append(" AND producto_id = ?");
             }
 
             stmt = conexion.prepareStatement(sql.toString());
@@ -254,20 +335,22 @@ public class Servicio {
                 Servicio s = new Servicio(rs.getInt("ID"), conexion);
                 s.setDescripcion(rs.getString("DESCRIPCION"));
                 s.setPrecio(rs.getDouble("PRECIO"));
-                s.setIdProducto(rs.getInt("ID_PRODUCTO"));
+                s.setIdProducto(rs.getInt("producto_id"));
                 servicios.add(s);
             }
         } catch (Exception e) {
             servicios = null;
         } finally {
             try {
-                if (rs != null)
+                if (rs != null) {
                     rs.close();
+                }
             } catch (SQLException e) {
             }
             try {
-                if (stmt != null)
+                if (stmt != null) {
                     stmt.close();
+                }
             } catch (SQLException e) {
             }
         }

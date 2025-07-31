@@ -4,20 +4,18 @@
  */
 package vista;
 
-import com.github.lgooddatepicker.components.DatePicker;
+import com.github.lgooddatepicker.components.*;
 import controlador.ConexionBD;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.sql.*;
 import controlador.ConsultasPersonal;
-import java.awt.HeadlessException;
-import java.awt.Image;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.util.*;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JComboBox;
+import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
 import modelo.Cita;
@@ -34,23 +32,19 @@ import modelo.Usuario;
  */
 public class GestionCitasVentana extends JFrame {
 
-    // Variables de instancia
+    //<editor-fold defaultstate="collapsed" desc="Variables de Instancia">
     private Connection con; // Conexión a la base de datos
     private String[] columnas = {"Fecha", "Hora", "Servicio", "Precio", "Cliente"}; // Lista de columnas para la tabla
     private String[] columnasAdmin = {"Fecha", "Hora", "Servicio", "Precio", "Cliente", "Personal"}; // Lista de columnas para la tabla de administrador
-    private ConsultasPersonal consultas = new ConsultasPersonal(); // Objeto para realizar consultas relacionadas con el personal
     private VentanaPrincipal vc; // Objeto de la clase VentanaPrincipal
-    private JComboBox<String> comboBoxHorarios; // Cuadro de lista desplegable para horarios
+    private JComboBox<String> comboBoxClientes; // Cuadro de lista desplegable para horarios y clientes
     private int filaSeleccionada;
     private Cita citaElegida;
-    private Personal empleadoEscogido;
-    private Cliente clienteEscogido;
-    private Horario horarioEscogido, horarioNuevo;
-    private Servicio servicioEscogido;
+    private Personal empleadoEscogido, empleadoPorDefecto;
+    private Horario horarioSeleccionado;
     private ArrayList<Cita> listadoCitasInicial, listadoCitas;
-    private ArrayList<Personal> listaEmpleados;
     private ArrayList<Horario> listaHorarioInicial, listaHorarios;
-    private ArrayList<Servicio> listaServicios;
+    //</editor-fold>
 
     /**
      * Constructor de la clase.
@@ -58,6 +52,7 @@ public class GestionCitasVentana extends JFrame {
     public GestionCitasVentana() {
         initComponents(); // Inicialización de componentes gráficos
         setIconImage(getIconImage()); // Establecer la imagen del icono de la aplicación
+        inicializarDatosIniciales();
         comprobarTabla(); // Comprobar si la tabla está vacía o no
         setExtendedState(JFrame.MAXIMIZED_BOTH); // Establecer la ventana en pantalla completa
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Establecer la acción de cierre de la ventana
@@ -82,22 +77,6 @@ public class GestionCitasVentana extends JFrame {
         }
     }
 
-    private boolean inicializarDatos(Connection conexionBaseData, Personal personal) {
-        boolean devo = false;
-        try {
-            con = conexionBaseData; // Pasar conexión a la base de datos
-            empleadoEscogido = personal;
-            listaHorarioInicial = Horario.buscarFiltrado(false, null, false, null, true, empleadoEscogido.getId(), false, 0, con); // Obtenemos los horarios que estan asignados al empleado
-            for (Horario horarioAsignado : listaHorarioInicial) {
-                listadoCitasInicial = Cita.buscarPorHorario(horarioAsignado.getId(), conexionBaseData); // De dicho horario vamos llenando las citas que tiene el empleado
-            }
-            devo = true;
-        } catch (Exception e) {
-            devo = false;
-        }
-        return devo;
-    }
-
     /**
      * Método para obtener la imagen del icono de la aplicación.
      */
@@ -105,26 +84,6 @@ public class GestionCitasVentana extends JFrame {
     public Image getIconImage() {
         Image retValue = Toolkit.getDefaultToolkit().getImage("./src/images/iconoDeAppEscritorio.png"); // Ruta de la imagen del icono
         return retValue;
-    }
-
-    /**
-     * Método para comprobar si la tabla está vacía y actualizarla en
-     * consecuencia.
-     */
-    public boolean comprobarTabla() {
-        boolean devo = false;
-        try {
-            if (tabla.getRowCount() > 0) { // Si la tabla tiene filas
-                DefaultTableModel model = (DefaultTableModel) tabla.getModel(); // Obtener el modelo de la tabla
-                model.setRowCount(0); // Establecer el número de filas en 0 para vaciar la tabla
-            } else { // Si la tabla está vacía
-                llenarTabla(); // Llenar la tabla con datos
-            }
-            devo = true;
-        } catch (Exception e) {
-            devo = false;
-        }
-        return devo;
     }
 
     /**
@@ -308,52 +267,60 @@ public class GestionCitasVentana extends JFrame {
      */
     @SuppressWarnings("empty-statement")
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {
-        filaSeleccionada = tabla.getSelectedRow();
-        if (filaSeleccionada != -1) {
-            try {
+        try {
+            filaSeleccionada = tabla.getSelectedRow();
+            if (filaSeleccionada != -1) {
+
                 // Comprobar el tipo de usuario y mostrar diferentes opciones según el tipo
                 if (empleadoEscogido.getApellidos().contains("Administrador")) {
                     // Mostrar el JOptionPane para seleccionar una opción
+                    horarioSeleccionado = listaHorarios.get(filaSeleccionada);
                     String[] opciones = {"Fecha", "Hora", "Servicio", "Precio", "Personal"};
-                    String seleccionAdmin = (String) JOptionPane.showInputDialog(null, "Seleccione una opción", "Opciones", JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
+                    String seleccionAdmin = (String) JOptionPane.showInputDialog(null, "Seleccione una opcion", "Opciones", JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
                     if (seleccionAdmin == null) {
+                        throw new Exception("No se selecciono ninguna opcion");
                     } else {
                         // Realizar acciones según la opción seleccionada
                         switch (seleccionAdmin) {
                             case "Fecha":
-                                modificarFecha();
+                                modificarFecha(horarioSeleccionado);
                                 llenarTablaTodosLosClientes();
                                 break;
                             case "Hora":
                                 /**
                                  * PENDIENTE DE CORREGIR FALLOS
+                                 *
+                                 * Corregido 31 Jul 2025
                                  */
-                                // modificarServicioHora(horarioAdminId);
+                                modificarHora(horarioSeleccionado);
                                 llenarTablaTodosLosClientes();
                                 break;
                             case "Servicio":
                                 /**
                                  * PENDIENTE DE CORREGIR FALLOS
+                                 *
+                                 * Corregido 31 Jul 2025
                                  */
-                                //Horario horAdmin = new Horario(horarioAdminId, fechaH, horaH, servicioH);
-                                //modificarServicio(horAdmin);
+                                modificarServicio(horarioSeleccionado);
                                 llenarTablaTodosLosClientes();
                                 break;
                             case "Precio":
                                 /**
                                  * PENDIENTE DE CORREGIR FALLOS
+                                 *
+                                 * Corregido 31 Jul 2025
                                  */
-                                //Horario horAdminPrecio = new Horario(horarioAdminId, fechaH, horaH, servicioH);
-                                //modificarPrecio(horAdminPrecio);
+                                modificarPrecio(horarioSeleccionado);
                                 llenarTablaTodosLosClientes();
                                 break;
                             case "Personal":
 
                                 /**
                                  * PENDIENTE DE CORREGIR FALLOS
+                                 *
+                                 * Corregido 31 Jul 2025
                                  */
-                                //Horario horAdminPersonal = new Horario(horarioAdminId, fechaH, horaH, servicioH, precioH, personalH);                                
-                                //modificarPersonal(horAdminPersonal);
+                                modificarPersonal(horarioSeleccionado);
                                 llenarTablaTodosLosClientes();
                                 break;
                             default:
@@ -363,253 +330,42 @@ public class GestionCitasVentana extends JFrame {
                 } else {
                     /**
                      * PENDIENTE DE CORREGIR
+                     *
+                     * Corregido 31 Jul 2025
                      */
-                    /*String citasPersonal = obtenerHorarioEscogidoPersonal();
-                    definirVariablesServicioPersonal(citasPersonal);
-                    if (true){ //clienteH.contains("No hay cliente")) {
-                    JOptionPane.showMessageDialog(null, "No se puede modificar esta cita. Por favor seleccione otra");
-                    } else {
-                    // Obtener el identificador del horario
-                    int horarioId = obtenerIdHorario(fechaH, horaH, servicioH);
+                    horarioSeleccionado = listaHorarioInicial.get(filaSeleccionada);
                     // Mostrar el JOptionPane para seleccionar una opción
                     String[] opciones = {"Fecha", "Hora", "Servicio"};
                     String seleccion = (String) JOptionPane.showInputDialog(null, "Seleccione una opción", "Opciones", JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
                     if (seleccion == null) {
+                        throw new Exception("No se ha seleccionado una opcion de modificacion.");
                     } else {
-                    // Realizar acciones según la opción seleccionada
-                    switch (seleccion) {
-                    case "Fecha":
-                    modificarServicioFecha(horarioId);
-                    llenarTablaHorario(citaElegida.getId());
-                    break;
-                    case "Hora":
-                    modificarServicioHora(horarioId);
-                    llenarTablaHorario(citaElegida.getId());
-                    break;
-                    case "Servicio":
-                    Horario horario = new Horario(horarioId, fechaH, horaH, servicioH);
-                    modificarServicio(horario);
-                    llenarTablaHorario(citaElegida.getId());
-                    break;
-                    default:
-                    JOptionPane.showMessageDialog(null, "Seleccione una opcion");
+                        // Realizar acciones según la opción seleccionada
+                        switch (seleccion) {
+                            case "Fecha":
+                                modificarFecha(horarioSeleccionado);
+                                llenarTablaHorario();
+                                break;
+                            case "Hora":
+                                modificarHora(horarioSeleccionado);
+                                llenarTablaHorario();
+                                break;
+                            case "Servicio":
+                                modificarServicio(horarioSeleccionado);
+                                llenarTablaHorario();
+                                break;
+                            default:
+                                JOptionPane.showMessageDialog(null, "Seleccione una opcion");
+                        }
                     }
-                    }
-                    }
-                     */
+
                 }
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Hubo un error al modificar");
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "No se ha seleccionado un horario");
-        }
-    }
 
-    /**
-     * Método para modificar la fecha del servicio.
-     *
-     * @param fechaActual La fecha actual del servicio.
-     */
-    public boolean modificarFecha() {
-        boolean devo = false;
-        Horario horarioActualizado;
-        try {
-            // Crear un cuadro de diálogo con un DatePicker para que el usuario seleccione una nueva fecha
-            DatePicker nuevaFecha = new DatePicker();
-            int resultado = JOptionPane.showConfirmDialog(null, nuevaFecha, "Introduce nueva fecha", JOptionPane.OK_CANCEL_OPTION);
-            if (resultado != JOptionPane.CANCEL_OPTION) {
-                // Obtener la fecha actualizada como un objeto LocalDate
-                String fechaActualizada = nuevaFecha.getDate().toString();
-                // Llamar a un método de consulta para modificar el servicio con la nueva fecha
-                horarioActualizado = new Horario(horarioEscogido.getId(), con);
-                horarioActualizado.setFecha(fechaActualizada);
-                horarioActualizado.setHora(horarioEscogido.getHora());
-                horarioActualizado.setIdPersonal(horarioEscogido.getIdPersonal());
-                horarioActualizado.setIdServicio(horarioEscogido.getIdServicio());
-                horarioActualizado.actualizarHorario();
             } else {
+                throw new Exception("No se ha seleccionado un horario");
             }
-            devo = true;
-        } catch (Exception e) {
-            devo = false;
-        }
-        return devo;
-    }
-
-    /**
-     * Método para modificar el precio del servicio.
-     *
-     * @param precioActual El objeto Horario con el precio actual del servicio.
-     */
-    public void modificarPrecio(Horario precioActual) {
-        // Mostrar un cuadro de diálogo para que el usuario ingrese el nuevo precio
-        String nuevoPrecioStr = JOptionPane.showInputDialog(null, "Introduce el nuevo precio:", "Actualizar precio", JOptionPane.OK_CANCEL_OPTION);
-
-        if (nuevoPrecioStr == null) {
-
-        } else {
-            double nuevoPrecio = Double.parseDouble(nuevoPrecioStr);
-
-            // Obtener la descripción del servicio y el ID del servicio
-            String descripcion = precioActual.getDescripcion();
-            int idServicio = obtenerIdServicio(descripcion);
-
-            // Crear la consulta SQL para actualizar el precio del servicio
-            String sql = "UPDATE servicios SET precio = ? WHERE id = ?";
-
-            try {
-                /**
-                 * PENDIENTE CORREGIR
-                 */
-                //realizarConexion();
-                PreparedStatement pstmt = con.prepareStatement(sql);
-
-                // Establecer los valores de los parámetros de la consulta
-                pstmt.setDouble(1, nuevoPrecio);
-                pstmt.setInt(2, idServicio);
-
-                // Ejecutar la consulta
-                pstmt.executeUpdate();
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, "Error modificando el precio");
-            }
-        }
-    }
-
-    /**
-     * Método para modificar el personal del servicio.
-     *
-     * @param personalActual El objeto Horario con el personal actual del
-     * servicio.
-     */
-    public void modificarPersonal(Horario personalActual) {
-        // Obtener la lista de personal disponible
-        ArrayList<String> personalPelu = obtenerPersonal();
-
-        // Mostrar un cuadro de lista desplegable con el personal disponible para que el usuario seleccione uno nuevo
-        JComboBox comboboxPers = new JComboBox(personalPelu.toArray());
-        int resultado = JOptionPane.showConfirmDialog(null, comboboxPers, "Seleccione Nuevo Personal", JOptionPane.OK_OPTION);
-
-        if (resultado == JOptionPane.CANCEL_OPTION) {
-        } else {
-            // Obtener el personal seleccionado y extraer el nombre y apellidos
-            String nuevoS = comboboxPers.getSelectedItem().toString();
-            String[] personal = nuevoS.split(", ");
-            String nombreP = personal[0].split(": ")[1];
-            String apellidosP = personal[1].split(": ")[1];
-
-            // Obtener el ID del nuevo personal
-            int idP = consultas.obtenerIdUsuario(nombreP, apellidosP);
-
-            // Llamar a un método de consulta para modificar el servicio con el nuevo personal
-            modificarPersonal(personalActual, idP);
-        }
-    }
-
-    // Método para obtener los horarios con cita asignada
-    public ArrayList<String> obtenerHorariosConCita() {
-        ArrayList<String> horariosConCita = new ArrayList<>();
-
-        try {
-            // Establecer la conexión a la base de datos (debes configurar tus propios datos de conexión)
-            /**
-             * PENDIENTE CORREGIR
-             */
-            //realizarConexion();
-
-            // Consulta SQL para obtener los horarios con cita asignada
-            String query = "SELECT horario.fecha, horario.hora, servicios.precio,servicios.descripcion, usuario.nombre,usuario.apellidos FROM horario JOIN cita ON horario.id = cita.id_horario JOIN usuario ON cita.id_cliente = usuario.id JOIN servicios ON horario.id_servicio = servicios.id WHERE horario.id_personal=? AND horario.fecha >= CURDATE()";
-
-            // Crear un Statement para ejecutar la consulta
-            PreparedStatement statement = con.prepareStatement(query);
-            statement.setInt(1, citaElegida.getId());
-            // Ejecutar la consulta y obtener el resultado
-            ResultSet resultSet = statement.executeQuery();
-
-            // Recorrer el resultado y agregar los campos a la lista
-            while (resultSet.next()) {
-                String fecha = resultSet.getString("fecha");
-                String hora = resultSet.getString("hora");
-                String servicio = resultSet.getString("descripcion");
-                Double precio = resultSet.getDouble("precio");
-                String nombreCliente = resultSet.getString("nombre");
-                String apellidosCliente = resultSet.getString("apellidos");
-                String cliente = nombreCliente + " " + apellidosCliente;
-                // Construir la cadena con los campos y agregarla a la lista
-                String horarioConCita = "Fecha: " + fecha + ", Hora: " + hora + ", Servicio: " + servicio + ", Cliente: " + cliente + ", Precio: " + String.valueOf(precio);
-                horariosConCita.add(horarioConCita);
-            }
-
-            // Cerrar el ResultSet, el Statement y la conexión
-            resultSet.close();
-            statement.close();
-            con.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return horariosConCita;
-    }
-
-    /**
-     * Método para modificar la fecha de un servicio.
-     *
-     * @param idHorario El ID del horario del servicio a modificar.
-     * @throws HeadlessException Si se produce un error al mostrar el cuadro de
-     * diálogo.
-     */
-    private void modificarServicioFecha(int idHorario) throws HeadlessException {
-        // Mostrar un cuadro de diálogo con un DatePicker para que el usuario seleccione una nueva fecha
-        //DatePicker nuevaFecha = new DatePicker();
-        //int resultado = JOptionPane.showConfirmDialog(null, nuevaFecha, "Introduce nueva fecha", JOptionPane.OK_CANCEL_OPTION);
-        //if (resultado == JOptionPane.CANCEL_OPTION) {
-//
-        //} else {
-        //    // Obtener la fecha seleccionada y convertirla a una cadena de texto
-        //    String fechaActualizada = nuevaFecha.getDate().toString();
-//
-        //    LocalDate fechaEscogida = nuevaFecha.getDate();
-        //    // Comprobación de que no sea menor a hoy
-        //    LocalDate fechaHoy = LocalDate.now();
-        //    if (fechaEscogida.isBefore(fechaHoy)) {
-        //        JOptionPane.showMessageDialog(null, "La fecha seleccionada no puede ser anterior a hoy");
-        //    } else {
-        //        // Obtener el ID de la cita
-        //        int idCita = idHorario;
-        //        // Llamar a un método de consulta para modificar el servicio con la nueva fecha
-        //        consultas.modificarServicioPorFecha(fechaActualizada, idCita);
-        //    }
-        //}
-    }
-
-    /**
-     * Método para modificar el servicio de un horario.
-     *
-     * @param horarioSeleccionado El objeto Horario del horario seleccionado.
-     * @throws HeadlessException Si se produce un error al mostrar el cuadro de
-     * diálogo.
-     */
-    private void modificarServicio(Horario horarioSeleccionado) throws HeadlessException {
-        // Obtener la lista de servicios disponibles
-        ArrayList<String> listaServ = consultas.serviciosBD();
-
-        // Mostrar un cuadro de lista desplegable con los servicios disponibles para que el usuario seleccione uno nuevo
-        JComboBox comboboxServ = new JComboBox(listaServ.toArray());
-        int resultado = JOptionPane.showConfirmDialog(null, comboboxServ, "Seleccione nuevo servicio", JOptionPane.OK_OPTION);
-        /**
-         * PENDIENTE CORREGIR
-         */
-        if (resultado != JOptionPane.CANCEL_OPTION) {
-            // Obtener el servicio seleccionado y su ID
-            String nuevoS = comboboxServ.getSelectedItem().toString();
-            //idS = consultas.cogerIdServicio(nuevoS);
-
-            // Obtener el ID del horario de servicio
-            int horarioServId = horarioSeleccionado.getId();
-
-            // Llamar a un método de consulta para modificar el servicio del horario
-            //consultas.modificarServicio(idS, horarioServId);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Hubo un error al modificar");
         }
     }
 
@@ -621,255 +377,15 @@ public class GestionCitasVentana extends JFrame {
     private void btnPedirActionPerformed(java.awt.event.ActionEvent evt) {
         /**
          * PENDIENTE CORREGIR
-         */
-        /*        if (tipoUsu.contains("Administrador")) {
-        // Método para administrador
-        obtenerDatos();
-        } else {
-        // Método para personal
-        insertarCitaPersonal();
-    }*/    }
-
-    /**
-     * Método para insertar una cita para el personal.
-     *
-     * @throws HeadlessException Si se produce un error al mostrar el cuadro de
-     * diálogo.
-     */
-    private void insertarCitaPersonal() throws HeadlessException {
-        filaSeleccionada = tabla.getSelectedRow();
-        /**
-         * PENDIENTE CORREGIR
-         */
-        /*  if (filaSeleccionada != -1) {
-        String citasPersonal = obtenerHorarioEscogidoPersonal();
-        definirVariablesServicioPersonal(citasPersonal);
-        if (!clienteH.contains("No hay cliente")) {
-        JOptionPane.showMessageDialog(null, "Este horario ya esta asignado");
-        } else {
-        // Crear un modelo de ComboBox con los horarios disponibles
-        // Obtener el ID del horario seleccionado
-        int idHorario = obtenerIdHorarioPersonal(fechaH, horaH, servicioH);
-        
-        // Mostrar un cuadro de lista desplegable con los clientes disponibles para que el usuario seleccione uno
-        ArrayList<String> listaClientes = obtenerClientes();
-        DefaultComboBoxModel<String> clienteModel = new DefaultComboBoxModel<>(listaClientes.toArray(new String[0]));
-        comboBoxHorarios = new JComboBox<>(clienteModel);
-        int resultadoCliente = JOptionPane.showConfirmDialog(null, comboBoxHorarios, "Elige el cliente", JOptionPane.OK_CANCEL_OPTION);
-        
-        if (resultadoCliente == JOptionPane.OK_OPTION) {
-        // Obtener el cliente seleccionado
-        String seleccion = comboBoxHorarios.getSelectedItem().toString();
-        String[] partes = seleccion.split(", ");
-        String nombreC = partes[0].split(": ")[1];
-        String apellidoC = partes[1].split(": ")[1];
-        
-        // Obtener el ID del cliente seleccionado
-        int idCliente = consultas.obtenerIdUsuario(nombreC, apellidoC);
-        
-        // Insertar la cita con el cliente y el horario seleccionado
-        insertarCita(idCliente, idHorario);
-        }
-        }
-        } else {
-        JOptionPane.showMessageDialog(null, "Horario no seleccionado");
-        }
-         */
-    }
-
-    /**
-     * Método para insertar una nueva cita en la base de datos.
-     *
-     * @param idcliente El ID del cliente de la cita.
-     * @param idHorario El ID del horario de la cita.
-     */
-    public void insertarCita(int idcliente, int idHorario) {
-        /**
-         * PENDIENTE CORREGIR
-         */
-        /*try {
-        realizarConexion();
-        
-        // Crear la consulta preparada para insertar la cita en la base de datos
-        PreparedStatement psC = con.prepareStatement("INSERT INTO cita (ID_CLIENTE, ID_HORARIO) VALUES (?,?)");
-        psC.setInt(1, idcliente);
-        psC.setInt(2, idHorario);
-        
-        // Ejecutar la consulta
-        int filasAfec = psC.executeUpdate();
-        if (filasAfec <= 0) {
-        JOptionPane.showMessageDialog(null, "No se pudo hacer la cita");
-        } else {
-        JOptionPane.showMessageDialog(null, "Cita creada exitosamente");
-        }
-        llenarTablaHorario(citaElegida.getId());
-        } catch (SQLException ex) {
-        JOptionPane.showMessageDialog(null, "No se pudo hacer la cita");
-        }*/
-    }
-
-    /**
-     * Método para obtener la lista de clientes disponibles.
-     *
-     * @return Una lista de cadenas con los nombres y apellidos de los clientes.
-     */
-    public ArrayList<String> obtenerClientes() {
-        /**
-         * PENDIENTE CORREGIR
-         */
-        ArrayList<String> clientes = new ArrayList<>();
-        /*realizarConexion();
-        try {
-        Statement stmt = con.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT nombre, apellidos FROM usuario WHERE tipo_de_usuario='Cliente'");
-        while (rs.next()) {
-        String nombre = rs.getString("nombre");
-        String apellidos = rs.getString("apellidos");
-        clientes.add("nombre: " + nombre + ", apellidos: " + apellidos);
-        }
-        } catch (SQLException e) {
-        JOptionPane.showMessageDialog(null, "Error al cargar clientes");
-        }*/
-        return clientes;
-    }
-
-    /**
-     * Método para obtener la lista de personal disponible en el sistema. Filtra
-     * los usuarios por tipo_de_usuario = 'Personal' y excluye al usuario
-     * 'administrador'.
-     *
-     * @return Una lista de cadenas con los nombres y apellidos del personal.
-     */
-    public ArrayList<String> obtenerPersonal() {
-        /**
-         * PENDIENTE CORREGIR
-         */
-        ArrayList<String> personal = new ArrayList<>();
-        /**
-         * realizarConexion(); // Establece la conexión a la base de datos. try
-         * { Statement stmt = con.createStatement(); // Consulta SQL para
-         * obtener el nombre y los apellidos del personal. ResultSet rs =
-         * stmt.executeQuery("SELECT nombre, apellidos FROM usuario WHERE
-         * tipo_de_usuario='Personal' AND nombre != 'administrador'");
          *
-         * // Recorre los resultados de la consulta. while (rs.next()) { String
-         * nombre = rs.getString("nombre"); String apellidos =
-         * rs.getString("apellidos"); personal.add("Nombre: " + nombre + ",
-         * Apellidos: " + apellidos); } } catch (SQLException e) {
-         * JOptionPane.showMessageDialog(null, "Error al cargar personal"); }
-         *
+         * Corregido 31 Jul 2025
          */
-        return personal; // Devuelve la lista de personal.
-    }
-
-    /**
-     * Método para obtener la lista de horarios disponibles sin citas para un
-     * personal.
-     *
-     * @param idPersonal El ID del personal.
-     * @return Una lista de cadenas con los horarios disponibles.
-     */
-    public ArrayList<Horario> obtenerHorariosSinCitas() {
-        ArrayList<Horario> horariosSinCitas = new ArrayList<>();
-
-        try {
-
-            // Consulta SQL para obtener los horarios sin citas
-            String sql = "SELECT * FROM horario h LEFT JOIN cita c ON h.id = c.ID_HORARIO where c.id IS NULL;";
-            PreparedStatement stmt = con.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
-
-            if (!rs.isBeforeFirst()) {
-                JOptionPane.showMessageDialog(null, "No existen horarios sin citas");
-            } else {
-                // Recorre los resultados de la consulta
-                while (rs.next()) {
-                    Horario horario = new Horario();
-                    horario.setFecha(rs.getString("fecha_es"));
-                    horario.setHora(rs.getString("hora_es"));
-                    horario.setIdServicio(rs.getInt("id_servicio"));
-                    horario.getServicio();
-                    horariosSinCitas.add(horario);
-                }
-            }
-
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al buscar los horarios");
-        }
-
-        return horariosSinCitas;
-    }
-
-    /**
-     * Método para obtener datos relacionados con la programación de un horario.
-     * Muestra un diálogo con componentes para seleccionar la fecha, hora,
-     * empleado y servicio. Luego, realiza la inserción de los datos en la tabla
-     * de horario.
-     */
-    public void obtenerDatos() {
-        // Crear los componentes de fecha y hora
-        //DatePicker datePicker = new DatePicker();
-        //TimePicker timePicker = new TimePicker();
-
-        // Crear el combobox para empleados
-        ArrayList<Usuario> listaEmpleados = consultas.obtenerListaEmpleados();
-        DefaultComboBoxModel<Usuario> empleadoModel = new DefaultComboBoxModel<>(listaEmpleados.toArray(new Usuario[0]));
-        JComboBox<Usuario> empleadoComboBox = new JComboBox<>(empleadoModel);
-
-        // Crear el combobox para servicios
-        ArrayList<Servicio> listaServicios = consultas.obtenerListaServicios();
-        DefaultComboBoxModel<Servicio> servicioModel = new DefaultComboBoxModel<>(listaServicios.toArray(new Servicio[0]));
-        JComboBox<Servicio> servicioComboBox = new JComboBox<>(servicioModel);
-
-        // Crear el panel de entrada de datos
-        //JPanel panel = new JPanel(new GridLayout(4, 2));
-        //panel.add(new JLabel("Fecha:"));
-        //panel.add(datePicker);
-        //panel.add(new JLabel("Hora:"));
-        //panel.add(timePicker);
-        //panel.add(new JLabel("Empleado:"));
-        //panel.add(empleadoComboBox);
-        //panel.add(new JLabel("Servicio:"));
-        //panel.add(servicioComboBox);
-        // Mostrar el panel de entrada de datos en un diálogo
-        //int result = JOptionPane.showConfirmDialog(null, panel, "Ingrese los datos", JOptionPane.OK_CANCEL_OPTION);
-        //if (result == JOptionPane.OK_OPTION) {
-        //    // Obtener los valores seleccionados
-        //    String fecha = datePicker.getDate().toString();
-        //    String hora = timePicker.getTime().toString();
-        //    Usuario empleado = (Usuario) empleadoComboBox.getSelectedItem();
-        //    Servicio servicio = (Servicio) servicioComboBox.getSelectedItem();
-//
-        //    // Realizar la inserción en la tabla de horario
-        //    insertarHorario(fecha, hora, empleado.getId(), servicio.getId());
-        //}
-    }
-
-    /**
-     * Método para insertar un nuevo registro en la tabla de horarios.
-     *
-     * @param fecha La fecha del horario a insertar.
-     * @param hora La hora del horario a insertar.
-     * @param idEmpleado El ID del empleado asociado al horario.
-     * @param idServicio El ID del servicio asociado al horario.
-     */
-    public void insertarHorario(String fecha, String hora, int idEmpleado, int idServicio) {
-        try {
-            // Consulta de inserción para la tabla horario
-            realizarConexion();
-            PreparedStatement statement = con.prepareStatement(
-                    "INSERT INTO horario (fecha, hora, id_personal, id_servicio) VALUES (?, ?, ?, ?)");
-            statement.setString(1, fecha);
-            statement.setString(2, hora);
-            statement.setInt(3, idEmpleado);
-            statement.setInt(4, idServicio);
-
-            // Ejecutar la consulta
-            statement.executeUpdate();
-            llenarTablaTodosLosClientes();
-            statement.close();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al insertar\n" + e.getMessage());
+        if (empleadoEscogido.getApellidos().contains("Administrador")) {
+            // Método para administrador
+            aniadirNuevosRegistros();
+        } else {
+            // Método para personal
+            insertarCitaPersonal();
         }
     }
 
@@ -881,11 +397,16 @@ public class GestionCitasVentana extends JFrame {
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
         /**
          * PENDIENTE CORREGIR
+         *
+         * Corregido 31 Jul 2025
          */
-        /**
-         * vc = new VentanaPrincipal(); vaciarTabla(); dispose();
-         * vc.setTipoUsu(tipoUsu); vc.setVisible(true);
-         */
+
+        vc = new VentanaPrincipal();
+        vaciarTabla();
+        dispose();
+        vc.setTipoUsu(empleadoEscogido.getApellidos());
+        vc.setVisible(true);
+
     }//GEN-LAST:event_btnSalirActionPerformed
 
     /**
@@ -896,172 +417,42 @@ public class GestionCitasVentana extends JFrame {
     private void btnBorrarActionPerformed(java.awt.event.ActionEvent evt) {
         /**
          * PENDIENTE CORREGIR
+         *
+         * Corregido 31 Jul 2025
          */
-        /**
-         * filaSeleccionada = tabla.getSelectedRow(); if (filaSeleccionada !=
-         * -1) { if (tipoUsu.contains("Administrador")) { try { borradoAdmin();
-         * llenarTablaTodosLosClientes(); } catch (SQLException ex) {
-         * JOptionPane.showMessageDialog(null, "No se pudo actualizar la
-         * tabla"); } } else { String horarioSeleccionado; horarioSeleccionado =
-         * obtenerHorarioEscogidoPersonal();
-         * definirVariablesServicioPersonal(horarioSeleccionado); if
-         * (clienteH.contains("No hay clientes")) {
-         * JOptionPane.showMessageDialog(null, "No hay ninguna cita que borrar.
-         * No existen citas"); } else { // Realizar la acción correspondiente
-         * según la selección del usuario int confirmacion =
-         * JOptionPane.showConfirmDialog(null, "¿Está seguro de que desea borrar
-         * la cita seleccionada?", "Borrar cita", JOptionPane.OK_CANCEL_OPTION);
-         * if (confirmacion == JOptionPane.OK_OPTION) { try { int
-         * idClienteSeleccionado = obtenerIdCliente(clienteH); int
-         * idHorarioSeleccionado = obtenerIdHorario(horarioSeleccionado);
-         * realizarConexion(); String sqlBorradoCita = "DELETE FROM CITA WHERE
-         * ID_CLIENTE=? AND ID_HORARIO=?"; PreparedStatement psBorradoCita =
-         * con.prepareStatement(sqlBorradoCita); psBorradoCita.setInt(1,
-         * idClienteSeleccionado); psBorradoCita.setInt(2,
-         * idHorarioSeleccionado); int resultado =
-         * psBorradoCita.executeUpdate(); if (resultado == 0) {
-         * JOptionPane.showMessageDialog(null, "No se pudo borrar la cita"); }
-         * else { JOptionPane.showMessageDialog(null, "Borrado exitoso"); }
-         * llenarTablaHorario(citaElegida.getId()); } catch (SQLException ex) {
-         * JOptionPane.showMessageDialog(null, "Error al mostrar las citas"); }
-         * } } } } else { JOptionPane.showMessageDialog(null, "No se ha
-         * seleccionado un horario"); }
-         */
-    }
-
-    private void definirVariablesServicioPersonal(String horarioSeleccionado) {
-        String[] subcadenas = horarioSeleccionado.split(",\\s*", 6);
-        /**
-         * PENDIENTE DE ACTUALIZAR
-         */
-        // Asignar las subcadenas a variables separadas
-        // fechaH = subcadenas[0].trim();
-        // horaH = subcadenas[1].trim();
-        // servicioH = subcadenas[2].trim();
-        // precioH = subcadenas[3].trim();
-        // clienteH = subcadenas[4].trim();
-    }
-
-    private String obtenerHorarioEscogidoPersonal() {
-        String horarioSeleccionado;
-        TableModel modelo = tabla.getModel();
-        Object[] rowData = new Object[modelo.getColumnCount()];
-        for (int i = 0; i < modelo.getColumnCount(); i++) {
-            rowData[i] = modelo.getValueAt(filaSeleccionada, i);
-        }
-        String horarioEscogido = Arrays.toString(rowData);
-        horarioSeleccionado = horarioEscogido.substring(horarioEscogido.indexOf("[") + 1, horarioEscogido.length() - 1);
-        return horarioSeleccionado;
-    }
-
-    /**
-     * Obtiene el ID del horario para la cita seleccionada.
-     *
-     * @param citaSeleccionada La cita seleccionada.
-     * @return El ID del horario.
-     * @throws SQLException Si ocurre un error al realizar la consulta SQL.
-     */
-    private int obtenerIdHorario(String citaSeleccionada) throws SQLException {
-        /**
-         * PENDIENTE CORREGIR
-         */
-        int identHorario = -1;
-        /*String[] subcadenas = citaSeleccionada.split(",\\s*", 6);
-        
-        // Asignar las subcadenas a variables separadas
-        String fechaH = subcadenas[0].trim();
-        String horaH = subcadenas[1].trim();
-        String servicioH = subcadenas[2].trim();
-        int idServicio = obtenerIdServicio(servicioH);
-        realizarConexion();
-        String consultaHorario = "SELECT id FROM horario WHERE fecha_es = ? AND hora_es = ? AND id_servicio = ?;";
-        PreparedStatement psIdHorario = con.prepareStatement(consultaHorario);
-        psIdHorario.setString(1, fechaH);
-        psIdHorario.setString(2, horaH);
-        psIdHorario.setInt(3, idServicio);
-        ResultSet rs = psIdHorario.executeQuery();
-        while (rs.next()) {
-        identHorario = rs.getInt("id");
-        }*/
-        return identHorario;
-    }
-
-    /**
-     * Método privado para obtener el ID del cliente asociado a una cita
-     * seleccionada.
-     *
-     * @param citaSeleccionada La cita seleccionada en formato de cadena.
-     * @return El ID del cliente asociado a la cita.
-     * @throws SQLException Si ocurre algún error al realizar la consulta SQL.
-     */
-    private int obtenerIdCliente(String citaSeleccionada) throws SQLException {
-        /**
-         * PENDIENTE CORREGIR
-         */
-        int idCliente = -1;
-        /*realizarConexion();
-        String consultaCliente = "SELECT ID FROM USUARIO WHERE CONCAT(NOMBRE, ' ', APELLIDOS) LIKE ?";
-        PreparedStatement psCliente = con.prepareStatement(consultaCliente);
-        psCliente.setString(1, citaSeleccionada);
-        ResultSet rsCli = psCliente.executeQuery();
-        if (rsCli.next()) {
-        idCliente = rsCli.getInt("ID");
-        }*/
-
-        return idCliente;
-    }
-
-    /**
-     * Método privado para realizar el borrado de un horario por parte de un
-     * administrador.
-     *
-     * @throws HeadlessException Si ocurre algún error relacionado con la
-     * interfaz gráfica.
-     */
-    private void borradoAdmin() throws HeadlessException {
-        // Mostrar un cuadro de diálogo de confirmación para asegurarse de que se desea borrar el horario seleccionado
-        int decision = JOptionPane.showConfirmDialog(null, "Seguro que desea borrar el horario seleccionado (ten en cuenta que puede contener un cliente)", "Confirmacion", JOptionPane.YES_NO_OPTION);
-        if (decision == JOptionPane.YES_OPTION) {
-            try {
-                /**
-                 * PENDIENTE CORREGIR
-                 */
-                /* // Realizar la conexión a la base de datos
-                realizarConexion();
-                String horarioSeleccionado = obtenerHorarioSeleccionado();
-                // Obtener el ID del horario seleccionado
-                int idHorario = buscarIdHorario(horarioSeleccionado);
-                
-                // Preparar la sentencia SQL para borrar el horario por su ID
-                String sql = "DELETE FROM HORARIO WHERE ID=?";
-                PreparedStatement psD = con.prepareStatement(sql);
-                psD.setInt(1, idHorario);
-                
-                // Ejecutar la sentencia SQL de borrado
-                int resultado = psD.executeUpdate();
-                
-                // Mostrar un mensaje de éxito o error dependiendo del resultado de la operación de borrado
-                if (resultado == 0) {
-                JOptionPane.showMessageDialog(null, "No se pudo borrar la cita.");
+        try {
+            filaSeleccionada = tabla.getSelectedRow();
+            if (filaSeleccionada != -1) {
+                if (empleadoEscogido.getApellidos().contains("Administrador")) {
+                    if (!borradoAdmin()) {
+                        throw new Exception("Error al intentar borrar la cita por parte del Admin.");
+                    }
+                    if (!llenarTablaTodosLosClientes()) {
+                        throw new Exception("Error al intentar mostrar las citas.");
+                    }
                 } else {
-                JOptionPane.showMessageDialog(null, "Borrado exitoso");
-                }*/
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Error al intentar borrar el horario");
+                    Cita citaSeleccionada = listadoCitas.get(filaSeleccionada);
+                    if (citaSeleccionada == null) {
+                        throw new Exception("No hay ninguna cita que borrar. No existen citas ");
+                    } else {
+                        // Realizar la acción correspondiente según la selección del usuario 
+                        int confirmacion = JOptionPane.showConfirmDialog(null, "¿Está seguro de que desea borrar la cita seleccionada? ", "Borrar cita", JOptionPane.OK_CANCEL_OPTION);
+                        if (confirmacion == JOptionPane.OK_OPTION) {
+                            if (!citaSeleccionada.eliminarCita()) {
+                                throw new Exception("No se pudo borrar la cita.");
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Borrado exitoso");
+                            }
+                            llenarTablaHorario();
+                        }
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "No se ha seleccionado un horario");
             }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "No se pudo actualizar la tabla" + e.getMessage());
         }
-    }
-
-    private String obtenerHorarioSeleccionado() {
-        String horarioSeleccionado;
-        TableModel modelo = tabla.getModel();
-        Object[] rowData = new Object[modelo.getColumnCount()];
-        for (int i = 0; i < modelo.getColumnCount(); i++) {
-            rowData[i] = modelo.getValueAt(filaSeleccionada, i);
-        }
-        String horarioEscogido = Arrays.toString(rowData);
-        horarioSeleccionado = horarioEscogido.substring(horarioEscogido.indexOf("[") + 1, horarioEscogido.length() - 1);
-        return horarioSeleccionado;
     }
 
     /**
@@ -1098,6 +489,7 @@ public class GestionCitasVentana extends JFrame {
         });
     }
 
+    //<editor-fold defaultstate="collapsed" desc="Declaracion de variables autogeneradas">
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBorrar;
     private javax.swing.JButton btnModificar;
@@ -1118,36 +510,111 @@ public class GestionCitasVentana extends JFrame {
     private javax.swing.JPanel panelTabla;
     private javax.swing.JTable tabla;
     // End of variables declaration//GEN-END:variables
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="Metodos de inicializacion de datos">
+    private boolean inicializarDatos(Connection conexionBaseData, Personal personal) {
+        boolean devo = false;
+        try {
+            con = conexionBaseData; // Pasar conexión a la base de datos
+            empleadoEscogido = personal;
+            listaHorarioInicial = Horario.buscarFiltrado(false, null, false, null, true, empleadoEscogido.getId(), false, 0, con); // Obtenemos los horarios que estan asignados al empleado
+            for (Horario horarioAsignado : listaHorarioInicial) {
+                listadoCitasInicial = Cita.buscarPorHorario(horarioAsignado.getId(), conexionBaseData); // De dicho horario vamos llenando las citas que tiene el empleado
+                if (listadoCitasInicial == null) {
+                    throw new Exception("Hubo un error al consultar las citas");
+                }
+                if (listadoCitasInicial.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "No hay citas");
+                }
+            }
+            devo = true;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error al inicializar datos, " + e.getMessage());
+            devo = false;
+        }
+        return devo;
+    }
+
+    private boolean inicializarDatosIniciales() {
+        boolean devo = false;
+        try {
+            // Establecemos una nueva conexión
+            con = ConexionBD.conectarSinLogin();
+            // Buscamos por defecto la cuenta de administrador
+            empleadoPorDefecto = Personal.obtenerPersonalPorId(1, con);
+            listaHorarioInicial = Horario.obtenerTodosLosHorarios(con); // Obtenemos todos los horarios
+            listadoCitasInicial = Cita.buscarTodas(con); // De dicho horario vamos llenando todas las citas que tiene el empleado
+
+            devo = true;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error intentando inicializar los datos " + e.getMessage());
+            devo = false;
+        }
+
+        return devo;
+    }
+//</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="Metodos relacionados con la tabla">
+    /**
+     * Método para comprobar si la tabla está vacía y actualizarla en
+     * consecuencia.
+     */
+    public boolean comprobarTabla() {
+        boolean devo = false;
+        try {
+            if (tabla.getRowCount() > 0) { // Si la tabla tiene filas
+                DefaultTableModel model = (DefaultTableModel) tabla.getModel(); // Obtener el modelo de la tabla
+                model.setRowCount(0); // Establecer el número de filas en 0 para vaciar la tabla
+            } else { // Si la tabla está vacía
+                llenarTabla(); // Llenar la tabla con datos
+            }
+            devo = true;
+        } catch (Exception e) {
+            devo = false;
+        }
+        return devo;
+    }
 
     /**
      *
      */
-    public void modificarDiseño() {
+    public boolean modificarDiseño() {
         /**
-         * PENDIENTE CORREGIR
+         * PENDIENTE CORREGIR Corregido 31 Jul 2025
          */
         // Botones
-        /**
-         * if (tipoUsu != null) { if (tipoUsu.contains("Administrador")) { // Si
-         * el tipo de usuario contiene "Administrador", se modifican los textos
-         * de los botones btnPedir.setText("Añadir horario");
-         * btnModificar.setText("Modificar horario"); btnBorrar.setText("Borrar
-         * horario"); } else { // Si el tipo de usuario no es "Administrador",
-         * se modifican los textos de los botones de otra forma
-         * btnPedir.setText("Concertar Cita"); btnModificar.setText("Modificar
-         * Cita"); btnBorrar.setText("Anular Cita"); } }
-        *
-         */
+        boolean devo = false;
+        try {
+            if (empleadoEscogido == null) {
+                empleadoEscogido = empleadoPorDefecto;
+            } else {
+                if (empleadoEscogido.getApellidos() != null) {
+                    if (empleadoEscogido.getApellidos().contains("Administrador")) { // Si el tipo de usuario contiene "Administrador", se modifican los textos de los botones
+                        btnPedir.setText("Añadir horario");
+                        btnModificar.setText("Modificar horario");
+                        btnBorrar.setText("Borrar horario");
+                    } else { // Si el tipo de usuario no es "Administrador", se modifican los textos de los botones de otra forma
+                        btnPedir.setText("Concertar Cita");
+                        btnModificar.setText("Modificar Cita");
+                        btnBorrar.setText("Anular Cita");
+                    }
+                }
 
-        // Propiedades de los botones
-        btnSalir.putClientProperty(this, "roundrect");
-        btnPedir.putClientProperty(this, "roundrect");
-        btnModificar.putClientProperty(this, "roundrect");
-        btnBorrar.putClientProperty(this, "roundrect");
+            }
+            // Propiedades de los botones
+            btnSalir.putClientProperty(this, "roundrect");
+            btnPedir.putClientProperty(this, "roundrect");
+            btnModificar.putClientProperty(this, "roundrect");
+            btnBorrar.putClientProperty(this, "roundrect");
 
-        // Tabla
-        tabla.setFillsViewportHeight(true);
-        tabla.setCellSelectionEnabled(false);
+            // Tabla
+            tabla.setFillsViewportHeight(true);
+            tabla.setCellSelectionEnabled(false);
+        } catch (Exception e) {
+        }
+        return devo;
 
     }
 
@@ -1157,13 +624,12 @@ public class GestionCitasVentana extends JFrame {
     public boolean llenarTabla() {
         boolean devo = false;
         try {
-            int idC = citaElegida.getId();
             if (empleadoEscogido.getApellidos() != null) {
-                if (idC != 0 && !empleadoEscogido.getApellidos().equals("Administrador")) {
-                    // Si el tipo de usuario no es "Administrador" y el ID no es 0, se llama al método llenarTablaHorario()
-                    llenarTablaHorario(idC);
+                if (!empleadoEscogido.getApellidos().equals("Administrador")) {
+                    // Si el tipo de usuario no es "Administrador", se llama al método llenarTablaHorario()
+                    llenarTablaHorario();
                 } else {
-                    // Si el tipo de usuario es "Administrador" o el ID es 0, se llama al método llenarTablaTodosLosClientes()
+                    // Si el tipo de usuario es "Administrador", se llama al método llenarTablaTodosLosClientes()
                     llenarTablaTodosLosClientes();
                 }
                 devo = true;
@@ -1182,7 +648,7 @@ public class GestionCitasVentana extends JFrame {
      */
     private boolean llenarTablaTodosLosClientes() {
         boolean devo = false;
-        String fechaOriginal, fecha, hora, descripcion, precio, cliente = "", empleado = "";
+        String cliente = "";
         Cliente clienteCitado;
         String[] fila;
         try {
@@ -1193,22 +659,25 @@ public class GestionCitasVentana extends JFrame {
                     return false;
                 }
             };
-
-            // Se recorre el listado de horarios del empleado y de las citas programadas, si coinciden se van llenando de valores cada columna
+            listaHorarios = Horario.obtenerTodosLosHorarios(con);
             for (int i = 0; i < listaHorarios.size(); i++) {
-                for (int j = 0; j < listadoCitas.size(); j++) {
-                    if (listadoCitas.get(j).getIdHorario() == listaHorarios.get(i).getId()) {
-                        clienteCitado = listadoCitas.get(i).getCliente();
+                listadoCitas = Cita.buscarPorHorario(listaHorarios.get(i).getId(), con);
+                if (listadoCitas.get(i) != null) {
+                    for (int j = 0; j < listadoCitas.size(); j++) {
+                        clienteCitado = listadoCitas.get(j).getCliente();
                         if (clienteCitado == null) {
                             cliente = "No existe cliente";
                         } else {
                             cliente = clienteCitado.getNombre();
                         }
                         fila = new String[]{listaHorarioInicial.get(i).getFecha(), listaHorarioInicial.get(i).getHora(), listaHorarioInicial.get(i).getDescripcion(), listaHorarios.get(i).getPrecio(), cliente, listaHorarios.get(i).getEmpleado()};
+                        modeloGeneral.addRow(fila);
                     }
                 }
             }
-
+            /*
+            // Se recorre el listado de horarios del empleado y de las citas programadas, si coinciden se van llenando de valores cada columna
+             */
             // Se establece el modeloGeneral como el modelo de la tabla
             tabla.setModel(modeloGeneral);
             tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -1232,10 +701,10 @@ public class GestionCitasVentana extends JFrame {
 
     /**
      *
-     * @param idPersonal
+     * @param idCita
      * @throws SQLException
      */
-    private boolean llenarTablaHorario(int idPersonal) {
+    private boolean llenarTablaHorario() {
         boolean devo = false;
         String[] fila;
         try {
@@ -1252,20 +721,22 @@ public class GestionCitasVentana extends JFrame {
                 for (int j = 0; j < listadoCitasInicial.size(); j++) {
                     if (listadoCitasInicial.get(j).getIdHorario() == listaHorarioInicial.get(i).getId()) {
                         fila = new String[]{listaHorarioInicial.get(i).getFecha(), listaHorarioInicial.get(i).getHora(), listaHorarioInicial.get(i).getDescripcion(), listaHorarioInicial.get(i).getPrecio(), listadoCitasInicial.get(j).getCliente().getNombre()};
+                        modelo.addRow(fila);
                     }
                 }
             }
 
-            /*while (resultado.next()) {
-            String fecha = resultado.getString("fecha");
-            String hora = resultado.getString("hora");
-            String descripcion = resultado.getString("descripcion");
-            String precio = resultado.getString("precio");
-            String cliente = resultado.getString("cliente");
-            
-            // Se agrega la fila al modelo de la tabla
-            modelo.addRow(fila);
-            }*/
+            /**
+             * while (resultado.next()) { String fecha =
+             * resultado.getString("fecha"); String hora =
+             * resultado.getString("hora"); String descripcion =
+             * resultado.getString("descripcion"); String precio =
+             * resultado.getString("precio"); String cliente =
+             * resultado.getString("cliente");
+             *
+             * // Se agrega la fila al modelo de la tabla modelo.addRow(fila);
+             * } *
+             */
             // Se establece el modelo como el modelo de la tabla
             tabla.setModel(modelo);
             tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -1291,274 +762,349 @@ public class GestionCitasVentana extends JFrame {
     /**
      *
      */
-    private void vaciarTabla() {
-        // Se establece un nuevo modelo de tabla vacío, sin filas ni columnas
-        tabla.setModel(new DefaultTableModel(0, 0));
+    private boolean vaciarTabla() {
+        boolean devo = false;
+        try {
+            // Se establece un nuevo modelo de tabla vacío, sin filas ni columnas
+            tabla.setModel(new DefaultTableModel(0, 0));
 
-        // Se establece el ID en el objeto vc
-        vc.setId(empleadoEscogido.getId());
+            // Se establece el ID en el objeto vc
+            vc.setId(empleadoEscogido.getId());
+            devo = true;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Ha ocurrido un error al vaciar la tabla " + e.getMessage());
+        }
+        return devo;
+    }
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="Metodos de Consultas">
+    //<editor-fold defaultstate="collapsed" desc="Metodos de Insercion">
+    /**
+     * Método para insertar una cita para el personal.
+     *
+     * @throws HeadlessException Si se produce un error al mostrar el cuadro de
+     * diálogo.
+     */
+    private boolean insertarCitaPersonal() {
+        /**
+         * PENDIENTE CORREGIR
+         *
+         * Corregido 31 Jul 2025
+         */
+        boolean devo = false;
+        filaSeleccionada = tabla.getSelectedRow();
+        try {
+            if (filaSeleccionada != -1) {
+                citaElegida = listadoCitasInicial.get(filaSeleccionada);
+                if (citaElegida == null) {
+                    throw new Exception("Este horario ya esta asignado");
+                } else {
+
+                    // Mostrar un cuadro de lista desplegable con los clientes disponibles para que el usuario seleccione uno
+                    ArrayList<Cliente> listaClientes = Cliente.obtenerTodos(con);
+                    DefaultComboBoxModel<String> clienteModel = new DefaultComboBoxModel<>(listaClientes.toArray(new String[0]));
+                    comboBoxClientes = new JComboBox<>(clienteModel);
+                    int resultadoCliente = JOptionPane.showConfirmDialog(null, comboBoxClientes, "Elige el cliente", JOptionPane.OK_CANCEL_OPTION);
+
+                    if (resultadoCliente == JOptionPane.OK_OPTION) {
+                        // Obtener el cliente seleccionado
+                        Cliente clienteElegido = (Cliente) comboBoxClientes.getSelectedItem();
+
+                        // Obtener el ID del cliente seleccionado
+                        int idCliente = clienteElegido.getId();
+
+                        // Insertar la cita con el cliente y el horario seleccionado
+                        insertarCita(idCliente, citaElegida.getId());
+                    }
+                    devo = true;
+                }
+            } else {
+                throw new Exception("Horario no seleccionado");
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Error al realizar la cita " + ex.getMessage());
+        }
+        return devo;
     }
 
+    /**
+     * Método para insertar una nueva cita en la base de datos.
+     *
+     * @param idCliente El ID del cliente de la cita.
+     * @param idHorario El ID del horario de la cita.
+     */
+    public boolean insertarCita(int idCliente, int idHorario) {
+        /**
+         * PENDIENTE CORREGIR
+         *
+         * Corregido 31 Jul 2025
+         */
+
+        boolean devo = false;
+        try {
+            Cita citaNueva = new Cita();
+            citaNueva.setIdCliente(idCliente);
+            citaNueva.setIdHorario(idHorario);
+            if (!citaNueva.aniadirCita()) {
+                throw new Exception("No se pudo realizar la cita");
+            } else {
+                JOptionPane.showMessageDialog(null, "Cita creada exitosamente");
+            }
+            llenarTablaHorario();
+            devo = true;
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Error al insertar la cita. " + ex.getMessage());
+        }
+        return devo;
+    }
+
+    /**
+     * Método para obtener datos relacionados con la programación de un horario.
+     * Muestra un diálogo con componentes para seleccionar la fecha, hora,
+     * empleado y servicio. Luego, realiza la inserción de los datos en la tabla
+     * de horario.
+     */
+    public boolean aniadirNuevosRegistros() {
+        boolean devo = false;
+        Horario horarioNuevo;
+        try {
+
+            // Crear los componentes de fecha y hora
+            DatePicker datePicker = new DatePicker();
+            TimePicker timePicker = new TimePicker();
+
+            // Crear el combobox para empleados
+            ArrayList<Personal> listaEmpleados = Personal.obtenerTodos(con);
+            DefaultComboBoxModel<Personal> empleadoModel = new DefaultComboBoxModel<>(listaEmpleados.toArray(new Personal[0]));
+            JComboBox<Personal> empleadoComboBox = new JComboBox<>(empleadoModel);
+
+            // Crear el combobox para servicios
+            ArrayList<Servicio> listaServicios = Servicio.obtenerTodos(con);
+            DefaultComboBoxModel<Servicio> servicioModel = new DefaultComboBoxModel<>(listaServicios.toArray(new Servicio[0]));
+            JComboBox<Servicio> servicioComboBox = new JComboBox<>(servicioModel);
+
+            // Crear el panel de entrada de datos
+            JPanel panel = new JPanel(new GridLayout(4, 2));
+            panel.add(new JLabel("Fecha:"));
+            panel.add(datePicker);
+            panel.add(new JLabel("Hora:"));
+            panel.add(timePicker);
+            panel.add(new JLabel("Empleado:"));
+            panel.add(empleadoComboBox);
+            panel.add(new JLabel("Servicio:"));
+            panel.add(servicioComboBox);
+            // Mostrar el panel de entrada de datos en un diálogo
+            int result = JOptionPane.showConfirmDialog(null, panel, "Ingrese los datos", JOptionPane.OK_CANCEL_OPTION);
+            if (result == JOptionPane.OK_OPTION) {
+                // Obtener los valores seleccionados
+                String fecha = datePicker.getDate().toString();
+                String hora = timePicker.getTime().toString();
+                Personal empleado = (Personal) empleadoComboBox.getSelectedItem();
+                Servicio servicio = (Servicio) servicioComboBox.getSelectedItem();
+                // Realizar la inserción en la tabla de horario
+                horarioNuevo = new Horario(fecha, hora, empleado, servicio, con);
+                ArrayList<Horario> horariosCoincidentes = Horario.buscarFiltrado(true, fecha, true, hora, true, empleado.getId(), true, servicio.getId(), con);
+                if (!horariosCoincidentes.isEmpty()) {
+                    throw new Exception("El horario que intentas añadir ya existe");
+                }
+                devo = horarioNuevo.crearHorario();
+            }
+            devo = true;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error al añadir un nuevo horario" + e.getMessage());
+            devo = false;
+        }
+        return devo;
+    }
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="Metodos de Modificacion">
     /**
      *
      * @param horarioId
      */
-    private void modificarServicioHora(int horarioId) {
-        // Se crea un nuevo objeto TimePicker para permitir al usuario seleccionar una nueva hora
-        //TimePicker nuevaFecha = new TimePicker();
+    private boolean modificarHora(Horario horarioActual) {
+        boolean devo = false;
+        Horario horarioActualizado;
+        try {
+            // Se crea un nuevo objeto TimePicker para permitir al usuario seleccionar una nueva hora
+            TimePicker nuevaFecha = new TimePicker();
 
-        // Se muestra un cuadro de diálogo para que el usuario introduzca la nueva hora utilizando el objeto TimePicker
-        //int resultado = JOptionPane.showConfirmDialog(null, nuevaFecha, "Introduce nueva hora", JOptionPane.OK_CANCEL_OPTION);
+            // Se muestra un cuadro de diálogo para que el usuario introduzca la nueva hora utilizando el objeto TimePicker
+            int resultado = JOptionPane.showConfirmDialog(null, nuevaFecha, "Introduce nueva hora", JOptionPane.OK_CANCEL_OPTION);
 //
-        //if (resultado != JOptionPane.CANCEL_OPTION) {
-        //    // Se obtiene la hora actualizada seleccionada por el usuario en formato de cadena de texto
-        //    String horaActualizada = nuevaFecha.getTime().toString();
+            if (resultado != JOptionPane.CANCEL_OPTION) {
+                // Se obtiene la hora actualizada seleccionada por el usuario en formato de cadena de texto
+                String horaActualizada = nuevaFecha.getTime().toString();
 //
-        //    // Se asigna el valor del horarioId a una variable local llamada idCita
-        //    int idCita = horarioId;
-//
-        //    // Se llama al método modificarServicioPorHora() del objeto consultas, pasando la hora actualizada y el idCita como argumentos
-        //    consultas.modificarServicioPorHora(horaActualizada, idCita);
-        //}
+// Se crea un objeto horario para actualizar la fecha del horario seleccionado
+                horarioActualizado = new Horario(horarioActual.getId(), con);
+                horarioActualizado.setHora(horaActualizada);
+                horarioActualizado.actualizarHorario();
+            }
+            devo = true;
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Error al modificar la hora" + ex.getMessage());
+        }
+        return devo;
     }
 
     /**
+     * Método para modificar la fecha del servicio.
      *
-     * @param fecha
-     * @param hora
-     * @param servicio
-     * @return
      */
-    public int obtenerIdHorario(String fecha, String hora, String servicio) {
-        // Se inicializan las variables de identificación de servicio y horario con un valor por defecto de -1
-        int idServicio = -1;
-        int idHorario = -1;
-
-        // Se establece la conexión a la base de datos
-        realizarConexion();
-
+    public boolean modificarFecha(Horario horarioActual) {
+        boolean devo = false;
+        Horario horarioActualizado;
         try {
-            // Se ejecuta una consulta para obtener el id del servicio en base a su descripción
-            PreparedStatement pstmt = con.prepareStatement("SELECT id FROM servicios WHERE descripcion=?");
-            pstmt.setString(1, servicio);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    // Si se encuentra un registro, se asigna el valor del id del servicio a la variable idServicio
-                    idServicio = rs.getInt("id");
-                }
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al buscar el servicio");
-        }
-
-        // Si se ha obtenido correctamente el id del servicio
-        if (idServicio != -1) {
-            try {
-                // Se ejecuta una consulta para obtener el id del horario en base a la fecha, hora y id del servicio
-                PreparedStatement pstmt = con.prepareStatement("SELECT id FROM horario WHERE fecha_es=? AND hora_es=? AND id_servicio=?");
-                pstmt.setString(1, fecha);
-                pstmt.setString(2, hora);
-                pstmt.setInt(3, idServicio);
-                try (ResultSet rs = pstmt.executeQuery()) {
-                    if (rs.next()) {
-                        // Si se encuentra un registro, se asigna el valor del id del horario a la variable idHorario
-                        idHorario = rs.getInt("id");
-                    }
-                }
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, "Error al coger el horario");
-            }
-        }
-
-        // Se devuelve el id del horario encontrado (o -1 si no se encontró ningún horario)
-        return idHorario;
-    }
-
-    /**
-     *
-     * @param fecha
-     * @param hora
-     * @param servicio
-     * @return
-     */
-    public int obtenerIdHorarioPersonal(String fecha, String hora, String servicio) {
-        // Se inicializan las variables de identificación de servicio y horario con un valor por defecto de -1
-        int idServicio = -1;
-        int idHorario = -1;
-
-        // Se establece la conexión a la base de datos
-        realizarConexion();
-
-        try {
-            // Se ejecuta una consulta para obtener el id del servicio en base a su descripción
-            PreparedStatement pstmt = con.prepareStatement("SELECT id FROM servicios WHERE descripcion=?");
-            pstmt.setString(1, servicio);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    // Si se encuentra un registro, se asigna el valor del id del servicio a la variable idServicio
-                    idServicio = rs.getInt("id");
-                }
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al buscar el servicio");
-        }
-
-        // Si se ha obtenido correctamente el id del servicio
-        if (idServicio != -1) {
-            try {
-                // Se ejecuta una consulta para obtener el id del horario en base a la fecha, hora y id del servicio
-                PreparedStatement pstmt = con.prepareStatement("SELECT id FROM horario WHERE fecha_es=? AND hora_es=? AND id_servicio=?");
-                pstmt.setString(1, fecha);
-                pstmt.setString(2, hora);
-                pstmt.setInt(3, idServicio);
-                try (ResultSet rs = pstmt.executeQuery()) {
-                    if (rs.next()) {
-                        // Si se encuentra un registro, se asigna el valor del id del horario a la variable idHorario
-                        idHorario = rs.getInt("id");
-                    }
-                }
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, "Error al coger el horario");
-            }
-        }
-
-        // Se devuelve el id del horario encontrado (o -1 si no se encontró ningún horario)
-        return idHorario;
-    }
-
-    /**
-     *
-     * @return
-     */
-    private ArrayList<String> obtenerHorarios() {
-        // Se crea una lista para almacenar los horarios
-        ArrayList<String> horarios = new ArrayList<>();
-
-        try {
-            // Se establece la conexión a la base de datos
-            realizarConexion();
-
-            // Consulta SQL para obtener los horarios y la información relacionada
-            String query = "SELECT DISTINCT horario.fecha, horario.hora, servicios.precio, servicios.descripcion, usuario.nombre as nombre_cliente, usuario.apellidos as apellidos_cliente, personal.nombre as nombre_personal, personal.apellidos as apellidos_personal FROM horario LEFT JOIN cita ON horario.id = cita.id_horario LEFT JOIN usuario ON cita.id_cliente = usuario.id JOIN servicios ON horario.id_servicio = servicios.id LEFT JOIN usuario as personal ON horario.id_personal = personal.id";
-
-            // Se crea un Statement para ejecutar la consulta
-            Statement statement = con.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-
-            // Se recorre el resultado de la consulta
-            while (resultSet.next()) {
-                // Se obtienen los valores de los campos correspondientes
-                String fecha = resultSet.getString("fecha");
-                String hora = resultSet.getString("hora");
-                String servicio = resultSet.getString("descripcion");
-                Double precio = resultSet.getDouble("precio");
-                String cliente = "";
-                if (resultSet.getString("nombre_cliente") == null && resultSet.getString("apellidos_cliente") == null) {
-                    cliente = "No hay cliente asignado";
-                } else {
-                    String nombreCliente = resultSet.getString("nombre_cliente");
-                    String apellidosCliente = resultSet.getString("apellidos_cliente");
-                    cliente = nombreCliente + " " + apellidosCliente;
-                }
-                String personal = "";
-                if (resultSet.getString("nombre_personal") == null && resultSet.getString("apellidos_personal") == null) {
-                    personal = "No hay personal asignado";
-                } else {
-                    String nombrePersonal = resultSet.getString("nombre_personal");
-                    String apellidosPersonal = resultSet.getString("apellidos_personal");
-                    personal = nombrePersonal + " " + apellidosPersonal;
-                }
-                String precioS = String.valueOf(precio);
-
-                // Se construye una cadena con la información del horario y se agrega a la lista de horarios
-                String horario = "Fecha: " + fecha + ", Hora: " + hora + ", Servicio: " + servicio + ", Cliente: " + cliente + ", Personal: " + personal + ", Precio: " + precioS;
-                horarios.add(horario);
-            }
-
-            // Se cierran los recursos utilizados
-            resultSet.close();
-            statement.close();
-            con.close();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al mostrar todos los horarios");
-        }
-
-        // Se devuelve la lista de horarios
-        return horarios;
-    }
-
-    /**
-     *
-     * @param descripcion
-     * @return
-     */
-    public int obtenerIdServicio(String descripcion) {
-        // Variable para almacenar el ID del servicio, se inicializa con un valor por defecto de -1
-        int idServicio = -1;
-
-        // Crear la consulta SQL para obtener el ID del servicio
-        String sql = "SELECT id FROM servicios WHERE descripcion = ?";
-
-        // Conectar a la base de datos y ejecutar la consulta
-        try {
-            // Establecer la conexión a la base de datos
-            realizarConexion();
-
-            // Preparar la sentencia SQL con el parámetro de la descripción del servicio
-            PreparedStatement pstmt = con.prepareStatement(sql);
-            pstmt.setString(1, descripcion);
-
-            // Ejecutar la consulta y procesar el resultado
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                // Si se encuentra un registro, se obtiene el valor del campo "id" y se asigna a la variable idServicio
-                idServicio = rs.getInt("id");
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-
-        // Devolver el ID del servicio
-        return idServicio;
-    }
-
-    /**
-     *
-     * @param personalActual
-     * @param idP
-     */
-    private void modificarPersonal(Horario personalActual, int idP) {
-        try {
-            // Establecer la conexión a la base de datos
-            realizarConexion();
-
-            // Crear la sentencia SQL para la actualización del personal en el horario
-            String actualizacion = "UPDATE HORARIO SET ID_PERSONAL=? WHERE ID LIKE ?";
-            PreparedStatement ps = con.prepareStatement(actualizacion);
-
-            // Obtener el ID del horario actual a partir de la fecha, hora y descripción proporcionados
-            int idH = obtenerIdHorario(personalActual.getFecha(), personalActual.getHora(), personalActual.getDescripcion());
-
-            // Establecer los parámetros de la sentencia SQL
-            ps.setInt(1, idP);
-            ps.setInt(2, idH);
-
-            // Ejecutar la actualización y obtener el resultado
-            int result = ps.executeUpdate();
-
-            // Comprobar el resultado de la actualización y mostrar mensajes correspondientes
-            if (result == 0) {
-                JOptionPane.showMessageDialog(null, "No se ha podido modificar el servicio, vuelva a intentarlo");
+            // Crear un cuadro de diálogo con un DatePicker para que el usuario seleccione una nueva fecha
+            DatePicker nuevaFecha = new DatePicker();
+            int resultado = JOptionPane.showConfirmDialog(null, nuevaFecha, "Introduce nueva fecha", JOptionPane.OK_CANCEL_OPTION);
+            if (resultado != JOptionPane.CANCEL_OPTION) {
+                // Obtener la fecha actualizada
+                String fechaActualizada = nuevaFecha.getDate().toString();
+                // Llamar a un método de consulta para modificar el servicio con la nueva fecha
+                horarioActualizado = new Horario(horarioActual.getId(), con);
+                horarioActualizado.setFecha(fechaActualizada);
+                horarioActualizado.actualizarHorario();
             } else {
-                JOptionPane.showMessageDialog(null, "Servicio modificado exitosamente");
             }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error intentando modificar el servicio");
+            devo = true;
+        } catch (Exception e) {
+            devo = false;
         }
+        return devo;
     }
 
-    private void realizarConexion() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    /**
+     * Método para modificar el precio del servicio.
+     *
+     */
+    public boolean modificarPrecio(Horario horarioActual) {
+        boolean devo = false;
+        Servicio servicioActualizado;
+        try {
+            // Mostrar un cuadro de diálogo para que el usuario ingrese el nuevo precio
+            String nuevoPrecioStr = JOptionPane.showInputDialog(null, "Introduce el nuevo precio:", "Actualizar precio", JOptionPane.OK_CANCEL_OPTION);
+
+            if (nuevoPrecioStr != null) {
+                double nuevoPrecio = Double.parseDouble(nuevoPrecioStr);
+                servicioActualizado = Servicio.obtenerServicioPorId(horarioActual.getIdServicio(), con);
+                servicioActualizado.setPrecio(nuevoPrecio);
+                servicioActualizado.actualizarServicio();
+                JOptionPane.showMessageDialog(null, "Se modificó el precio del servicio.");
+                devo = true;
+            } else {
+                throw new Exception("El precio no es válido o está vacío");
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Error modificando el precio");
+            devo = false;
+        }
+        return devo;
     }
+
+    /**
+     * Método para modificar el personal del servicio.
+     *
+     * @param personalActual El objeto Horario con el personal actual del
+     * servicio.
+     */
+    public boolean modificarPersonal(Horario personalActual) {
+        boolean devo = false;
+        try {
+            // Obtener la lista de personal disponible
+            ArrayList<Personal> personalPelu = Personal.obtenerTodos(con);
+            Horario horarioActualizado;
+            // Mostrar un cuadro de lista desplegable con el personal disponible para que el usuario seleccione uno nuevo
+            JComboBox comboboxPers = new JComboBox(personalPelu.toArray());
+            int resultado = JOptionPane.showConfirmDialog(null, comboboxPers, "Seleccione Nuevo Personal", JOptionPane.OK_OPTION);
+
+            if (resultado == JOptionPane.CANCEL_OPTION) {
+                JOptionPane.showMessageDialog(null, "Cancelando...");
+                devo = true;
+            } else {
+                // Obtener el personal seleccionado
+                Personal empleadoEscogido = (Personal) comboboxPers.getSelectedItem();
+                horarioActualizado = new Horario(personalActual.getId(), con);
+                horarioActualizado.setIdPersonal(empleadoEscogido.getId());
+                // Llamar a un método de consulta para modificar el servicio con el nuevo personal
+                if (!horarioActualizado.actualizarHorario()) {
+                    throw new Exception("Error al actualizar el horario por el personal");
+                }
+                devo = true;
+            }
+        } catch (Exception ex) {
+            devo = false;
+            JOptionPane.showMessageDialog(null, "Error en la modificacion. " + ex.getMessage());
+        }
+        return devo;
+    }
+
+    /**
+     * Método para modificar el servicio de un horario.
+     *
+     * @param horarioSeleccionado El objeto Horario del horario seleccionado.
+     * @throws HeadlessException Si se produce un error al mostrar el cuadro de
+     * diálogo.
+     */
+    private boolean modificarServicio(Horario horarioSeleccionado) {
+        boolean devo = false;
+        ArrayList<Servicio> listaServ;
+        Servicio nuevoServicio;
+        Horario horarioActualizado;
+        JComboBox comboboxServ;
+        try {
+            // Obtener la lista de servicios disponibles
+            listaServ = Servicio.obtenerTodos(con);
+            // Mostrar un cuadro de lista desplegable con los servicios disponibles para que el usuario seleccione uno nuevo
+            comboboxServ = new JComboBox(listaServ.toArray());
+            int resultado = JOptionPane.showConfirmDialog(null, comboboxServ, "Seleccione nuevo servicio", JOptionPane.OK_OPTION);
+            if (resultado != JOptionPane.CANCEL_OPTION) {
+                // Obtener el servicio seleccionado y su ID
+                nuevoServicio = (Servicio) comboboxServ.getSelectedItem();
+                horarioActualizado = new Horario(horarioSeleccionado.getId(), con);
+                horarioActualizado.setIdServicio(nuevoServicio.getId());
+                horarioActualizado.actualizarHorario();
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Error al inentar modificar el servicio. " + ex.getMessage());
+        }
+        return devo;
+    }
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="Metodos de Borrado">
+    /**
+     * Método privado para realizar el borrado de un horario por parte de un
+     * administrador.
+     *
+     * @throws HeadlessException Si ocurre algún error relacionado con la
+     * interfaz gráfica.
+     */
+    private boolean borradoAdmin() {
+        boolean devo = false;
+        Horario horarioElegido;
+        try {
+            // Mostrar un cuadro de diálogo de confirmación para asegurarse de que se desea borrar el horario seleccionado
+            int decision = JOptionPane.showConfirmDialog(null, "Seguro que desea borrar el horario seleccionado (ten en cuenta que puede contener un cliente)", "Confirmacion", JOptionPane.YES_NO_OPTION);
+            if (decision == JOptionPane.YES_OPTION) {
+                horarioElegido = listaHorarioInicial.get(filaSeleccionada);
+                if (!horarioElegido.eliminarHorario()) {
+                    throw new Exception("No se pudo borrar la cita. Depura el método.");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Borrado exitoso");
+                }
+            }
+            devo = true;
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Error al intentar borrar el horario, " + ex.getMessage());
+            devo = false;
+        }
+        return devo;
+    }
+    //</editor-fold>
+    //</editor-fold>
 
 }

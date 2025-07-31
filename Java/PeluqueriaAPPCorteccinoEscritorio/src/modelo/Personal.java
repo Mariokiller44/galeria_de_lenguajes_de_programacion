@@ -5,23 +5,25 @@
 package modelo;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 /**
  * Clase que representa al Personal
- * 
+ *
  * @author Mario
  * @version 1.0.2
  */
 public class Personal extends Usuario {
+
     private double salario;
     private String tipo;
     private Connection conexion; // Conexion a la base de datos
 
     public Personal() {
         /**
-         * Método para obtener un objeto Personal filtrando por los parámetros dados.
-         * Este es un método de ejemplo, debes implementar la lógica real según tu base
-         * de datos.
+         * Método para obtener un objeto Personal filtrando por los parámetros
+         * dados. Este es un método de ejemplo, debes implementar la lógica real
+         * según tu base de datos.
          */
 
     }
@@ -64,31 +66,50 @@ public class Personal extends Usuario {
         return conexion;
     }
 
-    public static Personal obtenerPersonalPorId(int idPersonal, Connection conexionBD) {
-        Personal devo = null;
+    @Override
+    protected boolean inicializarDesdeBD() {
+        boolean devo = false;
+        super.inicializarDesdeBD();
         try {
-            // Aquí se implementaría la lógica para obtener el personal por ID desde la base
-            // de datos
-            // Por ejemplo, realizar una consulta SQL y mapear los resultados a un objeto
-            // Personal
-            // Esto es un placeholder, ya que la implementación real depende de la
-            // estructura de la base de datos
-            devo = obtenerPersonalFiltrando(
-                    true, // confirmarId
-                    idPersonal,
-                    false, // confirmarSalario
-                    0.0,
-                    false, // confirmarTipo
-                    null,
-                    conexionBD);
+            String sql = "SELECT * FROM personal WHERE ID = ?";
+            PreparedStatement ps = conexion.prepareStatement(sql);
+            ps.setInt(1, getId());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                setTipo(rs.getString("tipo"));
+                setSalario(rs.getDouble("salario"));
+            }
+            devo = true;
         } catch (Exception e) {
-            // Manejo de excepciones
-            e.printStackTrace();
+            devo = false;
         }
         return devo;
     }
 
-    public static Personal obtenerPersonalFiltrando(
+    public static Personal obtenerPersonalPorId(int idPersonal, Connection conexionBD) {
+        Personal devo = null;
+        try {
+            devo = new Personal(idPersonal, conexionBD);
+            devo.inicializarDesdeBD();
+        } catch (Exception e) {
+            // Manejo de excepciones
+            devo = null;
+        }
+        return devo;
+    }
+
+    public static ArrayList<Personal> obtenerTodos(Connection conexionBD) {
+        ArrayList<Personal> devo = null;
+        try {
+            devo = obtenerPersonalFiltrando(false, 0, false, 0, false, null, conexionBD);
+        } catch (Exception e) {
+            // Manejo de excepciones
+            devo = null;
+        }
+        return devo;
+    }
+
+    public static ArrayList<Personal> obtenerPersonalFiltrando(
             boolean confirmarId,
             int id,
             boolean confirmarSalario,
@@ -96,11 +117,11 @@ public class Personal extends Usuario {
             boolean confirmarTipo,
             String tipo,
             Connection conexionBD) {
-        Personal personal = null;
+        ArrayList<Personal> personal = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            StringBuilder query = new StringBuilder("SELECT ID, TIPO, SALARIO FROM personal WHERE ID IS NOT NULL");
+            StringBuilder query = new StringBuilder("SELECT * FROM personal WHERE ID IS NOT NULL");
             if (confirmarId) {
                 query.append(" AND ID = ?");
             }
@@ -134,13 +155,15 @@ public class Personal extends Usuario {
             System.err.println("Error al obtener el personal: " + e.getMessage());
         } finally {
             try {
-                if (rs != null)
+                if (rs != null) {
                     rs.close();
+                }
             } catch (SQLException e) {
             }
             try {
-                if (stmt != null)
+                if (stmt != null) {
                     stmt.close();
+                }
             } catch (SQLException e) {
             }
         }
@@ -149,7 +172,7 @@ public class Personal extends Usuario {
 
     @Override
     public String toString() {
-        return super.toString() + ", salario: " + salario + ", tipo: " + tipo;
+        return super.toString() + ", tipo: " + tipo + ", salario: " + salario;
     }
 
 }
