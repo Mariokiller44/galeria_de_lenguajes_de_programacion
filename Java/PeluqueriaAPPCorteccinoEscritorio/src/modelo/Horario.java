@@ -99,15 +99,7 @@ public class Horario {
     public String getDescripcion() {
         return descripcion;
     }
-
-    public String getPrecio() {
-        return precio;
-    }
-
-    public String getEmpleado() {
-        return empleado;
-    }
-
+    
     public Personal getPersonal() {
         if (idPersonal != 0) {
             this.personal = Personal.obtenerPersonalPorId(idPersonal, conexionBD);

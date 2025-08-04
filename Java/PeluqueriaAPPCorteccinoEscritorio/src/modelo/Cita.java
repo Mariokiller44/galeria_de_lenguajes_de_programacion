@@ -154,11 +154,11 @@ public class Cita {
         try {
             String sql = "SELECT * FROM cita WHERE id = ?";
             PreparedStatement ps = conexion.prepareStatement(sql);
-            ps.setInt(1, id);
+            ps.setInt(1, getId());
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                idCliente = rs.getInt("id_cliente");
-                idHorario = rs.getInt("id_horario");
+                setIdCliente(rs.getInt("id_cliente"));
+                setIdHorario(rs.getInt("id_horario"));
                 getHorario(); // Cargar el horario asociado
                 getCliente(); // Cargar el cliente asociado
                 devo = true;
@@ -175,17 +175,17 @@ public class Cita {
         try {
             String sql = "INSERT INTO cita (id_cliente, id_horario) VALUES (?, ?)";
             PreparedStatement ps = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            ps.setInt(1, idCliente);
-            ps.setInt(2, idHorario);
+            ps.setInt(1, getIdCliente());
+            ps.setInt(2, getIdHorario());
             int filasAfectadas = ps.executeUpdate();
             if (filasAfectadas > 0) {
                 ResultSet rs = ps.getGeneratedKeys();
                 if (rs.next()) {
-                    id = rs.getInt(1); // Obtener el ID generado
-                    devo = true;
+                    setId(rs.getInt(1)); // Obtener el ID generado
                 }
+                devo = true;
             }
-            ps.close();
+             
         } catch (SQLException e) {
             System.out.println("Error al añadir Cita. " + e.getMessage());
             devo = false;
@@ -205,7 +205,6 @@ public class Cita {
             if (filasAfectadas > 0) {
                 devo = true;
             }
-            ps.close();
         } catch (SQLException e) {
             System.out.println("Error al actualizar Cita. " + e.getMessage());
             devo = false;
@@ -223,7 +222,7 @@ public class Cita {
             if (filasAfectadas > 0) {
                 devo = true;
             }
-            ps.close();
+             
         } catch (SQLException e) {
             System.out.println("Error al elminar Cita. " + e.getMessage());
             devo = false;
@@ -283,7 +282,7 @@ public class Cita {
     public static ArrayList<Cita> buscarPorHorario(int idHorario, Connection conexionBD) {
         ArrayList<Cita> devo = new ArrayList<>();
         try {
-            String sql = "SELECT * FROM cita WHERE id_horario = ?";
+            String sql = "SELECT id FROM cita WHERE id_horario = ?";
             PreparedStatement ps = conexionBD.prepareStatement(sql);
             ps.setInt(1, idHorario);
             ResultSet rs = ps.executeQuery();

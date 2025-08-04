@@ -138,6 +138,7 @@ public class Cliente extends Usuario {
                 cliente.setId(rs.getInt("ID"));
                 cliente.setDescripcion(rs.getString("DESCRIPCION"));
                 // Si necesitas inicializar más campos heredados, hazlo aquí
+                cliente.inicializarDesdeBD();
             }
         } catch (Exception e) {
             cliente = null;

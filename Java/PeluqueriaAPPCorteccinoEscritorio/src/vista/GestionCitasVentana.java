@@ -56,7 +56,7 @@ public class GestionCitasVentana extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH); // Establecer la ventana en pantalla completa
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Establecer la acción de cierre de la ventana
         setLocationRelativeTo(null); // Centrar la ventana en la pantalla
-        modificarDiseño(); // Modificar el diseño de la ventana
+        modificarDiseño();// Modificar el diseño de la ventana
         setTitle("Gestionar citas");
     }
 
@@ -70,6 +70,7 @@ public class GestionCitasVentana extends JFrame {
             setLocationRelativeTo(null); // Centrar la ventana en la pantalla
             comprobarTabla(); // Comprobar si la tabla está vacía o no
             modificarDiseño(); // Modificar el diseño de la ventana
+            llenarTabla();
             setTitle("Gestionar citas");
         } catch (Exception e) {
             System.err.println("Error al iniciar la ventana de gestión de Citas: " + e.getMessage());
@@ -511,28 +512,51 @@ public class GestionCitasVentana extends JFrame {
     //</editor-fold>
 
     //<editor-fold defaultstate="collapsed" desc="Metodos de inicializacion de datos">
+    /**
+     * Método corregido para inicializar datos
+     */
     private boolean inicializarDatos(Connection conexionBaseData, Personal personal) {
         boolean devo = false;
         try {
-            con = conexionBaseData; // Pasar conexión a la base de datos
+            con = conexionBaseData;
             empleadoEscogido = personal;
+
+            // Inicializar listas
+            listadoCitasInicial = new ArrayList<>();
+            listaHorarioInicial = new ArrayList<>();
+
             if (personal.getId() != 1) {
-                listaHorarioInicial = Horario.buscarFiltrado(false, null, false, null, true, personal.getId(), false, 0, conexionBaseData); // Obtenemos los horarios que estan asignados al empleado
-                for (Horario horarioAsignado : listaHorarioInicial) {
-                    listadoCitasInicial = Cita.buscarPorHorario(horarioAsignado.getId(), conexionBaseData); // De dicho horario vamos llenando las citas que tiene el empleado
-                    if (listadoCitasInicial == null) {
-                        throw new Exception("Hubo un error al consultar las citas");
+                // Empleado normal - obtener solo sus horarios
+                listaHorarioInicial = Horario.buscarFiltrado(false, null, false, null, true, personal.getId(), false, 0, conexionBaseData);
+
+                if (listaHorarioInicial == null) {
+                    listaHorarioInicial = new ArrayList<>();
+                }
+
+                // Obtener todas las citas de los horarios del empleado
+                for (Horario horario : listaHorarioInicial) {
+                    ArrayList<Cita> citasHorario = Cita.buscarPorHorario(horario.getId(), conexionBaseData);
+                    if (citasHorario != null) {
+                        listadoCitasInicial.addAll(citasHorario);
                     }
                 }
             } else {
-                listaHorarioInicial = Horario.obtenerTodosLosHorarios(conexionBaseData); // Obtenemos todos los horarios
-                for (Horario horarioAsignado : listaHorarioInicial) {
-                    listadoCitasInicial = Cita.buscarPorHorario(horarioAsignado.getId(), conexionBaseData); // De dicho horario vamos llenando las citas que tiene el empleado
+                // Administrador - obtener todos los horarios
+                listaHorarioInicial = Horario.obtenerTodosLosHorarios(conexionBaseData);
+                if (listaHorarioInicial == null) {
+                    listaHorarioInicial = new ArrayList<>();
+                }
+
+                // Obtener todas las citas
+                listadoCitasInicial = Cita.buscarTodas(conexionBaseData);
+                if (listadoCitasInicial == null) {
+                    listadoCitasInicial = new ArrayList<>();
                 }
             }
+
             devo = true;
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Error al inicializar datos, " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error al inicializar datos: " + e.getMessage());
             devo = false;
         }
         return devo;
@@ -545,6 +569,7 @@ public class GestionCitasVentana extends JFrame {
             con = ConexionBD.conectarSinLogin();
             // Buscamos por defecto la cuenta de administrador
             empleadoPorDefecto = Personal.obtenerPersonalPorId(1, con);
+            empleadoEscogido = empleadoPorDefecto;
             listaHorarioInicial = Horario.obtenerTodosLosHorarios(con); // Obtenemos todos los horarios
             listadoCitasInicial = Cita.buscarTodas(con); // De dicho horario vamos llenando todas las citas que tiene el empleado
 
@@ -569,9 +594,9 @@ public class GestionCitasVentana extends JFrame {
             if (tabla.getRowCount() > 0) { // Si la tabla tiene filas
                 DefaultTableModel model = (DefaultTableModel) tabla.getModel(); // Obtener el modelo de la tabla
                 model.setRowCount(0); // Establecer el número de filas en 0 para vaciar la tabla
-            } else { // Si la tabla está vacía
-                llenarTabla(); // Llenar la tabla con datos
-            }
+            }  // Si la tabla está vacía
+            llenarTabla(); // Llenar la tabla con datos
+
             devo = true;
         } catch (Exception e) {
             devo = false;
@@ -624,6 +649,172 @@ public class GestionCitasVentana extends JFrame {
     }
 
     /**
+     * Método corregido para llenar la tabla con todos los clientes (vista
+     * administrador)
+     */
+    private boolean llenarTablaTodosLosClientes() {
+        boolean devo = false;
+        try {
+            // Crear el modelo de tabla
+            DefaultTableModel modeloGeneral = new DefaultTableModel(columnasAdmin, 0) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+
+            // Obtener todos los horarios
+            listaHorarios = Horario.obtenerTodosLosHorarios(con);
+
+            if (listaHorarios == null || listaHorarios.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "No hay horarios disponibles");
+                tabla.setModel(modeloGeneral);
+                return true;
+            }
+
+            // Recorrer cada horario
+            for (Horario horario : listaHorarios) {
+                try {
+                    // Buscar citas para este horario específico
+                    ArrayList<Cita> citasDelHorario = Cita.buscarPorHorario(horario.getId(), con);
+
+                    if (citasDelHorario == null || citasDelHorario.isEmpty()) {
+                        // Horario sin citas - mostrar como disponible
+                        String[] fila = {
+                            horario.getFecha(),
+                            horario.getHora(),
+                            horario.getDescripcion(),
+                            String.valueOf(horario.getServicio().getPrecio()),
+                            "Disponible",
+                            horario.getPersonal().getNombre()
+                        };
+                        modeloGeneral.addRow(fila);
+                    } else {
+                        // Horario con citas - mostrar cada cita
+                        for (Cita cita : citasDelHorario) {
+                            Cliente cliente = cita.getCliente();
+                            String nombreCliente = (cliente != null) ? cliente.getNombre() : "Cliente no encontrado";
+
+                            String[] fila = {
+                                horario.getFecha(),
+                                horario.getHora(),
+                                horario.getDescripcion(),
+                                String.valueOf(horario.getServicio().getPrecio()),
+                                nombreCliente,
+                                horario.getPersonal().getNombre()
+                            };
+                            modeloGeneral.addRow(fila);
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error procesando horario ID " + horario.getId() + ": " + e.getMessage());
+                    // Continuar con el siguiente horario
+                }
+            }
+
+            // Configurar la tabla
+            tabla.setModel(modeloGeneral);
+            configurarSeleccionTabla();
+            tabla.setVisible(true);
+            devo = true;
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error al llenar tabla de administrador: " + e.getMessage());
+            devo = false;
+        }
+        return devo;
+    }
+
+    /**
+     * Método corregido para llenar la tabla de horarios (vista empleado)
+     */
+    private boolean llenarTablaHorario() {
+        boolean devo = false;
+        try {
+            // Crear el modelo de tabla
+            DefaultTableModel modelo = new DefaultTableModel(columnas, 0) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+
+            if (listaHorarioInicial == null || listaHorarioInicial.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "No hay horarios asignados para este empleado");
+                tabla.setModel(modelo);
+                return true;
+            }
+
+            // Recorrer cada horario del empleado
+            for (Horario horario : listaHorarioInicial) {
+                try {
+                    // Buscar citas para este horario
+                    ArrayList<Cita> citasDelHorario = Cita.buscarPorHorario(horario.getId(), con);
+
+                    if (citasDelHorario == null || citasDelHorario.isEmpty()) {
+                        // Horario disponible (sin citas)
+                        String[] fila = {
+                            horario.getFecha(),
+                            horario.getHora(),
+                            horario.getDescripcion(),
+                            String.valueOf(horario.getServicio().getPrecio()),
+                            "Disponible"
+                        };
+                        modelo.addRow(fila);
+                    } else {
+                        // Horario con citas
+                        for (Cita cita : citasDelHorario) {
+                            Cliente cliente = cita.getCliente();
+                            String nombreCliente = (cliente != null) ? cliente.getNombre() : "Cliente no encontrado";
+
+                            String[] fila = {
+                                horario.getFecha(),
+                                horario.getHora(),
+                                horario.getDescripcion(),
+                                String.valueOf(horario.getServicio().getPrecio()),
+                                nombreCliente
+                            };
+                            modelo.addRow(fila);
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error procesando horario ID " + horario.getId() + ": " + e.getMessage());
+                    // Continuar con el siguiente horario
+                }
+            }
+
+            // Configurar la tabla
+            tabla.setModel(modelo);
+            configurarSeleccionTabla();
+            devo = true;
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Error al llenar tabla horarios: " + ex.getMessage());
+            devo = false;
+        }
+        return devo;
+    }
+
+    /**
+     * Método auxiliar para configurar la selección de la tabla
+     */
+    private void configurarSeleccionTabla() {
+        tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabla.setColumnSelectionAllowed(false);
+        tabla.setRowSelectionAllowed(true);
+        tabla.setSelectionModel(new DefaultListSelectionModel() {
+            @Override
+            public void setSelectionInterval(int index0, int index1) {
+                if (index0 == index1 && isSelectedIndex(index0)) {
+                    removeSelectionInterval(index0, index1);
+                } else {
+                    super.setSelectionInterval(index0, index1);
+                }
+            }
+        });
+    }
+
+    /**
      *
      */
     public boolean llenarTabla() {
@@ -637,137 +828,12 @@ public class GestionCitasVentana extends JFrame {
                     // Si el tipo de usuario es "Administrador", se llama al método llenarTablaTodosLosClientes()
                     llenarTablaTodosLosClientes();
                 }
+                tabla.setVisible(true);
                 devo = true;
             }
         } catch (Exception ex) {
             // Si se produce una SQLException, se muestra un mensaje de error indicando que no se pudo llenar la tabla
             JOptionPane.showMessageDialog(null, "No se pudo llenar la tabla" + ex.getMessage());
-            devo = false;
-        }
-        return devo;
-    }
-
-    /**
-     *
-     * @throws SQLException
-     */
-    private boolean llenarTablaTodosLosClientes() {
-        boolean devo = false;
-        String cliente = "";
-        Cliente clienteCitado;
-        String[] fila;
-        try {
-            // Se crea un nuevo DefaultTableModel con las columnas específicas para la vista de administrador
-            DefaultTableModel modeloGeneral = new DefaultTableModel(columnasAdmin, 0) {
-                @Override
-                public boolean isCellEditable(int row, int column) {
-                    return false;
-                }
-            };
-            listaHorarios = Horario.obtenerTodosLosHorarios(con);
-            for (int i = 0; i < listaHorarios.size(); i++) {
-                listadoCitas = Cita.buscarPorHorario(listaHorarios.get(i).getId(), con);
-                if (listadoCitas.get(i) != null) {
-                    for (int j = 0; j < listadoCitas.size(); j++) {
-                        clienteCitado = listadoCitas.get(j).getCliente();
-                        if (clienteCitado == null) {
-                            cliente = "No existe cliente";
-                        } else {
-                            cliente = clienteCitado.getNombre();
-                        }
-                        fila = new String[]{listaHorarioInicial.get(i).getFecha(), listaHorarioInicial.get(i).getHora(), listaHorarioInicial.get(i).getDescripcion(), listaHorarios.get(i).getPrecio(), cliente, listaHorarios.get(i).getEmpleado()};
-                        modeloGeneral.addRow(fila);
-                    }
-                }
-            }
-            /*
-            // Se recorre el listado de horarios del empleado y de las citas programadas, si coinciden se van llenando de valores cada columna
-             */
-            // Se establece el modeloGeneral como el modelo de la tabla
-            tabla.setModel(modeloGeneral);
-            tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            tabla.setColumnSelectionAllowed(false);
-            tabla.setRowSelectionAllowed(true);
-            tabla.setSelectionModel(new DefaultListSelectionModel() {
-                @Override
-                public void setSelectionInterval(int index0, int index1) {
-                    if (index0 == index1 && isSelectedIndex(index0)) {
-                        removeSelectionInterval(index0, index1);
-                    } else {
-                        super.setSelectionInterval(index0, index1);
-                    }
-                }
-            });
-        } catch (Exception e) {
-            devo = false;
-        }
-        return devo;
-    }
-
-    /**
-     *
-     * @param idCita
-     * @throws SQLException
-     */
-    private boolean llenarTablaHorario() {
-        boolean devo = false;
-        String[] fila;
-        try {
-            // Se crea un nuevo DefaultTableModel con las columnas específicas para el horario
-            DefaultTableModel modelo = new DefaultTableModel(columnas, 0) {
-                @Override
-                public boolean isCellEditable(int row, int column) {
-                    return false;
-                }
-            };
-            String citaVacia = "No hay cita";
-            // Se recorre el listado de horarios del empleado y de las citas programadas, si coinciden se van llenando de valores cada columna
-            for (int i = 0; i < listaHorarioInicial.size(); i++) {
-                for (Horario horario : listaHorarioInicial) {
-                    listadoCitasInicial = Cita.buscarPorHorario(horario.getId(), con);
-                    if (listadoCitasInicial.isEmpty()) {
-                        fila = new String[]{listaHorarioInicial.get(i).getFecha(), listaHorarioInicial.get(i).getHora(), listaHorarioInicial.get(i).getDescripcion(), listaHorarioInicial.get(i).getPrecio(), citaVacia};
-                        modelo.addRow(fila);
-                    } else {
-                        for (int j = 0; j < listadoCitasInicial.size(); j++) {
-                            if (listadoCitasInicial.get(j).getIdHorario() == listaHorarioInicial.get(i).getId()) {
-                                fila = new String[]{listaHorarioInicial.get(i).getFecha(), listaHorarioInicial.get(i).getHora(), listaHorarioInicial.get(i).getDescripcion(), listaHorarioInicial.get(i).getPrecio(), listadoCitasInicial.get(j).getCliente().getNombre()};
-                                modelo.addRow(fila);
-                            }
-                        }
-                    }
-                }
-            }
-
-            /**
-             * while (resultado.next()) { String fecha =
-             * resultado.getString("fecha"); String hora =
-             * resultado.getString("hora"); String descripcion =
-             * resultado.getString("descripcion"); String precio =
-             * resultado.getString("precio"); String cliente =
-             * resultado.getString("cliente");
-             *
-             * // Se agrega la fila al modelo de la tabla modelo.addRow(fila);
-             * } *
-             */
-            // Se establece el modelo como el modelo de la tabla
-            tabla.setModel(modelo);
-            tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            tabla.setColumnSelectionAllowed(false);
-            tabla.setRowSelectionAllowed(true);
-            tabla.setSelectionModel(new DefaultListSelectionModel() {
-                @Override
-                public void setSelectionInterval(int index0, int index1) {
-                    if (index0 == index1 && isSelectedIndex(index0)) {
-                        removeSelectionInterval(index0, index1);
-                    } else {
-                        super.setSelectionInterval(index0, index1);
-                    }
-                }
-            });
-            devo = true;
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Error al llenar tabla horarios. "+ex.getMessage());
             devo = false;
         }
         return devo;
