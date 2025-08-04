@@ -7,6 +7,11 @@ package modelo;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -32,6 +37,11 @@ public class Usuario {
     public Usuario() {
     }
 
+    public Usuario(Connection conexionBaseDatos) {
+        this.conexionBaseDatos = conexionBaseDatos;
+    }
+
+    
     /*
      * Constructor de la clase Usuario.
      *
@@ -356,7 +366,242 @@ public class Usuario {
         return devo;
     }
 
+    // Método para modificar usuario
+    public boolean modificarUsuario() {
+        try {
+            String[] opciones = {"Nombre", "Apellidos", "Telefono", "Email", "Cuenta", "Contrasenia"};
+            int seleccion = JOptionPane.showOptionDialog(null, "¿Qué quieres modificar?", "Opciones",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, opciones, opciones[0]);
 
+            if (seleccion >= 0) {
+                String campo = opciones[seleccion];
+                String valor = obtenerValorCampo(campo);
+
+                if (valor != null && validarCampo(campo, valor)) {
+                    return actualizarCampoUsuario(campo, valor);
+                }
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Error al modificar: " + ex.getMessage());
+        }
+        return false;
+    }
+
+    private String obtenerValorCampo(String campo) {
+        switch (campo) {
+            case "Nombre":
+                return JOptionPane.showInputDialog(null, "Por favor, ingrese su nombre:");
+            case "Apellidos":
+                return JOptionPane.showInputDialog(null, "Por favor, ingrese sus apellidos:");
+            case "Telefono":
+                return JOptionPane.showInputDialog(null, "Por favor, ingrese su número de teléfono:");
+            case "Email":
+                String email;
+                do {
+                    email = JOptionPane.showInputDialog(null, "Por favor, ingrese su email:");
+                } while (!validarEmail(email));
+                return email;
+            case "Cuenta":
+                return JOptionPane.showInputDialog(null, "Por favor, ingrese su cuenta:");
+            case "Contrasenia":
+                return JOptionPane.showInputDialog(null, "Por favor, ingrese su contraseña:");
+            default:
+                return null;
+        }
+    }
+
+    private boolean validarCampo(String campo, String valor) {
+        switch (campo) {
+            case "Telefono":
+                if (valor.length() != 9) {
+                    JOptionPane.showMessageDialog(null, "Teléfono no válido. Introduce 9 dígitos");
+                    return false;
+                }
+                return true;
+            case "Email":
+                return validarEmail(valor);
+            default:
+                return valor != null && !valor.isEmpty();
+        }
+    }
+
+    private boolean actualizarCampoUsuario(String campo, String valor) throws SQLException {
+        String sql = "UPDATE usuario SET " + obtenerNombreColumna(campo) + " = ? WHERE ID = ?";
+
+        try (PreparedStatement ps = conexionBaseDatos.prepareStatement(sql)) {
+            if (campo.equals("Contrasenia")) {
+                ps.setString(1, "MD5(" + valor + ")");
+            } else {
+                ps.setString(1, valor);
+            }
+            ps.setInt(2, this.id);
+
+            int resultado = ps.executeUpdate();
+            if (resultado > 0) {
+                actualizarAtributoLocal(campo, valor);
+                JOptionPane.showMessageDialog(null, "Actualización realizada con éxito");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean actualizarAtributoLocal(String campo, String valor) {
+        boolean devo=false;
+        try {
+            switch (campo) {
+                case "Nombre":
+                    this.nombre = valor;
+                    break;
+                case "Apellidos":
+                    this.apellidos = valor;
+                    break;
+                case "Telefono":
+                    this.telefono = Integer.parseInt(valor);
+                    break;
+                case "Email":
+                    this.email = valor;
+                    break;
+                case "Cuenta":
+                    this.cuenta = valor;
+                    break;
+                case "Contrasenia":
+                    this.contrasenia = valor;
+                    break;
+            }
+            devo=true;
+        } catch (Exception ex) {
+            System.out.println("Ocurrio un error: "+ex.getMessage());
+        }
+        return devo;
+    }
+
+    private String obtenerNombreColumna(String campo) {
+        switch (campo) {
+            case "Nombre":
+                return "NOMBRE";
+            case "Apellidos":
+                return "APELLIDOS";
+            case "Telefono":
+                return "TELEFONO";
+            case "Email":
+                return "EMAIL";
+            case "Cuenta":
+                return "CUENTA";
+            case "Contrasenia":
+                return "CONTRASENIA";
+            default:
+                return "";
+        }
+    }
+
+    private boolean validarEmail(String email) {
+        // Implementar validación de email
+        return email != null && email.contains("@") && email.contains(".");
+    }
+
+    // Método para buscar todos los usuarios
+    public static ArrayList<Usuario> buscarTodos(Connection conexion) {
+        return buscarUsuariosFiltrados(false, null, false, null, false, null, false, null, conexion);
+    }
+
+    // Método para buscar usuarios con filtros
+    public static ArrayList<Usuario> buscarUsuariosFiltrados(
+            boolean usarNombre, String filtroNombre,
+            boolean usarApellidos, String filtroApellidos,
+            boolean usarEmail, String filtroEmail,
+            boolean usarCuenta, String filtroCuenta,
+            Connection conexion) {
+
+        ArrayList<Usuario> usuarios = new ArrayList<>();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            StringBuilder sql = new StringBuilder(
+                    "SELECT ID, NOMBRE, APELLIDOS, TELEFONO, EMAIL, CUENTA FROM usuario WHERE 1=1");
+
+            if (usarNombre && filtroNombre != null && !filtroNombre.isEmpty()) {
+                sql.append(" AND NOMBRE LIKE ?");
+            }
+            if (usarApellidos && filtroApellidos != null && !filtroApellidos.isEmpty()) {
+                sql.append(" AND APELLIDOS LIKE ?");
+            }
+            if (usarEmail && filtroEmail != null && !filtroEmail.isEmpty()) {
+                sql.append(" AND EMAIL LIKE ?");
+            }
+            if (usarCuenta && filtroCuenta != null && !filtroCuenta.isEmpty()) {
+                sql.append(" AND CUENTA LIKE ?");
+            }
+
+            stmt = conexion.prepareStatement(sql.toString());
+            int paramIndex = 1;
+
+            if (usarNombre && filtroNombre != null && !filtroNombre.isEmpty()) {
+                stmt.setString(paramIndex++, "%" + filtroNombre + "%");
+            }
+            if (usarApellidos && filtroApellidos != null && !filtroApellidos.isEmpty()) {
+                stmt.setString(paramIndex++, "%" + filtroApellidos + "%");
+            }
+            if (usarEmail && filtroEmail != null && !filtroEmail.isEmpty()) {
+                stmt.setString(paramIndex++, "%" + filtroEmail + "%");
+            }
+            if (usarCuenta && filtroCuenta != null && !filtroCuenta.isEmpty()) {
+                stmt.setString(paramIndex++, "%" + filtroCuenta + "%");
+            }
+
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                Usuario usuario = new Usuario(conexion);
+                usuario.setId(rs.getInt("ID"));
+                usuario.setNombre(rs.getString("NOMBRE"));
+                usuario.setApellidos(rs.getString("APELLIDOS"));
+                usuario.setTelefono(rs.getInt("TELEFONO"));
+                usuario.setEmail(rs.getString("EMAIL"));
+                usuario.setCuenta(rs.getString("CUENTA"));
+
+                usuarios.add(usuario);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error al buscar usuarios: " + e.getMessage());
+            usuarios = null;
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+            } catch (SQLException e) {
+                System.err.println("Error al cerrar recursos: " + e.getMessage());
+            }
+        }
+        return usuarios;
+    }
+
+    // Método para cargar un usuario por ID
+    public boolean cargarPorId(int id) {
+        String sql = "SELECT NOMBRE, APELLIDOS, TELEFONO, EMAIL, CUENTA FROM usuario WHERE ID = ?";
+
+        try (PreparedStatement ps = conexionBaseDatos.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                this.id = id;
+                this.nombre = rs.getString("NOMBRE");
+                this.apellidos = rs.getString("APELLIDOS");
+                this.telefono = rs.getInt("TELEFONO");
+                this.email = rs.getString("EMAIL");
+                this.cuenta = rs.getString("CUENTA");
+                return true;
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al cargar usuario: " + e.getMessage());
+        }
+        return false;
+    }
     /*
      * Sobrescritura del método toString() para representar el objeto como una
      * cadena de texto.

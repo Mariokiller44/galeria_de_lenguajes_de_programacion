@@ -9,7 +9,6 @@ import controlador.ConexionBD;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.sql.*;
-import controlador.ConsultasPersonal;
 import java.awt.*;
 import java.util.*;
 import javax.swing.DefaultComboBoxModel;
@@ -66,10 +65,10 @@ public class GestionCitasVentana extends JFrame {
             inicializarDatos(conexionBaseData, personal);
             initComponents(); // Inicialización de componentes gráficos
             setIconImage(getIconImage()); // Establecer la imagen del icono de la aplicación
-            comprobarTabla(); // Comprobar si la tabla está vacía o no
             setExtendedState(JFrame.MAXIMIZED_BOTH); // Establecer la ventana en pantalla completa
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Establecer la acción de cierre de la ventana
             setLocationRelativeTo(null); // Centrar la ventana en la pantalla
+            comprobarTabla(); // Comprobar si la tabla está vacía o no
             modificarDiseño(); // Modificar el diseño de la ventana
             setTitle("Gestionar citas");
         } catch (Exception e) {
@@ -401,10 +400,9 @@ public class GestionCitasVentana extends JFrame {
          * Corregido 31 Jul 2025
          */
 
-        vc = new VentanaPrincipal();
+        vc = new VentanaPrincipal(empleadoEscogido, con);
         vaciarTabla();
         dispose();
-        vc.setTipoUsu(empleadoEscogido.getApellidos());
         vc.setVisible(true);
 
     }//GEN-LAST:event_btnSalirActionPerformed
@@ -518,14 +516,18 @@ public class GestionCitasVentana extends JFrame {
         try {
             con = conexionBaseData; // Pasar conexión a la base de datos
             empleadoEscogido = personal;
-            listaHorarioInicial = Horario.buscarFiltrado(false, null, false, null, true, empleadoEscogido.getId(), false, 0, con); // Obtenemos los horarios que estan asignados al empleado
-            for (Horario horarioAsignado : listaHorarioInicial) {
-                listadoCitasInicial = Cita.buscarPorHorario(horarioAsignado.getId(), conexionBaseData); // De dicho horario vamos llenando las citas que tiene el empleado
-                if (listadoCitasInicial == null) {
-                    throw new Exception("Hubo un error al consultar las citas");
+            if (personal.getId() != 1) {
+                listaHorarioInicial = Horario.buscarFiltrado(false, null, false, null, true, personal.getId(), false, 0, conexionBaseData); // Obtenemos los horarios que estan asignados al empleado
+                for (Horario horarioAsignado : listaHorarioInicial) {
+                    listadoCitasInicial = Cita.buscarPorHorario(horarioAsignado.getId(), conexionBaseData); // De dicho horario vamos llenando las citas que tiene el empleado
+                    if (listadoCitasInicial == null) {
+                        throw new Exception("Hubo un error al consultar las citas");
+                    }
                 }
-                if (listadoCitasInicial.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "No hay citas");
+            } else {
+                listaHorarioInicial = Horario.obtenerTodosLosHorarios(conexionBaseData); // Obtenemos todos los horarios
+                for (Horario horarioAsignado : listaHorarioInicial) {
+                    listadoCitasInicial = Cita.buscarPorHorario(horarioAsignado.getId(), conexionBaseData); // De dicho horario vamos llenando las citas que tiene el empleado
                 }
             }
             devo = true;
@@ -612,7 +614,10 @@ public class GestionCitasVentana extends JFrame {
             // Tabla
             tabla.setFillsViewportHeight(true);
             tabla.setCellSelectionEnabled(false);
+            devo = true;
         } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error al modificar el diseño de la interfaz, " + e.getMessage());
+            devo = false;
         }
         return devo;
 
@@ -715,13 +720,21 @@ public class GestionCitasVentana extends JFrame {
                     return false;
                 }
             };
-
+            String citaVacia = "No hay cita";
             // Se recorre el listado de horarios del empleado y de las citas programadas, si coinciden se van llenando de valores cada columna
             for (int i = 0; i < listaHorarioInicial.size(); i++) {
-                for (int j = 0; j < listadoCitasInicial.size(); j++) {
-                    if (listadoCitasInicial.get(j).getIdHorario() == listaHorarioInicial.get(i).getId()) {
-                        fila = new String[]{listaHorarioInicial.get(i).getFecha(), listaHorarioInicial.get(i).getHora(), listaHorarioInicial.get(i).getDescripcion(), listaHorarioInicial.get(i).getPrecio(), listadoCitasInicial.get(j).getCliente().getNombre()};
+                for (Horario horario : listaHorarioInicial) {
+                    listadoCitasInicial = Cita.buscarPorHorario(horario.getId(), con);
+                    if (listadoCitasInicial.isEmpty()) {
+                        fila = new String[]{listaHorarioInicial.get(i).getFecha(), listaHorarioInicial.get(i).getHora(), listaHorarioInicial.get(i).getDescripcion(), listaHorarioInicial.get(i).getPrecio(), citaVacia};
                         modelo.addRow(fila);
+                    } else {
+                        for (int j = 0; j < listadoCitasInicial.size(); j++) {
+                            if (listadoCitasInicial.get(j).getIdHorario() == listaHorarioInicial.get(i).getId()) {
+                                fila = new String[]{listaHorarioInicial.get(i).getFecha(), listaHorarioInicial.get(i).getHora(), listaHorarioInicial.get(i).getDescripcion(), listaHorarioInicial.get(i).getPrecio(), listadoCitasInicial.get(j).getCliente().getNombre()};
+                                modelo.addRow(fila);
+                            }
+                        }
                     }
                 }
             }
@@ -768,8 +781,6 @@ public class GestionCitasVentana extends JFrame {
             // Se establece un nuevo modelo de tabla vacío, sin filas ni columnas
             tabla.setModel(new DefaultTableModel(0, 0));
 
-            // Se establece el ID en el objeto vc
-            vc.setId(empleadoEscogido.getId());
             devo = true;
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Ha ocurrido un error al vaciar la tabla " + e.getMessage());

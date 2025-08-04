@@ -19,8 +19,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.*;
+import java.util.ArrayList;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
+import modelo.Producto;
+import modelo.Usuario;
 import styles.GestionProductosStyle;
 
 public class GestionProductosVentana extends javax.swing.JFrame {
@@ -28,69 +31,23 @@ public class GestionProductosVentana extends javax.swing.JFrame {
     /**
      * Declaracion de atributos
      */
-    private DefaultTableModel tableModel;
+    private DefaultTableModel modeloTabla;
     private ConsultasPersonal consultas;
     private Connection con;
-    private String tipoUsu = "";
     private JPopupMenu popupMenu = new JPopupMenu();
     private VentanaPrincipal ventanaPrincipal;
-    private int id;
-    
-
-    /**
-     * Este método devuelve el valor de la variable id.
-     *
-     * @return El valor de la variable id.
-     */
-    public int getId() {
-        return id;
-    }
-
-    /**
-     * Este método establece el valor de la variable id.
-     *
-     * @param id El nuevo valor de la variable id.
-     */
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    /**
-     * Establece la ventana principal.
-     *
-     * @param ventanaPrincipal La instancia de la ventana principal.
-     */
-    public void setVentanaPrincipal(VentanaPrincipal ventanaPrincipal) {
-        this.ventanaPrincipal = ventanaPrincipal;
-    }
-
-    /**
-     * Este método devuelve el valor de la variable tipoUsu.
-     *
-     * @return El valor de la variable tipoUsu.
-     */
-    public String getTipoUsu() {
-        return tipoUsu;
-    }
-
-    /**
-     * Este método establece el valor de la variable tipoUsu.
-     *
-     * @param tipoUsu El nuevo valor de la variable tipoUsu.
-     */
-    public void setTipoUsu(String tipoUsu) {
-        this.tipoUsu = tipoUsu;
-    }
+    private Usuario usuarioActivo;
 
     /**
      * Creates new form GestionProductosVentanaFrame
      */
-    public GestionProductosVentana() {
+    public GestionProductosVentana(Usuario usu, Connection conexion) {
         initComponents();
         setTitle("Gestión de Productos");
         // Establecer el título de la ventana
-        tableModel = new DefaultTableModel(new Object[]{"Nombre", "Cantidad"}, 0);
+        modeloTabla = new DefaultTableModel(new Object[]{"Nombre", "Cantidad"}, 0);
         scrollPane.getViewport().setBackground(new Color(186, 179, 179)); // Establecer color de fondo del panel de desplazamiento
+        usuarioActivo = usu;
         // Personalizar el renderizador de encabezado para cambiar el color de los títulos
         JTableHeader header = productosTable.getTableHeader();
         header.setBackground(new Color(74, 159, 255));
@@ -104,14 +61,6 @@ public class GestionProductosVentana extends javax.swing.JFrame {
         setResizable(false); // Deshabilitar la capacidad de redimensionar la ventana
 
         setLocationRelativeTo(null); // Mostrar la ventana en el centro de la pantalla
-
-        // Verificar el tipo de usuario y realizar acciones correspondientes
-        if (tipoUsu != null) {
-            if (!tipoUsu.isEmpty()) {
-                comprobarTipoUsuario();
-                aniadirmenuPopUp();
-            }
-        }
 
         cargarProductos(); // Cargar los productos en la tabla
 
@@ -148,7 +97,7 @@ public class GestionProductosVentana extends javax.swing.JFrame {
         jPanel4 = new javax.swing.JPanel();
         salirButton = new javax.swing.JButton();
         scrollPane = new javax.swing.JScrollPane();
-        productosTable = new JTable(tableModel){
+        productosTable = new JTable(modeloTabla){
             @Override
             public boolean isCellEditable(int row, int columns){
                 return false;
@@ -270,16 +219,6 @@ public class GestionProductosVentana extends javax.swing.JFrame {
         confirmarSalir();
     }//GEN-LAST:event_salirButtonActionPerformed
 
-    public static void main(String args[]) {
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new GestionProductosVentana().setVisible(true);
-            }
-        });
-    }
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton agregarButton;
     private javax.swing.JButton eliminarButton;
@@ -292,7 +231,6 @@ public class GestionProductosVentana extends javax.swing.JFrame {
     private javax.swing.JScrollPane scrollPane;
     // End of variables declaration//GEN-END:variables
 
-    
     private void agregarProducto() {
         String nombre = JOptionPane.showInputDialog(this, "Ingrese el nombre del producto:");
         if (nombre != null && !nombre.isEmpty()) {
@@ -302,7 +240,7 @@ public class GestionProductosVentana extends javax.swing.JFrame {
                     int stock = Integer.parseInt(stockStr);
 
                     // Agregar el nuevo producto a la tabla y a la base de datos
-                    tableModel.addRow(new Object[]{nombre, stock});
+                    modeloTabla.addRow(new Object[]{nombre, stock});
                     consultas.realizarConexion();
                     con = consultas.getCon();
                     PreparedStatement statement = con.prepareStatement("INSERT INTO PRODUCTOS (NOMBRE, STOCK) VALUES (?, ?)");
@@ -333,8 +271,8 @@ public class GestionProductosVentana extends javax.swing.JFrame {
                     int filaSeleccionada = productosTable.getSelectedRow();
                     if (filaSeleccionada != -1) {
                         // Obtener el nombre y la cantidad actual del producto seleccionado
-                        String nombreProducto = (String) tableModel.getValueAt(filaSeleccionada, 0);
-                        String cantidadActualStr = String.valueOf(tableModel.getValueAt(filaSeleccionada, 1));
+                        String nombreProducto = (String) modeloTabla.getValueAt(filaSeleccionada, 0);
+                        String cantidadActualStr = String.valueOf(modeloTabla.getValueAt(filaSeleccionada, 1));
 
                         // Mostrar un cuadro de diálogo para ingresar la nueva cantidad
                         String nuevaCantidadStr = JOptionPane.showInputDialog("Ingrese la nueva cantidad para el producto \"" + nombreProducto + "\":", cantidadActualStr);
@@ -346,7 +284,7 @@ public class GestionProductosVentana extends javax.swing.JFrame {
                                     throw new NumberFormatException("No se puede insertar una cantidad menor a 0");
                                 } else {
                                     // Actualizar la cantidad en la tabla y en la base de datos
-                                    tableModel.setValueAt(nuevaCantidadStr, filaSeleccionada, 1);
+                                    modeloTabla.setValueAt(nuevaCantidadStr, filaSeleccionada, 1);
                                     int idProducto = obtenerIdProducto(nombreProducto);
                                     actualizarStockProducto(idProducto, nuevaCantidad);
                                 }
@@ -371,14 +309,14 @@ public class GestionProductosVentana extends javax.swing.JFrame {
                     int filaSeleccionada = productosTable.getSelectedRow();
                     if (filaSeleccionada != -1) {
                         // Obtener el nombre del producto seleccionado
-                        String nombreProducto = (String) tableModel.getValueAt(filaSeleccionada, 0);
+                        String nombreProducto = (String) modeloTabla.getValueAt(filaSeleccionada, 0);
 
                         // Mostrar un cuadro de diálogo para ingresar el nuevo nombre
                         String nuevoNombre = JOptionPane.showInputDialog("Ingrese el nuevo nombre del producto: ");
                         if (nuevoNombre != null) {
                             if (esNombreValido(nuevoNombre)) {
                                 // Actualizar el nombre en la tabla y en la base de datos
-                                tableModel.setValueAt(nuevoNombre, filaSeleccionada, 0);
+                                modeloTabla.setValueAt(nuevoNombre, filaSeleccionada, 0);
                                 int idProducto = obtenerIdProducto(nombreProducto);
                                 actualizarNombreProducto(idProducto, nuevoNombre);
                             } else {
@@ -390,8 +328,7 @@ public class GestionProductosVentana extends javax.swing.JFrame {
             });
 
             // Obtener el tipo de usuario
-            tipoUsu = getTipoUsu();
-            if (tipoUsu.equals("Administrador")) {
+            if (usuarioActivo.getApellidos().equals("Administrador")) {
                 // Agregar el elemento de menú al menú emergente si el tipo de usuario es "Administrador"
                 popupMenu.add(modificarNombre);
             }
@@ -470,55 +407,51 @@ public class GestionProductosVentana extends javax.swing.JFrame {
      * @param idProducto El ID del producto a actualizar.
      * @param nuevaCantidad La nueva cantidad de stock del producto.
      */
-    private void actualizarStockProducto(int idProducto, int nuevaCantidad) {
-        consultas.realizarConexion();
-        con = consultas.getCon();
-        String consulta = "UPDATE PRODUCTOS SET STOCK = ? WHERE ID = ?";
-
+    private boolean actualizarStockProducto(int idProducto, int nuevaCantidad) {
+        boolean devo = false;
         try {
-            PreparedStatement stmt = con.prepareStatement(consulta);
-            stmt.setInt(1, nuevaCantidad);
-            stmt.setInt(2, idProducto);
-            stmt.executeUpdate();
-            JOptionPane.showMessageDialog(this, "Stock actualizado correctamente");
-
-        } catch (SQLException e) {
-            e.getMessage();
-            JOptionPane.showMessageDialog(this, "Error al actualizar el stock del producto", "Error", JOptionPane.ERROR_MESSAGE);
+            Producto productoActual = Producto.buscarPorId(idProducto, con);
+            Producto productoNuevo = new Producto(idProducto, productoActual.getNombre(), nuevaCantidad, con);
+            if (productoNuevo.getStock() < 2) {
+                JOptionPane.showMessageDialog(null, "Se está agotando el stock", "Aviso de falta de Stock", JOptionPane.WARNING_MESSAGE);
+            }
+            if (productoNuevo.actualizar()) {
+                JOptionPane.showMessageDialog(this, "Stock actualizado correctamente");
+            } else {
+                JOptionPane.showMessageDialog(this, "No se pudo actualizar el stock");
+            }
+            devo = true;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al actualizar el stock del producto" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            devo = false;
         }
+        return devo;
     }
 
     /**
-     * Carga los productos desde la base de datos y los muestra en la tabla.
+     * Carga los productos y los muestra en la tabla.
      */
-    private void cargarProductos() {
+    private boolean cargarProductos() {
         // Limpia la tabla antes de cargar los productos
-        tableModel.setRowCount(0);
-        consultas = new ConsultasPersonal();
+        boolean devo = false;
         try {
-            // Conexión a la base de datos
-            consultas.realizarConexion();
-            con = consultas.getCon();
+            modeloTabla.setRowCount(0);
+            ArrayList<Producto> listaProductos;
+
             // Realizar consulta
-            String sql = "SELECT NOMBRE, STOCK FROM PRODUCTOS";
-            Statement statement = con.createStatement();
-            ResultSet resultSet = statement.executeQuery(sql);
-
+            listaProductos = Producto.buscarTodos(con);
             // Llenar la tabla con los resultados de la consulta
-            while (resultSet.next()) {
-                String nombre = resultSet.getString("NOMBRE");
-                int stock = resultSet.getInt("STOCK");
-                tableModel.addRow(new Object[]{nombre, stock});
+            for (Producto producto : listaProductos) {
+                String nombre = producto.getNombre();
+                int stock = producto.getStock();
+                modeloTabla.addRow(new Object[]{nombre, stock});
             }
-
-            // Cerrar conexión y liberar recursos
-            resultSet.close();
-            statement.close();
-            con.close();
-            productosTable.setModel(tableModel);
-        } catch (SQLException e) {
+            productosTable.setModel(modeloTabla);
+            devo = true;
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error al cargar los productos", "Error", JOptionPane.ERROR_MESSAGE);
         }
+        return devo;
     }
 
     /**
@@ -527,11 +460,11 @@ public class GestionProductosVentana extends javax.swing.JFrame {
     private void eliminarProducto() {
         int selectedRow = productosTable.getSelectedRow();
         if (selectedRow != -1) {
-            String nombre = (String) tableModel.getValueAt(selectedRow, 0);
+            String nombre = (String) modeloTabla.getValueAt(selectedRow, 0);
             int respuesta = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar el producto '" + nombre + "'?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
             if (respuesta == JOptionPane.YES_OPTION) {
                 // Eliminar el producto de la tabla y de la base de datos
-                tableModel.removeRow(selectedRow);
+                modeloTabla.removeRow(selectedRow);
                 try {
                     consultas.realizarConexion();
                     con = consultas.getCon();
@@ -553,29 +486,43 @@ public class GestionProductosVentana extends javax.swing.JFrame {
      * Comprueba el tipo de usuario y habilita/deshabilita los botones según
      * corresponda.
      */
-    private void comprobarTipoUsuario() {
-        if (!tipoUsu.equals("Administrador")) {
-            agregarButton.setEnabled(false);
-            eliminarButton.setEnabled(false);
-        } else {
-            agregarButton.setEnabled(true);
-            eliminarButton.setEnabled(true);
+    private boolean comprobarTipoUsuario() {
+        boolean devo = false;
+        try {
+            if (!usuarioActivo.getApellidos().equals("Administrador")) {
+                agregarButton.setEnabled(false);
+                eliminarButton.setEnabled(false);
+            } else {
+                agregarButton.setEnabled(true);
+                eliminarButton.setEnabled(true);
+            }
+            devo = true;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Ha ocurrido un error en la configuracion. " + e.getMessage());
         }
+        return devo;
     }
 
-    private void confirmarSalir() {
-        int opcion = JOptionPane.showConfirmDialog(this, "¿Desea salir de la ventana?", "Salir", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-        if (opcion == JOptionPane.YES_OPTION) {
-            // Restablecer el Look and Feel a la configuración predeterminada
-            try {
-                // Cerrar la ventana
-                ventanaPrincipal.setTipoUsu(tipoUsu);
-                ventanaPrincipal.setVisible(true);
-                dispose();
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Error al salir", "Error", JOptionPane.ERROR_MESSAGE);
+    private boolean confirmarSalir() {
+        boolean devo = false;
+        try {
+            int opcion = JOptionPane.showConfirmDialog(this, "¿Desea salir de la ventana?", "Salir", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (opcion == JOptionPane.YES_OPTION) {
+                // Restablecer el Look and Feel a la configuración predeterminada
+                try {
+
+                    // Cerrar la ventana
+                    ventanaPrincipal = new VentanaPrincipal(usuarioActivo, con);
+                    ventanaPrincipal.setVisible(true);
+                    dispose();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "Error al salir", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Ha ocurrido un error en la configuracion. " + e.getMessage());
         }
+        return devo;
     }
 
 }

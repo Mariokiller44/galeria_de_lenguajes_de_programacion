@@ -174,9 +174,6 @@
     <Container class="javax.swing.JScrollPane" name="scrollPane">
       <Properties>
         <Property name="toolTipText" type="java.lang.String" value=""/>
-        <Property name="viewportView" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="default"/>
-        </Property>
       </Properties>
       <AuxValues>
         <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
@@ -196,7 +193,7 @@
             </Property>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTable(tableModel){&#xa;    @Override&#xa;    public boolean isCellEditable(int row, int columns){&#xa;    return false;&#xa;    }&#xa;}"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTable(modeloTabla){&#xa;    @Override&#xa;    public boolean isCellEditable(int row, int columns){&#xa;    return false;&#xa;    }&#xa;}"/>
           </AuxValues>
         </Component>
       </SubComponents>

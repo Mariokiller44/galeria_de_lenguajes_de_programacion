@@ -7,10 +7,6 @@ package controlador;
 import java.sql.Connection;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import modelo.Horario;
 import modelo.Personal;
@@ -228,101 +224,7 @@ public class ConsultasPersonal {
         this.con = con;
     }
 
-    public void modificarUsuario(int id) {
-        realizarConexion();
-        String[] opciones = {"Nombre", "Apellidos", "Telefono", "Email", "Cuenta", "Contrasenia"};
-        String nombre, apellidos, telefono, email, cuenta, contrasenia;
-        String actualizacionSQL = "UPDATE usuario SET ";
-        int seleccion = JOptionPane.showOptionDialog(null, "¿Que quieres modificar?", "Opciones", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, opciones, opciones[0]);
-        if (seleccion >= 0) {
-            try {
-                String actualizar = opciones[seleccion].toString();
-                switch (actualizar) {
-                    case "Nombre":
-                        nombre = JOptionPane.showInputDialog(null, "Por favor, ingrese su nombre:");
-                        String actualizacionNombre = actualizacionSQL + "NOMBRE = ? WHERE ID=?";
-                        PreparedStatement actNombre = con.prepareStatement(actualizacionNombre);
-                        actNombre.setString(1, nombre);
-                        actNombre.setInt(2, id);
-                        int resultado = actNombre.executeUpdate();
-                        if (resultado > 0) {
-                            JOptionPane.showMessageDialog(null, "Actualizacion hecha satisfactoriamente");
-                        }
-                        break;
-                    case "Apellidos":
-                        apellidos = JOptionPane.showInputDialog(null, "Por favor, ingrese sus apellidos:");
-                        String actualizacionApellidos = actualizacionSQL + "APELLIDOS = ? WHERE ID=?";
-                        PreparedStatement actApellidos = con.prepareStatement(actualizacionApellidos);
-                        actApellidos.setString(1, apellidos);
-                        actApellidos.setInt(2, id);
-                        int resultadoApe = actApellidos.executeUpdate();
-                        if (resultadoApe > 0) {
-                            JOptionPane.showMessageDialog(null, "Actualizacion hecha satisfactoriamente");
-                        }
-                        break;
-                    case "Telefono":
-                        telefono = JOptionPane.showInputDialog(null, "Por favor, ingrese su número de teléfono:");
-                        String actualizacionTelefono = actualizacionSQL + "TELEFONO = ? WHERE ID=?";
-                        if (telefono.length() != 9) {
-                            JOptionPane.showMessageDialog(null, "Telefono no valido. Introduce 9 digitos");
-                        } else {
-                            PreparedStatement actTelf = con.prepareStatement(actualizacionTelefono);
-                            actTelf.setString(1, telefono);
-                            actTelf.setInt(2, id);
-                            int resultadoTelf = actTelf.executeUpdate();
-                            if (resultadoTelf > 0) {
-                                JOptionPane.showMessageDialog(null, "Actualizacion hecha satisfactoriamente");
-                            }
-                        }
-                        break;
-                    case "Email":
-                        boolean comprobacion=false;
-                        do{
-                            email = JOptionPane.showInputDialog(null, "Por favor, ingrese su dirección de correo electrónico:");
-                            comprobacion=validarEmail(email);
-                        }while(!comprobacion);
-                        String actualizacionEmail = actualizacionSQL + "EMAIL = ? WHERE ID=?";
-                        PreparedStatement actEmail = con.prepareStatement(actualizacionEmail);
-                        actEmail.setString(1, email);
-                        actEmail.setInt(2, id);
-                        int resultadoEmail = actEmail.executeUpdate();
-                        if (resultadoEmail > 0) {
-                            JOptionPane.showMessageDialog(null, "Actualizacion hecha satisfactoriamente");
-                        }
-                        break;
-                    case "Cuenta":
-                        cuenta = JOptionPane.showInputDialog(null, "Por favor, ingrese su cuenta:");
-                        String actualizacionCuenta = actualizacionSQL + "CUENTA = ? WHERE ID=?";
-                        PreparedStatement actCuenta = con.prepareStatement(actualizacionCuenta);
-                        actCuenta.setString(1, cuenta);
-                        actCuenta.setInt(2, id);
-                        int resultadoCuenta = actCuenta.executeUpdate();
-                        if (resultadoCuenta > 0) {
-                            JOptionPane.showMessageDialog(null, "Actualizacion hecha satisfactoriamente");
-                        }
-                        break;
-                    case "Contrasenia":
-                        contrasenia = JOptionPane.showInputDialog(null, "Por favor, ingrese su contraseña:");
-                        String actualizacionPasswd = actualizacionSQL + "CONTRASENIA = MD5(?) WHERE ID=?";
-                        PreparedStatement actPasswd = con.prepareStatement(actualizacionPasswd);
-                        actPasswd.setString(1, contrasenia);
-                        actPasswd.setInt(2, id);
-                        int resultadoPasswd = actPasswd.executeUpdate();
-                        if (resultadoPasswd > 0) {
-                            JOptionPane.showMessageDialog(null, "Actualizacion hecha satisfactoriamente");
-                        }
-                        break;
-                    default:
-                        JOptionPane.showMessageDialog(null, "Selección inválida");
-                        break;
-                }
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, "Error al modificar. Compruebe bien los datos requeridos");
-            }
-
-        }
-
-    }
+    
 
     public void modificarHorarioPorFechaHora(String fecha, String hora, int idHorario) {
         try {
@@ -461,13 +363,5 @@ public class ConsultasPersonal {
         return id;
     }
 
-    private boolean validarEmail(String email) {
-        String EMAIL_PATTERN = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
-        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-        Matcher matcher = pattern.matcher(email);
-        if (matcher.matches()==false) {
-            JOptionPane.showConfirmDialog(null, "Email invalido.");
-        }
-        return matcher.matches();
-    }
+    
 }

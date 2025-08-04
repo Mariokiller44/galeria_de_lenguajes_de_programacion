@@ -555,9 +555,7 @@ public class VentanaLog extends JFrame {
                     try {
                         if (usu.getTipo_de_usuario().contains("Personal")) {
                             this.dispose();
-                            VentanaPrincipal vc = new VentanaPrincipal();
-                            vc.setValor(usu.getId());
-                            vc.setTipoUsu(usu.getTipo_de_usuario());
+                            VentanaPrincipal vc = new VentanaPrincipal(usu,con);
                             vc.setVisible(true);
                             devo = true;
                         } else {

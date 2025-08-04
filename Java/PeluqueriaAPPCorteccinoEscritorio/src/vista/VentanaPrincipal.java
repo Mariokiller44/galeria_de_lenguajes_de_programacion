@@ -21,53 +21,15 @@ import modelo.Usuario;
  */
 public class VentanaPrincipal extends JFrame {
 
-    private int posicionActual, id; // Variables para controlar la posición y el ID
     private int posicionFinal; // Variable para la posición final
     private Timer animacion; // Temporizador para la animación
     private JPanel panelSustituto; // Panel que se sustituirá en la animación
     private ConsultasPersonal consultas; // Objeto para realizar consultas
     private Usuario usu; // Objeto para representar al usuario
-    private String tipoUsu; // Tipo de usuario
     private VentanaLog ventanaLog; // Referencia a la ventana de inicio de sesión
     private JTable tablaDatosUsuario;
     private Connection conexion;
     private Personal empleado;
-
-    /**
-     * Obtiene el ID.
-     *
-     * @return El ID.
-     */
-    public int getId() {
-        return id;
-    }
-
-    /**
-     * Establece el ID.
-     *
-     * @param id El ID a establecer.
-     */
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    /**
-     * Obtiene el tipo de usuario.
-     *
-     * @return El tipo de usuario.
-     */
-    public String getTipoUsu() {
-        return tipoUsu;
-    }
-
-    /**
-     * Establece el tipo de usuario.
-     *
-     * @param tipoUsu El tipo de usuario a establecer.
-     */
-    public void setTipoUsu(String tipoUsu) {
-        this.tipoUsu = tipoUsu;
-    }
 
     /**
      * Establece la ventana de inicio de sesión.
@@ -85,17 +47,12 @@ public class VentanaPrincipal extends JFrame {
         initComponents(); // Inicializar componentes de la ventana
         setIconImage(getIconImage()); // Establecer la imagen del ícono de la ventana
         setTitle("Ventana Principal");
-        tipoUsu = getTipoUsu(); // Obtener el tipo de usuario
         vaciarPanelOpciones(); // Vaciar el panel de opciones
         panelOpciones.setVisible(true); // Mostrar el panel de opciones
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE); // Configurar el comportamiento al cerrar la ventana
         setLocationRelativeTo(null); // Mostrar la ventana en el centro de la pantalla
         setResizable(false); // Deshabilitar la capacidad de redimensionar la ventana
-
-        if (tipoUsu != null) {
-            tipoUsu = getTipoUsu(); // Obtener el tipo de usuario
-        }
 
         ventanaLog = new VentanaLog(); // Crear una instancia de la ventana de inicio de sesión
 
@@ -150,15 +107,6 @@ public class VentanaPrincipal extends JFrame {
     public Image getIconImage() {
         Image retValue = Toolkit.getDefaultToolkit().getImage("./src/images/iconoDeAppEscritorio.png");
         return retValue;
-    }
-
-    /**
-     * Establece el valor del ID.
-     *
-     * @param valor El valor del ID a establecer.
-     */
-    public void setValor(int valor) {
-        this.id = valor;
     }
 
     /**
@@ -449,8 +397,6 @@ public class VentanaPrincipal extends JFrame {
             JOptionPane.showMessageDialog(null, "Abriendo el menú de consultas"); // Muestra un mensaje de diálogo indicando que se está abriendo el menú de consultas
             dispose(); // Cierra la ventana actual
             GestionCitasVentana gc = new GestionCitasVentana(empleado, conexion); // Crea una instancia de la clase GestionCitasVentana
-            gc.modificarDiseño(); // Modifica el diseño de la ventana de GestionCitasVentana
-            gc.comprobarTabla(); // Comprueba la tabla en la ventana de GestionCitasVentana
             gc.setVisible(true); // Hace visible la ventana de GestionCitasVentana
         } else {
             // Si el texto del elemento de menú no contiene la subcadena "Consultar citas"
@@ -463,105 +409,88 @@ public class VentanaPrincipal extends JFrame {
     /**
      * Método para mostrar una tabla con los datos del usuario.
      *
-     * @throws HeadlessException Si se produce un error de encabezado.
      */
-    private void mostrarTablaDatos() throws HeadlessException {
-        consultas = new ConsultasPersonal();
-        tablaDatosUsuario = new JTable();
-        DefaultTableModel modelo = rellenarFilasTabla();
-        consultas.realizarConexion();
-        llenarTabla(modelo);
-        // Agregar el MouseMotionListener para mostrar el tooltip con el valor completo
-        tablaDatosUsuario.addMouseMotionListener(new MouseMotionAdapter() {
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                int row = tablaDatosUsuario.rowAtPoint(e.getPoint());
-                if (row > -1) {
-                    StringBuilder tooltip = new StringBuilder();
-                    for (int col = 0; col < tablaDatosUsuario.getColumnCount(); col++) {
-                        Object value = tablaDatosUsuario.getValueAt(row, col);
-                        tooltip.append(tablaDatosUsuario.getColumnName(col)).append(": ").append(value).append("<br>");
+    private boolean mostrarTablaDatos() {
+        boolean devo = false;
+        try {
+            tablaDatosUsuario = new JTable();
+            DefaultTableModel modelo = rellenarFilasTabla();
+            llenarTabla(modelo);
+            // Agregar el MouseMotionListener para mostrar el tooltip con el valor completo
+            tablaDatosUsuario.addMouseMotionListener(new MouseMotionAdapter() {
+                @Override
+                public void mouseMoved(MouseEvent e) {
+                    int row = tablaDatosUsuario.rowAtPoint(e.getPoint());
+                    if (row > -1) {
+                        StringBuilder tooltip = new StringBuilder();
+                        for (int col = 0; col < tablaDatosUsuario.getColumnCount(); col++) {
+                            Object value = tablaDatosUsuario.getValueAt(row, col);
+                            tooltip.append(tablaDatosUsuario.getColumnName(col)).append(": ").append(value).append("<br>");
+                        }
+                        tablaDatosUsuario.setToolTipText("<html>" + tooltip.toString() + "</html>");
+                    } else {
+                        tablaDatosUsuario.setToolTipText(null);
                     }
-                    tablaDatosUsuario.setToolTipText("<html>" + tooltip.toString() + "</html>");
-                } else {
-                    tablaDatosUsuario.setToolTipText(null);
                 }
-            }
-        });
+            });
 
-        // Crear el menú emergente para modificar el usuario
-        JPopupMenu popupMenu = new JPopupMenu();
-        JMenuItem menuItem = new JMenuItem("Modificar");
-        menuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                consultas.modificarUsuario(id);
-                tablaDatosUsuario.removeAll();
-                llenarTabla(null);
-            }
-        });
-        popupMenu.add(menuItem);
+            // Crear el menú emergente para modificar el usuario
+            JPopupMenu popupMenu = new JPopupMenu();
+            JMenuItem menuItem = new JMenuItem("Modificar");
+            menuItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    usu.modificarUsuario();
+                    tablaDatosUsuario.removeAll();
+                    llenarTabla(null);
+                }
+            });
+            popupMenu.add(menuItem);
 
-        // Asociar el menú emergente a la tabla
-        tablaDatosUsuario.setComponentPopupMenu(popupMenu);
+            // Asociar el menú emergente a la tabla
+            tablaDatosUsuario.setComponentPopupMenu(popupMenu);
 
-        // Ajustar el ancho de las columnas al contenido
-        tablaDatosUsuario.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        tablaDatosUsuario.setRowHeight(tablaDatosUsuario.getRowHeight() + 5);
+            // Ajustar el ancho de las columnas al contenido
+            tablaDatosUsuario.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+            tablaDatosUsuario.setRowHeight(tablaDatosUsuario.getRowHeight() + 5);
 
-        // Ajustar el tamaño de las celdas al contenido
-        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
-        renderer.setHorizontalAlignment(DefaultTableCellRenderer.LEFT);
-        tablaDatosUsuario.setDefaultRenderer(String.class, renderer);
+            // Ajustar el tamaño de las celdas al contenido
+            DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+            renderer.setHorizontalAlignment(DefaultTableCellRenderer.LEFT);
+            tablaDatosUsuario.setDefaultRenderer(String.class, renderer);
 
-        // Crear el JScrollPane para agregar el JTable
-        JScrollPane scrollPane = new JScrollPane(tablaDatosUsuario);
+            // Crear el JScrollPane para agregar el JTable
+            JScrollPane scrollPane = new JScrollPane(tablaDatosUsuario);
 
-        // Mostrar el JTable en el JOptionPane
-        JOptionPane.showMessageDialog(null, scrollPane, "Datos del usuario", JOptionPane.INFORMATION_MESSAGE);
+            // Mostrar el JTable en el JOptionPane
+            JOptionPane.showMessageDialog(null, scrollPane, "Datos del usuario", JOptionPane.INFORMATION_MESSAGE);
+            devo = true;
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Hubo un error al mostrar los datos. " + ex.getMessage());
+            devo = false;
+        }
+        return devo;
     }
 
-    private void llenarTabla(DefaultTableModel modelo) {
-        if (modelo == null) {
-            modelo = rellenarFilasTabla();
-        }
+    private boolean llenarTabla(DefaultTableModel modelo) {
+        boolean devo = false;
         try {
-            String mostrarDatos = "SELECT id, nombre, apellidos, telefono, email, cuenta, contrasenia FROM usuario WHERE id=?";
-            PreparedStatement psDatos = consultas.getCon().prepareStatement(mostrarDatos);
-            if (id != 0) {
-                // Establecer el valor del parámetro en la consulta preparada
-                psDatos.setInt(1, id);
+            if (modelo == null) {
+                modelo = rellenarFilasTabla();
+            } else {
 
-                // Ejecutar la consulta
-                ResultSet resul = psDatos.executeQuery();
+                // Crear un objeto Usuario con los datos obtenidos
+                // Agregar los datos al modelo de la tabla
+                String fila[] = {usu.getNombre(), usu.getApellidos(), String.valueOf(usu.getTelefono()), usu.getEmail(), usu.getCuenta(), usu.getContrasenia()};
+                modelo.addRow(fila);
 
-                // Iterar sobre los resultados y agregarlos al modelo de la tabla
-                while (resul.next()) {
-                    int idCliente = resul.getInt("id");
-                    String nombre = resul.getString("nombre");
-                    String apellidos = resul.getString("apellidos");
-                    String telefono = String.valueOf(resul.getInt("telefono"));
-                    String email = resul.getString("email");
-                    String cuenta = resul.getString("cuenta");
-                    String contrasenia = resul.getString("contrasenia");
-
-                    // Crear un objeto Usuario con los datos obtenidos
-                    usu = new Usuario(id, nombre, apellidos, Integer.parseInt(telefono), email, cuenta, contrasenia);
-
-                    // Agregar los datos al modelo de la tabla
-                    String fila[] = {nombre, apellidos, telefono, email, cuenta, contrasenia};
-                    modelo.addRow(fila);
-                }
                 // Crear el JTable con el modelo de la tabla
                 tablaDatosUsuario.setModel(modelo);
-            } else {
-                JOptionPane.showMessageDialog(null, "No hay datos que mostrar");
             }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error mostrando datos");
-        } catch (NumberFormatException nfe) {
-            JOptionPane.showMessageDialog(null, "El dato introducido no es un numero");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Error al llenar la tabla. " + ex.getMessage());
         }
+        return devo;
     }
 
     private DefaultTableModel rellenarFilasTabla() {
@@ -591,7 +520,7 @@ public class VentanaPrincipal extends JFrame {
 
     private void cerrarSesionMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cerrarSesionMouseClicked
         // TODO add your handling code here:
-// Comprobación si el texto del botón cerrarSesion contiene "Cerrar sesión"
+        // Comprobación si el texto del botón cerrarSesion contiene "Cerrar sesión"
         if (cerrarSesion.getText().contains("Cerrar sesión")) {
             // Mostrar un cuadro de diálogo de confirmación para cerrar sesión
             int decision = JOptionPane.showConfirmDialog(null, "¿Seguro que desea cerrar sesión?");
@@ -609,9 +538,7 @@ public class VentanaPrincipal extends JFrame {
             // Cerrar la ventana actual
             dispose();
             // Crear una nueva instancia de GestionProductosVentana y configurar sus propiedades
-            GestionProductosVentana gpv = new GestionProductosVentana();
-            gpv.setId(id);
-            gpv.setTipoUsu(tipoUsu);
+            GestionProductosVentana gpv = new GestionProductosVentana(usu,conexion);
             gpv.aniadirmenuPopUp();
             // Mostrar la ventana de gestión de productos
             gpv.setVisible(true);
@@ -629,43 +556,7 @@ public class VentanaPrincipal extends JFrame {
     private void cerrarSesionMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cerrarSesionMouseExited
         // TODO add your handling code here:
     }//GEN-LAST:event_cerrarSesionMouseExited
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(VentanaPrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(VentanaPrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(VentanaPrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(VentanaPrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new VentanaPrincipal().setVisible(true);
-            }
-        });
-    }
-
+   
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuBar barraNav;
     private com.github.lgooddatepicker.components.CalendarPanel calendarPanel1;

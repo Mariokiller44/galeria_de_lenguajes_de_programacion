@@ -44,7 +44,7 @@ public class Producto {
         return conexion;
     }
 
-    private String getNombre() {
+    public String getNombre() {
         return nombre;
     }
 
@@ -173,6 +173,15 @@ public class Producto {
             if (producto.inicializarDesdeBD()) {
                 return producto;
             }
+        } catch (Exception e) {
+            producto = null;
+        }
+        return producto;
+    }
+    public static ArrayList<Producto> buscarTodos(Connection conexion) {
+        ArrayList<Producto> producto = null;
+        try {
+            producto = buscarPorNombreYStock(false, null, false, -1, conexion);
         } catch (Exception e) {
             producto = null;
         }
