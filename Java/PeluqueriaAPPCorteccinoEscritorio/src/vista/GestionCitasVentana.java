@@ -767,6 +767,7 @@ public class GestionCitasVentana extends JFrame {
             });
             devo = true;
         } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Error al llenar tabla horarios. "+ex.getMessage());
             devo = false;
         }
         return devo;
