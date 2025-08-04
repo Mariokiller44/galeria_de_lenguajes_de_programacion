@@ -163,8 +163,6 @@ public class Cita {
                 getCliente(); // Cargar el cliente asociado
                 devo = true;
             }
-            rs.close();
-            ps.close();
         } catch (SQLException e) {
             System.out.println("Error al inicializar. " + e.getMessage());
             devo = false;
@@ -186,7 +184,6 @@ public class Cita {
                     id = rs.getInt(1); // Obtener el ID generado
                     devo = true;
                 }
-                rs.close();
             }
             ps.close();
         } catch (SQLException e) {
@@ -257,8 +254,6 @@ public class Cita {
                 // Añadir la cita a la lista
                 devo.add(cita);
             }
-            rs.close();
-            ps.close();
         } catch (SQLException e) {
             System.out.println("Error al buscar Cita por cliente. " + e.getMessage());
             devo = null;
@@ -278,8 +273,6 @@ public class Cita {
                 // Añadir la cita a la lista
                 devo.add(cita);
             }
-            rs.close();
-            ps.close();
         } catch (SQLException e) {
             System.out.println("Error al buscar Cita por cliente. " + e.getMessage());
             devo = null;

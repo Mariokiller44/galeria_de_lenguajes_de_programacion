@@ -153,20 +153,7 @@ public class Personal extends Usuario {
         } catch (Exception e) {
             personal = null;
             System.err.println("Error al obtener el personal: " + e.getMessage());
-        } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-            } catch (SQLException e) {
-            }
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException e) {
-            }
-        }
+        } 
         return personal;
     }
 

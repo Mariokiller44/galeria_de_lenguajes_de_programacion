@@ -172,19 +172,6 @@ public class Servicio {
             exito = true;
         } catch (Exception e) {
             exito = false;
-        } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-            } catch (SQLException e) {
-            }
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException e) {
-            }
         }
         // Retorna true si se inicializó correctamente, false en caso contrario
         return exito;
@@ -266,19 +253,6 @@ public class Servicio {
             }
         } catch (Exception e) {
             System.err.println("Error al obtener el servicio: " + e.getMessage());
-        } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-            } catch (SQLException e) {
-            }
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException e) {
-            }
         }
         return servicio;
     }
@@ -340,19 +314,6 @@ public class Servicio {
             }
         } catch (Exception e) {
             servicios = null;
-        } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-            } catch (SQLException e) {
-            }
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException e) {
-            }
         }
         return servicios;
     }

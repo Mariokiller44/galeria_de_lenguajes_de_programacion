@@ -565,17 +565,6 @@ public class Usuario {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error al buscar usuarios: " + e.getMessage());
             usuarios = null;
-        } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException e) {
-                System.err.println("Error al cerrar recursos: " + e.getMessage());
-            }
         }
         return usuarios;
     }

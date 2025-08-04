@@ -113,19 +113,6 @@ public class Cliente extends Usuario {
         } catch (Exception e) {
             cliente = null;
             System.err.println("Error al obtener el cliente: " + e.getMessage());
-        } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-            } catch (SQLException e) {
-            }
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException e) {
-            }
         }
         return cliente;
     }
@@ -155,19 +142,6 @@ public class Cliente extends Usuario {
         } catch (Exception e) {
             cliente = null;
             System.err.println("Error al obtener el cliente: " + e.getMessage());
-        } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-            } catch (SQLException e) {
-            }
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException e) {
-            }
         }
         return cliente;
     }
