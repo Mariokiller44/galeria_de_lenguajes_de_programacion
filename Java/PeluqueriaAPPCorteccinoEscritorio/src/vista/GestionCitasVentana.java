@@ -60,7 +60,6 @@ public class GestionCitasVentana extends JFrame {
             inicializarDatosIniciales(); // Inicializamos por defecto con el usuario administrador
             comprobarTabla(); // Comprobar si la tabla está vacía o no
             modificarDiseño();// Modificar el diseño de la ventana
-            llenarTabla();
             setVisible(true);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error al iniciar la ventana de gestión de Citas: " + e.getMessage(), "Error", JOptionPane.ABORT);
@@ -79,7 +78,6 @@ public class GestionCitasVentana extends JFrame {
             inicializarDatos(conexionBaseData, personal);
             comprobarTabla(); // Comprobar si la tabla está vacía o no
             modificarDiseño(); // Modificar el diseño de la ventana
-            llenarTabla();
             setVisible(true);
         } catch (Exception e) {
             System.err.println("Error al iniciar la ventana de gestión de Citas: " + e.getMessage());
