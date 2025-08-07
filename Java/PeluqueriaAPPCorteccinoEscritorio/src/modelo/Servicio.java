@@ -127,17 +127,10 @@ public class Servicio {
     }
 
     public Producto getProducto() {
-        Producto prod = null;
-        try {
-            if (this.idProducto != 0) {
-                prod = Producto.buscarPorId(this.idProducto, this.conexionBD);
-            } else {
-                prod = this.producto;
-            }
-        } catch (Exception e) {
-            prod = null;
+        if (this.idProducto != 0) {
+            producto = Producto.buscarPorId(this.idProducto, this.conexionBD);
         }
-        return prod;
+        return producto;
     }
 
     public boolean setProducto(Producto producto) {
@@ -159,7 +152,7 @@ public class Servicio {
         try {
             String sql = "SELECT * FROM servicios WHERE ID = ?";
             stmt = conexionBD.prepareStatement(sql);
-            stmt.setInt(1, id);
+            stmt.setInt(1, getId());
             rs = stmt.executeQuery();
             // Si se encuentra el servicio, inicializa los atributos
             if (rs.next()) {
@@ -244,15 +237,12 @@ public class Servicio {
     // Obtener un servicio por ID
     public static Servicio obtenerServicioPorId(int id, Connection conexionBD) {
         Servicio servicio = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
         try {
             servicio = new Servicio(id, conexionBD);
-            if (servicio.inicializarDesdeBD()) {
-                return servicio;
-            }
+            servicio.inicializarDesdeBD();
         } catch (Exception e) {
             System.err.println("Error al obtener el servicio: " + e.getMessage());
+            servicio = null;
         }
         return servicio;
     }

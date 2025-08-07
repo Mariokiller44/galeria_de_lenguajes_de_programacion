@@ -294,8 +294,34 @@ public class Usuario {
         return devo;
     }
 
-    // Métodos de acceso y modificación de los atributos
-    protected boolean inicializarDesdeBD() {
+    // Métodos de acceso y modificación de los atributos (Del cual hereden las clases hijas)
+    protected boolean inicializarDesdeBD(int id,Connection con) {
+        boolean devo = false;
+        try {
+            String sql = "SELECT * FROM usuario WHERE ID = ?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, getId());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                setNombre(rs.getString("NOMBRE"));
+                setApellidos(rs.getString("APELLIDOS"));
+                setEmail(rs.getString("EMAIL"));
+                setTelefono(rs.getInt("TELEFONO"));
+                setCuenta(rs.getString("CUENTA"));
+                setContrasenia(rs.getString("CONTRASENIA"));
+                tipo_de_usuario = rs.getString("TIPO_DE_USUARIO");
+                devo = true;
+            } else {
+                System.out.println("No se encontró el usuario con ID: " + this.id);
+            }
+        } catch (Exception e) {
+            devo = false;
+        }
+        return devo;
+    }
+    
+    // Métodos de acceso y modificación de los atributos propio de la clase
+    private boolean inicializarDesdeBD() {
         boolean devo = false;
         try {
             String sql = "SELECT * FROM usuario WHERE ID = ?";

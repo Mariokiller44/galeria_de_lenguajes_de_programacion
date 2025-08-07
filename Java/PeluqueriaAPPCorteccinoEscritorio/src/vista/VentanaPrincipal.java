@@ -26,20 +26,10 @@ public class VentanaPrincipal extends JFrame {
     private JPanel panelSustituto; // Panel que se sustituirá en la animación
     private ConsultasPersonal consultas; // Objeto para realizar consultas
     private Usuario usu; // Objeto para representar al usuario
-    private VentanaLog ventanaLog; // Referencia a la ventana de inicio de sesión
     private JTable tablaDatosUsuario;
     private Connection conexion;
     private Personal empleado;
-
-    /**
-     * Establece la ventana de inicio de sesión.
-     *
-     * @param ventanaLog La ventana de inicio de sesión a establecer.
-     */
-    public void setVentanaLog(VentanaLog ventanaLog) {
-        this.ventanaLog = ventanaLog;
-    }
-
+    
     /**
      * Constructor de la clase VentanaPrincipal.
      */
@@ -54,20 +44,6 @@ public class VentanaPrincipal extends JFrame {
         setLocationRelativeTo(null); // Mostrar la ventana en el centro de la pantalla
         setResizable(false); // Deshabilitar la capacidad de redimensionar la ventana
 
-        ventanaLog = new VentanaLog(); // Crear una instancia de la ventana de inicio de sesión
-
-        // Agregar un WindowListener para controlar el cierre de la ventana
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                // Abre la otra ventana en lugar de cerrar el programa
-                int decision = JOptionPane.showConfirmDialog(null, "¿Seguro que quieres salir?", "Cerrar Sesión", JOptionPane.YES_NO_OPTION);
-                if (decision == JOptionPane.YES_OPTION) {
-                    dispose(); // Cerrar la ventana actual
-                    ventanaLog.setVisible(true); // Mostrar la ventana de inicio de sesión
-                }
-            }
-        });
     }
 
     public VentanaPrincipal(Usuario usuario, Connection con) {
@@ -79,22 +55,10 @@ public class VentanaPrincipal extends JFrame {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE); // Configurar el comportamiento al cerrar la ventana
         setLocationRelativeTo(null); // Mostrar la ventana en el centro de la pantalla
         setResizable(false); // Deshabilitar la capacidad de redimensionar la ventana
-        ventanaLog = new VentanaLog(); // Crear una instancia de la ventana de inicio de sesión
         usu = usuario;
         conexion = con;
         inicializarDatos();
-        // Agregar un WindowListener para controlar el cierre de la ventana
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                // Abre la otra ventana en lugar de cerrar el programa
-                int decision = JOptionPane.showConfirmDialog(null, "¿Seguro que quieres salir?", "Cerrar Sesión", JOptionPane.YES_NO_OPTION);
-                if (decision == JOptionPane.YES_OPTION) {
-                    dispose(); // Cerrar la ventana actual
-                    ventanaLog.setVisible(true); // Mostrar la ventana de inicio de sesión
-                }
-            }
-        });
+
     }
 
     /**
@@ -140,6 +104,11 @@ public class VentanaPrincipal extends JFrame {
         menuCitas = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         panelBienvenida.setBackground(new java.awt.Color(51, 102, 255));
         panelBienvenida.setLayout(new java.awt.BorderLayout());
@@ -233,14 +202,14 @@ public class VentanaPrincipal extends JFrame {
         menuConsultas.setText("-> Consultar");
         menuConsultas.setFont(new java.awt.Font("Comic Sans MS", 3, 14)); // NOI18N
         menuConsultas.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                menuConsultasMouseClicked(evt);
-            }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 menuConsultasMouseEntered(evt);
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 menuConsultasMouseExited(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                menuConsultasMousePressed(evt);
             }
         });
 
@@ -390,24 +359,8 @@ public class VentanaPrincipal extends JFrame {
 
     }//GEN-LAST:event_panelOpcionesMouseClicked
 
-    private void menuConsultasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuConsultasMouseClicked
-        // TODO add your handling code here:
-        if (menuConsultas.getText().contains("Consultar citas")) {
-            // Si el texto del elemento de menú contiene la subcadena "Consultar citas"
-            JOptionPane.showMessageDialog(null, "Abriendo el menú de consultas"); // Muestra un mensaje de diálogo indicando que se está abriendo el menú de consultas
-            dispose(); // Cierra la ventana actual
-            GestionCitasVentana gc = new GestionCitasVentana(empleado, conexion); // Crea una instancia de la clase GestionCitasVentana
-            gc.setVisible(true); // Hace visible la ventana de GestionCitasVentana
-        } else {
-            // Si el texto del elemento de menú no contiene la subcadena "Consultar citas"
-            JOptionPane.showMessageDialog(null, "Mostrando datos del perfil"); // Muestra un mensaje de diálogo indicando que se están mostrando los datos del perfil
-            mostrarTablaDatos(); // Llama al método "mostrarTablaDatos" para mostrar la tabla de datos del perfil
-        }
-
-    }//GEN-LAST:event_menuConsultasMouseClicked
-
     /**
-     * Método para mostrar una tabla con los datos del usuario.
+     * Método para mostrar una tabla emergente con los datos del usuario.
      *
      */
     private boolean mostrarTablaDatos() {
@@ -538,7 +491,7 @@ public class VentanaPrincipal extends JFrame {
             // Cerrar la ventana actual
             dispose();
             // Crear una nueva instancia de GestionProductosVentana y configurar sus propiedades
-            GestionProductosVentana gpv = new GestionProductosVentana(usu,conexion);
+            GestionProductosVentana gpv = new GestionProductosVentana(usu, conexion);
             gpv.aniadirmenuPopUp();
             // Mostrar la ventana de gestión de productos
             gpv.setVisible(true);
@@ -556,7 +509,33 @@ public class VentanaPrincipal extends JFrame {
     private void cerrarSesionMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cerrarSesionMouseExited
         // TODO add your handling code here:
     }//GEN-LAST:event_cerrarSesionMouseExited
-   
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+        // Abre la otra ventana en lugar de cerrar el programa
+        int decision = JOptionPane.showConfirmDialog(null, "¿Seguro que quieres salir?", "Cerrar Sesión", JOptionPane.YES_NO_OPTION);
+        if (decision == JOptionPane.YES_OPTION) {
+            VentanaLog ventanaLog = new VentanaLog(); // Crear una instancia de la ventana de inicio de sesión
+            ventanaLog.setVisible(true); // Mostrar la ventana de inicio de sesión
+            dispose(); // Cerrar la ventana actual
+        }
+    }//GEN-LAST:event_formWindowClosing
+
+    private void menuConsultasMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuConsultasMousePressed
+        // TODO add your handling code here:
+        if (menuConsultas.getText().contains("Consultar citas")) {
+            // Si el texto del elemento de menú contiene la subcadena "Consultar citas"
+            JOptionPane.showMessageDialog(null, "Abriendo el menú de consultas"); // Muestra un mensaje de diálogo indicando que se está abriendo el menú de consultas
+            GestionCitasVentana gc = new GestionCitasVentana(empleado, conexion); // Crea una instancia de la clase GestionCitasVentana
+            gc.setVisible(true); // Hace visible la ventana de GestionCitasVentana
+            this.dispose(); // Cierra la ventana actual
+        } else {
+            // Si el texto del elemento de menú no contiene la subcadena "Consultar citas"
+            JOptionPane.showMessageDialog(null, "Mostrando datos del perfil"); // Muestra un mensaje de diálogo indicando que se están mostrando los datos del perfil
+            mostrarTablaDatos(); // Llama al método "mostrarTablaDatos" para mostrar la tabla de datos del perfil
+        }
+    }//GEN-LAST:event_menuConsultasMousePressed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuBar barraNav;
     private com.github.lgooddatepicker.components.CalendarPanel calendarPanel1;

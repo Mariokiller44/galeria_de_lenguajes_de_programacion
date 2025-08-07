@@ -47,6 +47,7 @@ public class Horario {
         setServicio(servicio);
         this.conexionBD = connect;
     }
+
     public Horario(String fecha, String hora, Personal personal, Servicio servicio, Connection connect) {
         setFecha(fecha);
         setHora(hora);
@@ -99,7 +100,7 @@ public class Horario {
     public String getDescripcion() {
         return descripcion;
     }
-    
+
     public Personal getPersonal() {
         if (idPersonal != 0) {
             this.personal = Personal.obtenerPersonalPorId(idPersonal, conexionBD);
@@ -183,6 +184,9 @@ public class Horario {
                 this.idServicio = rs.getInt("ID_SERVICIO");
                 getPersonal();
                 getServicio();
+                // Si es necesario para la obtencion del atributo descripcion puedes descomentar esta parte:
+                this.descripcion = servicio.getDescripcion();
+                this.precio = String.valueOf(servicio.getPrecio());
                 devo = true;
             } else {
                 System.out.println("No se encontró el horario con ID: " + this.id);
@@ -268,19 +272,15 @@ public class Horario {
 
     // Buscar un Horario por su id
     public static Horario buscarPorId(int id, Connection conn) {
+        Horario h = null;
         try {
-            String sql = "SELECT * FROM horario WHERE id = ?";
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                Horario h = new Horario(rs.getInt("id"), conn);
-                return h;
-            }
+            h = new Horario(id, conn);
+            h.inicializarDesdeBD();
         } catch (Exception e) {
             // Manejo de error
+            h = null;
         }
-        return null;
+        return h;
     }
 
     /**
@@ -328,48 +328,6 @@ public class Horario {
         return devo;
     }
 
-    /**
-     * Metodo original para obtener Horarios que tengan cita planificada
-     *
-     * @return listado de horarios
-     *
-     * public ArrayList<Horario> obtenerHorariosConCita() { ArrayList<Horario>
-     * horariosConCita = new ArrayList<>();
-     *
-     * try { // Establecer la conexi�n a la base de datos (debes configurar tus
-     * propios datos de conexi�n) //realizarConexion();
-     *
-     * // Consulta SQL para obtener los horarios con cita asignada String query
-     * = "SELECT horario.fecha, horario.hora,
-     * servicios.precio,servicios.descripcion, usuario.nombre,usuario.apellidos
-     * FROM horario JOIN cita ON horario.id = cita.id_horario JOIN usuario ON
-     * cita.id_cliente = usuario.id JOIN servicios ON horario.id_servicio =
-     * servicios.id WHERE horario.id_personal=? AND horario.fecha >= CURDATE()";
-     *
-     * // Crear un Statement para ejecutar la consulta PreparedStatement
-     * statement = con.prepareStatement(query); statement.setInt(1,
-     * citaElegida.getId()); // Ejecutar la consulta y obtener el resultado
-     * ResultSet resultSet = statement.executeQuery();
-     *
-     * // Recorrer el resultado y agregar los campos a la lista while
-     * (resultSet.next()) { String fecha = resultSet.getString("fecha"); String
-     * hora = resultSet.getString("hora"); String servicio =
-     * resultSet.getString("descripcion"); Double precio =
-     * resultSet.getDouble("precio"); String nombreCliente =
-     * resultSet.getString("nombre"); String apellidosCliente =
-     * resultSet.getString("apellidos"); String cliente = nombreCliente + " " +
-     * apellidosCliente; // Construir la cadena con los campos y agregarla a la
-     * lista String horarioConCita = "Fecha: " + fecha + ", Hora: " + hora + ",
-     * Servicio: " + servicio + ", Cliente: " + cliente + ", Precio: " +
-     * String.valueOf(precio); horariosConCita.add(horarioConCita); }
-     *
-     * // Cerrar el ResultSet, el Statement y la conexi�n resultSet.close();
-     * statement.close(); con.close(); } catch (SQLException e) {
-     * e.printStackTrace(); }
-     *
-     * return horariosConCita; }
-     */
-    
     
     // Método para obtener los horarios con cita asignada
     public ArrayList<Horario> obtenerHorariosConCita() {
@@ -393,6 +351,7 @@ public class Horario {
 
         return horariosConCita;
     }
+
     /**
      * Método para obtener la lista de horarios disponibles sin citas para un
      * personal.
@@ -425,13 +384,12 @@ public class Horario {
             }
 
         } catch (Exception e) {
-            horariosSinCitas=null;
+            horariosSinCitas = null;
             JOptionPane.showMessageDialog(null, "Error al buscar los horarios");
         }
 
         return horariosSinCitas;
     }
-    
 
     /**
      * Método alternativo que devuelve una lista de objetos Horario
@@ -443,7 +401,7 @@ public class Horario {
         ArrayList<Horario> listaHorarios;
 
         try {
-            listaHorarios = buscarFiltrado(false, null, false, null, false, 0, false, 0, conexionBDatos);
+            listaHorarios = buscarHorariosDetallados(false, null, false, null, false, 0, false, 0, conexionBDatos);
 
         } catch (Exception e) {
             System.err.println("Error al obtener lista de horarios: " + e.getMessage());
@@ -452,26 +410,44 @@ public class Horario {
         return listaHorarios;
     }
 
-    // Buscar Horarios filtrando por atributos
-    public static ArrayList<Horario> buscarFiltrado(
+    /**
+     * Metodo de acceso a datos para buscar los horarios detallados por filtros
+     * 
+     * @param filtrarFecha
+     * @param fecha
+     * @param filtrarHora
+     * @param hora
+     * @param filtrarIdPersonal
+     * @param idPersonal
+     * @param filtrarIdServicio
+     * @param idServicio
+     * @param conn
+     * @return 
+     */
+    public static ArrayList<Horario> buscarHorariosDetallados(
             boolean filtrarFecha, String fecha,
             boolean filtrarHora, String hora,
             boolean filtrarIdPersonal, int idPersonal,
             boolean filtrarIdServicio, int idServicio, Connection conn) {
+
         ArrayList<Horario> lista = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("SELECT * FROM horario WHERE 1=1");
+        StringBuilder sql = new StringBuilder("SELECT id_horario FROM vista_horario_detallado WHERE 1=1");
+
         if (filtrarFecha) {
-            sql.append(" AND fecha = ? ,");
+            sql.append(" AND fecha = ?");
         }
         if (filtrarHora) {
-            sql.append(" AND hora = ? , ");
+            sql.append(" AND hora = ?");
         }
         if (filtrarIdPersonal) {
-            sql.append(" AND ID_PERSONAL = ? ,");
+            sql.append(" AND id_horario IN (SELECT id FROM horario WHERE id_personal = ?)");
         }
         if (filtrarIdServicio) {
-            sql.append(" AND ID_SERVICIO = ? ,");
+            sql.append(" AND id_horario IN (SELECT id FROM horario WHERE id_servicio = ?)");
         }
+
+        sql.append(" ORDER BY fecha DESC, hora DESC");
+
         try {
             PreparedStatement ps = conn.prepareStatement(sql.toString());
             int idx = 1;
@@ -487,15 +463,16 @@ public class Horario {
             if (filtrarIdServicio) {
                 ps.setInt(idx++, idServicio);
             }
+
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                Horario h = new Horario(rs.getInt("id"), conn);
+                Horario h = new Horario(rs.getInt("id_horario"), conn);
                 h.inicializarDesdeBD();
                 lista.add(h);
             }
         } catch (Exception e) {
-            // Manejo de error
             lista = null;
+            System.out.println("Error al buscar horarios detallados: " + e.getMessage());
         }
         return lista;
     }

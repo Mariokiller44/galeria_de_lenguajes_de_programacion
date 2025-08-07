@@ -170,9 +170,7 @@ public class Producto {
         Producto producto = null;
         try {
             producto = new Producto(id, conexion);
-            if (producto.inicializarDesdeBD()) {
-                return producto;
-            }
+            producto.inicializarDesdeBD();
         } catch (Exception e) {
             producto = null;
         }

@@ -10,6 +10,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.sql.*;
 import java.awt.*;
+import java.time.LocalDate;
 import java.util.*;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListSelectionModel;
@@ -42,38 +43,48 @@ public class GestionCitasVentana extends JFrame {
     private Personal empleadoEscogido, empleadoPorDefecto;
     private Horario horarioSeleccionado;
     private ArrayList<Cita> listadoCitasInicial, listadoCitas;
-    private ArrayList<Horario> listaHorarioInicial, listaHorarios;
+    private ArrayList<Horario> listaHorarioInicial;
     //</editor-fold>
 
     /**
      * Constructor de la clase.
      */
     public GestionCitasVentana() {
-        initComponents(); // Inicialización de componentes gráficos
-        setIconImage(getIconImage()); // Establecer la imagen del icono de la aplicación
-        inicializarDatosIniciales();
-        comprobarTabla(); // Comprobar si la tabla está vacía o no
-        setExtendedState(JFrame.MAXIMIZED_BOTH); // Establecer la ventana en pantalla completa
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Establecer la acción de cierre de la ventana
-        setLocationRelativeTo(null); // Centrar la ventana en la pantalla
-        modificarDiseño();// Modificar el diseño de la ventana
-        setTitle("Gestionar citas");
-    }
-
-    public GestionCitasVentana(Personal personal, Connection conexionBaseData) {
         try {
-            inicializarDatos(conexionBaseData, personal);
             initComponents(); // Inicialización de componentes gráficos
             setIconImage(getIconImage()); // Establecer la imagen del icono de la aplicación
             setExtendedState(JFrame.MAXIMIZED_BOTH); // Establecer la ventana en pantalla completa
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Establecer la acción de cierre de la ventana
+            setTitle("Gestionar citas");
             setLocationRelativeTo(null); // Centrar la ventana en la pantalla
+            inicializarDatosIniciales(); // Inicializamos por defecto con el usuario administrador
+            comprobarTabla(); // Comprobar si la tabla está vacía o no
+            modificarDiseño();// Modificar el diseño de la ventana
+            llenarTabla();
+            setVisible(true);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error al iniciar la ventana de gestión de Citas: " + e.getMessage(), "Error", JOptionPane.ABORT);
+            dispose();
+        }
+    }
+
+    public GestionCitasVentana(Personal personal, Connection conexionBaseData) {
+        try {
+            initComponents(); // Inicialización de componentes gráficos
+            setIconImage(getIconImage()); // Establecer la imagen del icono de la aplicación
+            setExtendedState(JFrame.MAXIMIZED_BOTH); // Establecer la ventana en pantalla completa
+            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Establecer la acción de cierre de la ventana
+            setTitle("Gestionar citas");
+            setLocationRelativeTo(null); // Centrar la ventana en la pantalla
+            inicializarDatos(conexionBaseData, personal);
             comprobarTabla(); // Comprobar si la tabla está vacía o no
             modificarDiseño(); // Modificar el diseño de la ventana
             llenarTabla();
-            setTitle("Gestionar citas");
+            setVisible(true);
         } catch (Exception e) {
             System.err.println("Error al iniciar la ventana de gestión de Citas: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error al iniciar la ventana de gestión de Citas: " + e.getMessage(), "Error", JOptionPane.ABORT);
+            dispose();
         }
     }
 
@@ -267,6 +278,15 @@ public class GestionCitasVentana extends JFrame {
      */
     @SuppressWarnings("empty-statement")
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {
+        if (tabla.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(null, "Debe seleccionar una fila para modificar.");
+        }else{
+            comprobarYmodificarCita();
+        }
+    }
+
+    private boolean comprobarYmodificarCita() {
+        boolean exito = false;
         try {
             filaSeleccionada = tabla.getSelectedRow();
             if (filaSeleccionada != -1) {
@@ -274,10 +294,11 @@ public class GestionCitasVentana extends JFrame {
                 // Comprobar el tipo de usuario y mostrar diferentes opciones según el tipo
                 if (empleadoEscogido.getApellidos().contains("Administrador")) {
                     // Mostrar el JOptionPane para seleccionar una opción
-                    horarioSeleccionado = listaHorarios.get(filaSeleccionada);
+                    horarioSeleccionado = listaHorarioInicial.get(filaSeleccionada);
                     String[] opciones = {"Fecha", "Hora", "Servicio", "Precio", "Personal"};
                     String seleccionAdmin = (String) JOptionPane.showInputDialog(null, "Seleccione una opcion", "Opciones", JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
                     if (seleccionAdmin == null) {
+                        exito = false;
                         throw new Exception("No se selecciono ninguna opcion");
                     } else {
                         // Realizar acciones según la opción seleccionada
@@ -326,6 +347,7 @@ public class GestionCitasVentana extends JFrame {
                             default:
                                 JOptionPane.showMessageDialog(null, "Opción no válida");
                         }
+                        exito = true;
                     }
                 } else {
                     /**
@@ -358,15 +380,18 @@ public class GestionCitasVentana extends JFrame {
                                 JOptionPane.showMessageDialog(null, "Seleccione una opcion");
                         }
                     }
+                    exito = true;
 
                 }
 
             } else {
+                exito = false;
                 throw new Exception("No se ha seleccionado un horario");
             }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Hubo un error al modificar");
+            JOptionPane.showMessageDialog(null, "Hubo un error al modificar" + ex.getMessage());
         }
+        return exito;
     }
 
     /**
@@ -454,40 +479,39 @@ public class GestionCitasVentana extends JFrame {
         }
     }
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(GestionCitasVentana.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(GestionCitasVentana.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(GestionCitasVentana.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(GestionCitasVentana.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new GestionCitasVentana().setVisible(true);
-            }
-        });
-    }
-
+//    /**
+//     * @param args the command line arguments
+//     */
+//    public static void main(String args[]) {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//         */
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(GestionCitasVentana.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            java.util.logging.Logger.getLogger(GestionCitasVentana.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            java.util.logging.Logger.getLogger(GestionCitasVentana.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(GestionCitasVentana.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//        /* Create and display the form */
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                new GestionCitasVentana().setVisible(true);
+//            }
+//        });
+//    }
     //<editor-fold defaultstate="collapsed" desc="Declaracion de variables autogeneradas">
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBorrar;
@@ -525,21 +549,29 @@ public class GestionCitasVentana extends JFrame {
             listadoCitasInicial = new ArrayList<>();
             listaHorarioInicial = new ArrayList<>();
 
-            if (personal.getId() != 1) {
+            if (personal.getId() > 1) {
                 // Empleado normal - obtener solo sus horarios
-                listaHorarioInicial = Horario.buscarFiltrado(false, null, false, null, true, personal.getId(), false, 0, conexionBaseData);
+                String fechaActual = LocalDate.now().toString(); // yyyy-MM-dd
+                listaHorarioInicial = Horario.buscarHorariosDetallados(
+                        true, fechaActual,
+                        false, null,
+                        true, personal.getId(),
+                        false, 0,
+                        conexionBaseData
+                );
 
                 if (listaHorarioInicial == null) {
-                    listaHorarioInicial = new ArrayList<>();
-                }
-
-                // Obtener todas las citas de los horarios del empleado
-                for (Horario horario : listaHorarioInicial) {
-                    ArrayList<Cita> citasHorario = Cita.buscarPorHorario(horario.getId(), conexionBaseData);
-                    if (citasHorario != null) {
-                        listadoCitasInicial.addAll(citasHorario);
+                    inicializarDatosIniciales();
+                } else {
+                    // Obtener todas las citas de los horarios del empleado
+                    for (Horario horario : listaHorarioInicial) {
+                        ArrayList<Cita> citasHorario = Cita.buscarPorHorario(horario.getId(), conexionBaseData);
+                        if (citasHorario != null) {
+                            listadoCitasInicial.addAll(citasHorario);
+                        }
                     }
                 }
+
             } else {
                 // Administrador - obtener todos los horarios
                 listaHorarioInicial = Horario.obtenerTodosLosHorarios(conexionBaseData);
@@ -649,8 +681,10 @@ public class GestionCitasVentana extends JFrame {
     }
 
     /**
-     * Método corregido para llenar la tabla con todos los clientes (vista
-     * administrador)
+     * Método corregido para llenar la tabla con todos
+     *
+     * los horarios(vista administrador)
+     *
      */
     private boolean llenarTablaTodosLosClientes() {
         boolean devo = false;
@@ -663,52 +697,41 @@ public class GestionCitasVentana extends JFrame {
                 }
             };
 
-            // Obtener todos los horarios
-            listaHorarios = Horario.obtenerTodosLosHorarios(con);
-
-            if (listaHorarios == null || listaHorarios.isEmpty()) {
+            // Comprobar que la lista de horarios no es nula o está vacía
+            if (listaHorarioInicial == null || listaHorarioInicial.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "No hay horarios disponibles");
                 tabla.setModel(modeloGeneral);
-                return true;
-            }
-
-            // Recorrer cada horario
-            for (Horario horario : listaHorarios) {
-                try {
-                    // Buscar citas para este horario específico
-                    ArrayList<Cita> citasDelHorario = Cita.buscarPorHorario(horario.getId(), con);
-
-                    if (citasDelHorario == null || citasDelHorario.isEmpty()) {
-                        // Horario sin citas - mostrar como disponible
-                        String[] fila = {
-                            horario.getFecha(),
-                            horario.getHora(),
-                            horario.getDescripcion(),
-                            String.valueOf(horario.getServicio().getPrecio()),
-                            "Disponible",
-                            horario.getPersonal().getNombre()
-                        };
-                        modeloGeneral.addRow(fila);
-                    } else {
-                        // Horario con citas - mostrar cada cita
-                        for (Cita cita : citasDelHorario) {
-                            Cliente cliente = cita.getCliente();
-                            String nombreCliente = (cliente != null) ? cliente.getNombre() : "Cliente no encontrado";
-
-                            String[] fila = {
-                                horario.getFecha(),
-                                horario.getHora(),
-                                horario.getDescripcion(),
-                                String.valueOf(horario.getServicio().getPrecio()),
-                                nombreCliente,
-                                horario.getPersonal().getNombre()
-                            };
-                            modeloGeneral.addRow(fila);
-                        }
+                devo = true;
+            } else {
+                // Crear un mapa para búsqueda rápida de citas por horario
+                Map<Integer, Cita> citasPorHorario = new HashMap<>();
+                if (listadoCitasInicial != null) {
+                    for (Cita cita : listadoCitasInicial) {
+                        citasPorHorario.put(cita.getIdHorario(), cita);
                     }
-                } catch (Exception e) {
-                    System.err.println("Error procesando horario ID " + horario.getId() + ": " + e.getMessage());
-                    // Continuar con el siguiente horario
+                }
+
+                // Recorrer cada horario UNA SOLA VEZ
+                for (Horario horario : listaHorarioInicial) {
+                    String nombreCliente = "Disponible";
+
+                    // Buscar si este horario tiene una cita asignada
+                    Cita citaAsignada = citasPorHorario.get(horario.getId());
+                    if (citaAsignada != null) {
+                        Cliente cliente = citaAsignada.getCliente();
+                        nombreCliente = (cliente != null) ? cliente.getNombre() : "Cliente no encontrado";
+                    }
+
+                    // Agregar una sola fila por horario
+                    String[] fila = {
+                        horario.getFecha(),
+                        horario.getHora(),
+                        horario.getDescripcion(),
+                        String.valueOf(horario.getServicio().getPrecio()),
+                        nombreCliente,
+                        horario.getPersonal().getNombre()
+                    };
+                    modeloGeneral.addRow(fila);
                 }
             }
 
@@ -745,42 +768,49 @@ public class GestionCitasVentana extends JFrame {
                 return true;
             }
 
-            // Recorrer cada horario del empleado
-            for (Horario horario : listaHorarioInicial) {
-                try {
-                    // Buscar citas para este horario
-                    ArrayList<Cita> citasDelHorario = Cita.buscarPorHorario(horario.getId(), con);
-
-                    if (citasDelHorario == null || citasDelHorario.isEmpty()) {
-                        // Horario disponible (sin citas)
-                        String[] fila = {
-                            horario.getFecha(),
-                            horario.getHora(),
-                            horario.getDescripcion(),
-                            String.valueOf(horario.getServicio().getPrecio()),
-                            "Disponible"
-                        };
-                        modelo.addRow(fila);
-                    } else {
-                        // Horario con citas
-                        for (Cita cita : citasDelHorario) {
-                            Cliente cliente = cita.getCliente();
-                            String nombreCliente = (cliente != null) ? cliente.getNombre() : "Cliente no encontrado";
-
-                            String[] fila = {
-                                horario.getFecha(),
-                                horario.getHora(),
-                                horario.getDescripcion(),
-                                String.valueOf(horario.getServicio().getPrecio()),
-                                nombreCliente
-                            };
-                            modelo.addRow(fila);
-                        }
+            // Filtrar horarios del empleado actual (si no es administrador)
+            ArrayList<Horario> horariosEmpleado = new ArrayList<>();
+            if (empleadoEscogido != null && !empleadoEscogido.getApellidos().contains("Administrador")) {
+                // Solo mostrar horarios del empleado actual
+                for (Horario horario : listaHorarioInicial) {
+                    if (horario.getPersonal().getId() == empleadoEscogido.getId()) {
+                        horariosEmpleado.add(horario);
                     }
-                } catch (Exception e) {
-                    System.err.println("Error procesando horario ID " + horario.getId() + ": " + e.getMessage());
-                    // Continuar con el siguiente horario
                 }
+            } else {
+                // Si es administrador, mostrar todos
+                horariosEmpleado = listaHorarioInicial;
+            }
+
+            // Crear un mapa para búsqueda rápida de citas por horario
+            Map<Integer, Cita> citasPorHorario = new HashMap<>();
+            if (listadoCitasInicial != null) {
+                for (Cita cita : listadoCitasInicial) {
+                    citasPorHorario.put(cita.getIdHorario(), cita);
+                }
+            }
+
+            // Recorrer cada horario del empleado UNA SOLA VEZ
+            for (Horario horario : horariosEmpleado) {
+                String nombreCliente = "Disponible";
+
+                // Buscar si este horario tiene una cita asignada
+                Cita citaAsignada = citasPorHorario.get(horario.getId());
+                if (citaAsignada != null) {
+                    Cliente cliente = citaAsignada.getCliente();
+                    nombreCliente = (cliente != null) ? cliente.getNombre() : "Cliente no encontrado";
+                }
+
+                // Agregar una sola fila por horario
+                String[] fila = {
+                    horario.getFecha(),
+                    horario.getHora(),
+                    horario.getDescripcion(),
+                    String.valueOf(horario.getServicio().getPrecio()),
+                    nombreCliente,
+                    horario.getPersonal().getNombre()
+                };
+                modelo.addRow(fila);
             }
 
             // Configurar la tabla
@@ -790,6 +820,7 @@ public class GestionCitasVentana extends JFrame {
 
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Error al llenar tabla horarios: " + ex.getMessage());
+            ex.printStackTrace();
             devo = false;
         }
         return devo;
@@ -798,20 +829,28 @@ public class GestionCitasVentana extends JFrame {
     /**
      * Método auxiliar para configurar la selección de la tabla
      */
-    private void configurarSeleccionTabla() {
-        tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tabla.setColumnSelectionAllowed(false);
-        tabla.setRowSelectionAllowed(true);
-        tabla.setSelectionModel(new DefaultListSelectionModel() {
-            @Override
-            public void setSelectionInterval(int index0, int index1) {
-                if (index0 == index1 && isSelectedIndex(index0)) {
-                    removeSelectionInterval(index0, index1);
-                } else {
-                    super.setSelectionInterval(index0, index1);
+    private boolean configurarSeleccionTabla() {
+        boolean exito=false;
+        try {
+            tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            tabla.setColumnSelectionAllowed(false);
+            tabla.setRowSelectionAllowed(true);
+            tabla.setSelectionModel(new DefaultListSelectionModel() {
+                @Override
+                public void setSelectionInterval(int index0, int index1) {
+                    if (index0 == index1 && isSelectedIndex(index0)) {
+                        removeSelectionInterval(index0, index1);
+                    } else {
+                        super.setSelectionInterval(index0, index1);
+                    }
                 }
-            }
-        });
+            });
+            exito=true;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error al configurar la seleccion de la tabla: "+e.getMessage());
+            exito=false;
+        }
+        return exito;
     }
 
     /**
@@ -828,7 +867,6 @@ public class GestionCitasVentana extends JFrame {
                     // Si el tipo de usuario es "Administrador", se llama al método llenarTablaTodosLosClientes()
                     llenarTablaTodosLosClientes();
                 }
-                tabla.setVisible(true);
                 devo = true;
             }
         } catch (Exception ex) {
@@ -871,8 +909,8 @@ public class GestionCitasVentana extends JFrame {
          * Corregido 31 Jul 2025
          */
         boolean devo = false;
-        filaSeleccionada = tabla.getSelectedRow();
         try {
+            filaSeleccionada = tabla.getSelectedRow();
             if (filaSeleccionada != -1) {
                 citaElegida = listadoCitasInicial.get(filaSeleccionada);
                 if (citaElegida == null) {
@@ -982,7 +1020,7 @@ public class GestionCitasVentana extends JFrame {
                 Servicio servicio = (Servicio) servicioComboBox.getSelectedItem();
                 // Realizar la inserción en la tabla de horario
                 horarioNuevo = new Horario(fecha, hora, empleado, servicio, con);
-                ArrayList<Horario> horariosCoincidentes = Horario.buscarFiltrado(true, fecha, true, hora, true, empleado.getId(), true, servicio.getId(), con);
+                ArrayList<Horario> horariosCoincidentes = Horario.buscarHorariosDetallados(true, fecha, true, hora, true, empleado.getId(), true, servicio.getId(), con);
                 if (!horariosCoincidentes.isEmpty()) {
                     throw new Exception("El horario que intentas añadir ya existe");
                 }

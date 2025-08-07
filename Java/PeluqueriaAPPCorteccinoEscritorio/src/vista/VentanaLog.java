@@ -45,16 +45,7 @@ public class VentanaLog extends JFrame {
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setTitle("Inicio de sesión");
-        checkMostrarContrasenia.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (checkMostrarContrasenia.isSelected()) {
-                    textoContrasenia.setEchoChar('\u0000');
-                } else {
-                    textoContrasenia.setEchoChar('\u2022');
-                }
-            }
-        });
+
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -70,8 +61,6 @@ public class VentanaLog extends JFrame {
         ImageIcon icono = new ImageIcon("src/images/iconoDeAppEscritorio.png");
         return icono.getImage();// Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
     }
-
-   
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -390,6 +379,11 @@ public class VentanaLog extends JFrame {
 
         checkMostrarContrasenia.setBackground(new java.awt.Color(18, 189, 201));
         checkMostrarContrasenia.setText("mostrarContraseña");
+        checkMostrarContrasenia.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                checkMostrarContraseniaStateChanged(evt);
+            }
+        });
         panelCentral.add(checkMostrarContrasenia, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 300, 130, -1));
 
         panelGeneral.add(panelCentral, java.awt.BorderLayout.CENTER);
@@ -480,8 +474,15 @@ public class VentanaLog extends JFrame {
         // TODO add your handling code here:
         BDManager.importarBD();
     }//GEN-LAST:event_botonCargarDatosActionPerformed
-    
-    
+
+    private void checkMostrarContraseniaStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_checkMostrarContraseniaStateChanged
+        // TODO add your handling code here:
+        if (checkMostrarContrasenia.isSelected()) {
+            textoContrasenia.setEchoChar('\u0000');
+        } else {
+            textoContrasenia.setEchoChar('\u2022');
+        }
+    }//GEN-LAST:event_checkMostrarContraseniaStateChanged
 
     /**
      * @param args the command line arguments
@@ -555,7 +556,7 @@ public class VentanaLog extends JFrame {
                     try {
                         if (usu.getTipo_de_usuario().contains("Personal")) {
                             this.dispose();
-                            VentanaPrincipal vc = new VentanaPrincipal(usu,con);
+                            VentanaPrincipal vc = new VentanaPrincipal(usu, con);
                             vc.setVisible(true);
                             devo = true;
                         } else {
@@ -575,7 +576,7 @@ public class VentanaLog extends JFrame {
         }
         return devo;
     }
-    
+
     /**
      *
      * @param contrasenia.
@@ -587,15 +588,15 @@ public class VentanaLog extends JFrame {
     public String calcularMD5(String contrasenia) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("MD5");
         byte[] hashBytes = md.digest(contrasenia.getBytes(StandardCharsets.UTF_8));
-        
+
         StringBuilder sb = new StringBuilder();
         for (byte b : hashBytes) {
             sb.append(String.format("%02x", b));
         }
-        
+
         return sb.toString();
     }
-    
+
     private boolean irARegistro() {
         boolean devo = false;
         try {
@@ -608,7 +609,7 @@ public class VentanaLog extends JFrame {
         }
         return devo;
     }
-    
+
     /**
      *
      * @param Nombre de la cuenta del Usuario
@@ -631,5 +632,5 @@ public class VentanaLog extends JFrame {
         return contrasenia;
     }
 //</editor-fold>
-    
+
 }

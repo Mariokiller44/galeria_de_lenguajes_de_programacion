@@ -1,4 +1,3 @@
-
 /**
  * Paquete modelo
  */
@@ -9,15 +8,17 @@ import java.util.ArrayList;
 
 /**
  * Clase Cita: representa una cita con sus atributos.
- * 
+ *
  * @author Mario
  */
 public class Cita {
+
     // Atributos
     private int id, idCliente, idHorario; // Empleado asignado a la cita
     private Horario horario; // Horario de la cita
     private Cliente cliente; // Cliente de la cita
     private Connection conexion; // Conexión a la base de datos
+
     /*
      * Constructor de la clase Cita.
      * 
@@ -32,8 +33,8 @@ public class Cita {
     }
 
     /**
-     * Constructor por defecto de la clase Cita.
-     * Inicializa los atributos a sus valores por defecto.
+     * Constructor por defecto de la clase Cita. Inicializa los atributos a sus
+     * valores por defecto.
      */
     public Cita() {
     }
@@ -64,7 +65,7 @@ public class Cita {
     }
 
     public Horario getHorario() {
-        if (idHorario > 0 && horario == null) {
+        if (idHorario != 0) {
             horario = Horario.buscarPorId(idHorario, conexion);
         }
         return horario;
@@ -115,8 +116,8 @@ public class Cita {
     }
 
     public Cliente getCliente() {
-        if (idCliente > 0 && cliente == null) {
-            cliente = Cliente.obtenerClientePorId(idCliente, conexion);
+        if (this.idCliente != 0) {
+            this.cliente = Cliente.obtenerClientePorId(idCliente, conexion);
         }
         return cliente;
     }
@@ -157,8 +158,8 @@ public class Cita {
             ps.setInt(1, getId());
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                setIdCliente(rs.getInt("id_cliente"));
-                setIdHorario(rs.getInt("id_horario"));
+                this.idCliente = rs.getInt("id_cliente");
+                this.idHorario = rs.getInt("id_horario");
                 getHorario(); // Cargar el horario asociado
                 getCliente(); // Cargar el cliente asociado
                 devo = true;
@@ -185,7 +186,7 @@ public class Cita {
                 }
                 devo = true;
             }
-             
+
         } catch (SQLException e) {
             System.out.println("Error al añadir Cita. " + e.getMessage());
             devo = false;
@@ -222,7 +223,7 @@ public class Cita {
             if (filasAfectadas > 0) {
                 devo = true;
             }
-             
+
         } catch (SQLException e) {
             System.out.println("Error al elminar Cita. " + e.getMessage());
             devo = false;
@@ -249,7 +250,7 @@ public class Cita {
             if (rs.next()) {
                 Cita cita = new Cita(rs.getInt("id"), conexionBD);
                 cita.inicializarDesdeBD(); // Inicializar la cita
-                
+
                 // Añadir la cita a la lista
                 devo.add(cita);
             }
@@ -259,14 +260,14 @@ public class Cita {
         }
         return devo;
     }
-    
+
     public static ArrayList<Cita> buscarTodas(Connection conexionBD) {
         ArrayList<Cita> devo = new ArrayList<>();
         try {
             String sql = "SELECT * FROM cita";
             PreparedStatement ps = conexionBD.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
+            while (rs.next()) {
                 Cita cita = new Cita(rs.getInt("id"), conexionBD);
                 cita.inicializarDesdeBD(); // Inicializar la cita
                 // Añadir la cita a la lista
@@ -282,14 +283,18 @@ public class Cita {
     public static ArrayList<Cita> buscarPorHorario(int idHorario, Connection conexionBD) {
         ArrayList<Cita> devo = new ArrayList<>();
         try {
-            String sql = "SELECT id FROM cita WHERE id_horario = ?";
+            // JOIN con horario para poder ordenar por fecha
+            String sql = "SELECT c.id FROM cita c "
+                    + "JOIN horario h ON c.id_horario = h.id "
+                    + "WHERE c.id_horario = ? "
+                    + "ORDER BY h.fecha DESC, h.hora DESC";
             PreparedStatement ps = conexionBD.prepareStatement(sql);
             ps.setInt(1, idHorario);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
+            while (rs.next()) { // Cambié if por while por si hay múltiples citas
                 Cita cita = new Cita(rs.getInt("id"), conexionBD);
-                cita.inicializarDesdeBD(); // Inicializar la cita
-                devo.add(cita); // Se encontró al menos una cita para el horario
+                cita.inicializarDesdeBD();
+                devo.add(cita);
             }
         } catch (SQLException e) {
             System.out.println("Error al buscar Cita por horario. " + e.getMessage());

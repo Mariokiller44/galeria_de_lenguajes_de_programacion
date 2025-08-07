@@ -66,10 +66,9 @@ public class Personal extends Usuario {
         return conexion;
     }
 
-    @Override
-    protected boolean inicializarDesdeBD() {
+    private boolean inicializarDesdeBD() {
         boolean devo = false;
-        super.inicializarDesdeBD();
+        super.inicializarDesdeBD(getId(), conexion);
         try {
             String sql = "SELECT * FROM personal WHERE ID = ?";
             PreparedStatement ps = conexion.prepareStatement(sql);

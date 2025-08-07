@@ -24,7 +24,7 @@ public class Cliente extends Usuario {
     }
 
     public Cliente(int id, Connection conexion) {
-        super.getId();
+        super.setId(id);
         this.conexion = conexion;
     }
 
@@ -46,10 +46,9 @@ public class Cliente extends Usuario {
         return super.toString() + ", descripcion: " + descripcion;
     }
 
-    @Override
-    protected boolean inicializarDesdeBD() {
+    private boolean inicializarDesdeBD() {
         boolean devo = false;
-        super.inicializarDesdeBD();
+        super.inicializarDesdeBD(getId(), conexion);
         try {
             String sql = "SELECT * FROM cliente WHERE ID = ?";
             PreparedStatement ps = conexion.prepareStatement(sql);
@@ -126,20 +125,10 @@ public class Cliente extends Usuario {
      */
     public static Cliente obtenerClientePorId(int idCliente, Connection conexionBD) {
         Cliente cliente = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
         try {
-            String query = "SELECT ID, DESCRIPCION FROM cliente WHERE ID = ?";
-            stmt = conexionBD.prepareStatement(query);
-            stmt.setInt(1, idCliente);
-            rs = stmt.executeQuery();
-            if (rs.next()) {
-                cliente = new Cliente();
-                cliente.setId(rs.getInt("ID"));
-                cliente.setDescripcion(rs.getString("DESCRIPCION"));
-                // Si necesitas inicializar más campos heredados, hazlo aquí
-                cliente.inicializarDesdeBD();
-            }
+            cliente = new Cliente(idCliente, conexionBD);
+            cliente.inicializarDesdeBD();
+            // Si necesitas inicializar más campos heredados, hazlo aquí
         } catch (Exception e) {
             cliente = null;
             System.err.println("Error al obtener el cliente: " + e.getMessage());
