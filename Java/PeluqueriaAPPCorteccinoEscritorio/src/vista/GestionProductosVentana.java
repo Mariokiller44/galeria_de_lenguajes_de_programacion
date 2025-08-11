@@ -525,15 +525,4 @@ public class GestionProductosVentana extends javax.swing.JFrame {
         }
         return devo;
     }
-
-    public static void main(String args[]) {
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                con = ConexionBD.conectarSinLogin();
-                new GestionProductosVentana().setVisible(true);
-            }
-        });
-    }
 }
