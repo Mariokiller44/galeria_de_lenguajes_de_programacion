@@ -6,13 +6,13 @@ import java.util.*;
 /**
  * Clase Producto : representa un producto con sus atributos y metodos de la
  * clase.
- * 
+ *
  * @author Mario
  * @version 1.0.2
  * @since 19-7-2025
  */
-
 public class Producto {
+
     // Atributos
     private int id;
     private String nombre;
@@ -25,6 +25,10 @@ public class Producto {
 
     public Producto(int id, Connection conexion) {
         this.id = id;
+        this.conexion = conexion;
+    }
+    
+    public Producto(Connection conexion) {
         this.conexion = conexion;
     }
 
@@ -98,7 +102,6 @@ public class Producto {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                setId(rs.getInt("ID"));
                 setNombre(rs.getString("NOMBRE"));
                 setStock(rs.getInt("STOCK"));
             }
@@ -176,10 +179,11 @@ public class Producto {
         }
         return producto;
     }
+
     public static ArrayList<Producto> buscarTodos(Connection conexion) {
-        ArrayList<Producto> producto = null;
+        ArrayList<Producto> producto = new ArrayList<>();
         try {
-            producto = buscarPorNombreYStock(false, null, false, -1, conexion);
+            producto = buscarPorNombreYStock(false, null, false, 0, conexion);
         } catch (Exception e) {
             producto = null;
         }
@@ -190,26 +194,30 @@ public class Producto {
             int stock, Connection conexion) {
         ArrayList<Producto> productos = new ArrayList<>();
         try {
-            StringBuilder sql = new StringBuilder("SELECT ID FROM Productos WHERE 1=1");
-
-            if (usarNombre && filtroNombre != null && !filtroNombre.isEmpty()) {
-                sql.append(" AND NOMBRE LIKE ?");
+            StringBuilder sql = new StringBuilder("SELECT ID FROM productos WHERE ID IS NOT NULL");
+            if (usarNombre) {
+                sql.append(" AND NOMBRE = ?");
             }
-            if (usarStock && stock >= 0) {
+            if (usarStock) {
                 sql.append(" AND STOCK = ?");
             }
-
-            PreparedStatement stmt = conexion.prepareStatement(sql.toString());
-            ResultSet rs = stmt.executeQuery();
+            PreparedStatement ps = conexion.prepareStatement(sql.toString());
+            int idx = 1;
+            if (usarNombre) {
+                ps.setString(idx++, filtroNombre);
+            }
+            if (usarStock) {
+                ps.setInt(idx++, stock);
+            }
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                Producto p = new Producto(
-                        rs.getInt("ID"),
-                        conexion);
+                Producto p = new Producto(rs.getInt("ID"), conexion);
                 p.inicializarDesdeBD();
                 productos.add(p);
             }
         } catch (Exception e) {
             productos = null;
+            System.out.println("Error al buscar horarios detallados: " + e.getMessage());
         }
 
         return productos;

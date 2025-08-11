@@ -116,7 +116,7 @@ public class Personal extends Usuario {
             boolean confirmarTipo,
             String tipo,
             Connection conexionBD) {
-        ArrayList<Personal> personal = null;
+        ArrayList<Personal> personal = new ArrayList<>();
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
@@ -142,12 +142,10 @@ public class Personal extends Usuario {
                 stmt.setString(paramIndex++, tipo);
             }
             rs = stmt.executeQuery();
-            if (rs.next()) {
-                Personal newPersonal = new Personal();
-                newPersonal.setId(rs.getInt("ID"));
-                newPersonal.setTipo(rs.getString("TIPO"));
-                newPersonal.setSalario(rs.getDouble("SALARIO"));
+            while (rs.next()) {
+                Personal newPersonal = new Personal(rs.getInt("ID"),conexionBD);
                 newPersonal.inicializarDesdeBD();
+                personal.add(newPersonal);
             }
         } catch (Exception e) {
             personal = null;

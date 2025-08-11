@@ -264,7 +264,7 @@ public class Cita {
     public static ArrayList<Cita> buscarTodas(Connection conexionBD) {
         ArrayList<Cita> devo = new ArrayList<>();
         try {
-            String sql = "SELECT * FROM cita";
+            String sql = "SELECT id FROM cita";
             PreparedStatement ps = conexionBD.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {

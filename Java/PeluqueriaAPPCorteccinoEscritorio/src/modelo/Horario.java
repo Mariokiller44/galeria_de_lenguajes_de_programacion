@@ -8,6 +8,9 @@ import java.sql.*;
 import java.util.*;
 
 import controlador.ConexionBD;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import javax.swing.JOptionPane;
 
 /**
@@ -90,7 +93,13 @@ public class Horario {
     }
 
     public String getFecha() {
-        return fecha;
+        try {
+            LocalDate fechaOri = LocalDate.parse(fecha);
+            String fechaConvertida = fechaOri.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+            return fechaConvertida;
+        } catch (Exception e) {
+            return fecha; // Devolver original si hay error
+        }
     }
 
     public String getHora() {
@@ -129,7 +138,7 @@ public class Horario {
     }
 
     public void setIdServicio(int idServicio) {
-        this.id = id;
+        this.idServicio = idServicio;
     }
 
     public void setFecha(String fecha) {
@@ -206,6 +215,12 @@ public class Horario {
             PreparedStatement ps = conexionBD.prepareStatement(sql);
             ps.setString(1, fecha);
             ps.setString(2, hora);
+            if (idPersonal==0) {
+                setIdPersonal(personal.getId());
+            }
+            if (idServicio==0) {
+                setIdServicio(servicio.getId());
+            }
             ps.setInt(3, idPersonal);
             ps.setInt(4, idServicio);
             int rows = ps.executeUpdate();
@@ -220,25 +235,43 @@ public class Horario {
         boolean exito = false;
         try {
             StringBuilder sql = new StringBuilder("UPDATE horario SET ");
+            StringBuilder campos = new StringBuilder();
             if (fecha != null) {
-                sql.append(" fecha= ?, ");
+                if (campos.length() > 0) {
+                    campos.append(", ");
+                }
+                campos.append("fecha = ?");
             }
-            if (hora == null) {
-                sql.append(" hora = ?, ");
+            if (hora != null) {
+                if (campos.length() > 0) {
+                    campos.append(", ");
+                }
+                campos.append("hora = ?");
             }
             if (idPersonal != 0) {
-                sql.append(" ID_PERSONAL = ?, ");
+                if (campos.length() > 0) {
+                    campos.append(", ");
+                }
+                campos.append("ID_PERSONAL = ?");
             }
             if (idServicio != 0) {
-                sql.append(" ID_SERVICIO = ? ");
+                if (campos.length() > 0) {
+                    campos.append(", ");
+                }
+                campos.append("ID_SERVICIO = ?");
             }
-            sql.append(" WHERE id=? ");
+
+            if (campos.length() == 0) {
+               exito=false; // No hay nada que actualizar
+            }
+
+            sql.append(campos).append(" WHERE id = ?");
             PreparedStatement ps = conexionBD.prepareStatement(sql.toString());
             int idx = 1;
             if (fecha != null) {
                 ps.setString(idx++, fecha);
             }
-            if (hora == null) {
+            if (hora != null) {
                 ps.setString(idx++, hora);
             }
             if (idPersonal != 0) {
@@ -247,7 +280,7 @@ public class Horario {
             if (idServicio != 0) {
                 ps.setInt(idx++, idServicio);
             }
-            ps.setInt(idx + 1, id);
+            ps.setInt(idx++, id);
             int rows = ps.executeUpdate();
             exito = rows > 0;
         } catch (Exception e) {
@@ -328,7 +361,6 @@ public class Horario {
         return devo;
     }
 
-    
     // Método para obtener los horarios con cita asignada
     public ArrayList<Horario> obtenerHorariosConCita() {
         ArrayList<Horario> horariosConCita = new ArrayList<>();
@@ -412,7 +444,7 @@ public class Horario {
 
     /**
      * Metodo de acceso a datos para buscar los horarios detallados por filtros
-     * 
+     *
      * @param filtrarFecha
      * @param fecha
      * @param filtrarHora
@@ -422,7 +454,7 @@ public class Horario {
      * @param filtrarIdServicio
      * @param idServicio
      * @param conn
-     * @return 
+     * @return
      */
     public static ArrayList<Horario> buscarHorariosDetallados(
             boolean filtrarFecha, String fecha,
@@ -431,7 +463,7 @@ public class Horario {
             boolean filtrarIdServicio, int idServicio, Connection conn) {
 
         ArrayList<Horario> lista = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("SELECT id_horario FROM vista_horario_detallado WHERE 1=1");
+        StringBuilder sql = new StringBuilder("SELECT id FROM horario WHERE id IS NOT NULL");
 
         if (filtrarFecha) {
             sql.append(" AND fecha = ?");
@@ -440,13 +472,13 @@ public class Horario {
             sql.append(" AND hora = ?");
         }
         if (filtrarIdPersonal) {
-            sql.append(" AND id_horario IN (SELECT id FROM horario WHERE id_personal = ?)");
+            sql.append(" AND id_personal = ?");
         }
         if (filtrarIdServicio) {
-            sql.append(" AND id_horario IN (SELECT id FROM horario WHERE id_servicio = ?)");
+            sql.append(" AND id_servicio = ?");
         }
 
-        sql.append(" ORDER BY fecha DESC, hora DESC");
+        sql.append(" ORDER BY fecha ASC, hora ASC");
 
         try {
             PreparedStatement ps = conn.prepareStatement(sql.toString());
@@ -466,7 +498,7 @@ public class Horario {
 
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                Horario h = new Horario(rs.getInt("id_horario"), conn);
+                Horario h = new Horario(rs.getInt("id"), conn);
                 h.inicializarDesdeBD();
                 lista.add(h);
             }

@@ -311,7 +311,7 @@ public class Servicio {
     // toString
     @Override
     public String toString() {
-        return "Servicio:" + descripcion;
+        return "Servicio: " + descripcion;
     }
 
 }

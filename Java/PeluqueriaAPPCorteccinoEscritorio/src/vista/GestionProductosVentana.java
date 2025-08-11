@@ -10,6 +10,7 @@ package vista;
  * @author Mario
  */
 import com.formdev.flatlaf.FlatLightLaf;
+import controlador.ConexionBD;
 import controlador.ConsultasPersonal;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -22,6 +23,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
+import modelo.Personal;
 import modelo.Producto;
 import modelo.Usuario;
 import styles.GestionProductosStyle;
@@ -33,20 +35,63 @@ public class GestionProductosVentana extends javax.swing.JFrame {
      */
     private DefaultTableModel modeloTabla;
     private ConsultasPersonal consultas;
-    private Connection con;
+    private static Connection con;
     private JPopupMenu popupMenu = new JPopupMenu();
     private VentanaPrincipal ventanaPrincipal;
     private Usuario usuarioActivo;
+    private Personal personalActivo;
+
+    private GestionProductosVentana() {
+        initComponents();
+        setIconImage(getIconImage());
+        setTitle("Gestión de Productos");
+        // Establecer el título de la ventana
+        modeloTabla = new DefaultTableModel(new Object[]{"Nombre", "Cantidad"}, 0);
+        scrollPane.getViewport().setBackground(new Color(186, 179, 179)); // Establecer color de fondo del panel de desplazamiento
+        personalActivo = Personal.obtenerPersonalPorId(1, con);//Usar el administrador por defecto
+        // Personalizar el renderizador de encabezado para cambiar el color de los títulos
+        JTableHeader header = productosTable.getTableHeader();
+        header.setBackground(new Color(74, 159, 255));
+        header.setForeground(Color.WHITE);
+        DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) productosTable.getTableHeader().getDefaultRenderer();
+        renderer.setHorizontalAlignment(JLabel.CENTER);
+        renderer.setFont(new Font("Arial", Font.BOLD, 14));
+
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE); // Configurar el comportamiento al cerrar la ventana
+        setIconImage(getIconImage()); // Establecer la imagen del ícono de la ventana
+        setResizable(false); // Deshabilitar la capacidad de redimensionar la ventana
+
+        setLocationRelativeTo(null); // Mostrar la ventana en el centro de la pantalla
+
+        cargarProductos(); // Cargar los productos en la tabla
+
+        ventanaPrincipal = new VentanaPrincipal(); // Crear una instancia de la ventana principal
+
+        // Agregar un WindowListener para controlar el cierre de la ventana
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                int decision = JOptionPane.showConfirmDialog(null, "¿Seguro que quieres salir?", "Cerrar Sesión", JOptionPane.YES_NO_OPTION);
+                if (decision == JOptionPane.YES_OPTION) {
+                    dispose(); // Cerrar la ventana actual
+                    ventanaPrincipal.setVisible(true); // Mostrar la ventana principal
+                }
+            }
+        });
+        aniadirmenuPopUp();
+    }
 
     /**
      * Creates new form GestionProductosVentanaFrame
      */
     public GestionProductosVentana(Usuario usu, Connection conexion) {
         initComponents();
+        setIconImage(getIconImage());
         setTitle("Gestión de Productos");
         // Establecer el título de la ventana
         modeloTabla = new DefaultTableModel(new Object[]{"Nombre", "Cantidad"}, 0);
         scrollPane.getViewport().setBackground(new Color(186, 179, 179)); // Establecer color de fondo del panel de desplazamiento
+        con = conexion;
         usuarioActivo = usu;
         // Personalizar el renderizador de encabezado para cambiar el color de los títulos
         JTableHeader header = productosTable.getTableHeader();
@@ -78,6 +123,12 @@ public class GestionProductosVentana extends javax.swing.JFrame {
             }
         });
         aniadirmenuPopUp();
+    }
+
+    @Override
+    public Image getIconImage() {
+        ImageIcon icono = new ImageIcon("src/images/iconoDeAppEscritorio.png");
+        return super.getIconImage(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
     }
 
     /**
@@ -285,8 +336,10 @@ public class GestionProductosVentana extends javax.swing.JFrame {
                                 } else {
                                     // Actualizar la cantidad en la tabla y en la base de datos
                                     modeloTabla.setValueAt(nuevaCantidadStr, filaSeleccionada, 1);
-                                    int idProducto = obtenerIdProducto(nombreProducto);
-                                    actualizarStockProducto(idProducto, nuevaCantidad);
+                                    Producto p = new Producto(con);
+                                    p.setNombre(nombreProducto);
+                                    p.inicializarDesdeBD();
+                                    actualizarStockProducto(p.getId(), nuevaCantidad);
                                 }
                             } catch (NumberFormatException ex) {
                                 JOptionPane.showMessageDialog(null, ex.getMessage());
@@ -317,8 +370,10 @@ public class GestionProductosVentana extends javax.swing.JFrame {
                             if (esNombreValido(nuevoNombre)) {
                                 // Actualizar el nombre en la tabla y en la base de datos
                                 modeloTabla.setValueAt(nuevoNombre, filaSeleccionada, 0);
-                                int idProducto = obtenerIdProducto(nombreProducto);
-                                actualizarNombreProducto(idProducto, nuevoNombre);
+                                Producto p = new Producto(con);
+                                p.setNombre(nuevoNombre);
+                                p.inicializarDesdeBD();
+                                p.actualizar();
                             } else {
                                 JOptionPane.showMessageDialog(null, "El nombre ingresado contiene números y no es válido.");
                             }
@@ -356,52 +411,6 @@ public class GestionProductosVentana extends javax.swing.JFrame {
     }
 
     /**
-     * Este método obtiene el ID de un producto dado su nombre.
-     *
-     * @param nombreProducto El nombre del producto.
-     * @return El ID del producto.
-     */
-    private int obtenerIdProducto(String nombreProducto) {
-        int retorno = 0;
-        try {
-            consultas.realizarConexion();
-            con = consultas.getCon();
-            String consulta = "SELECT ID FROM PRODUCTOS WHERE NOMBRE =?";
-            PreparedStatement stmt = con.prepareStatement(consulta);
-            stmt.setString(1, nombreProducto);
-            ResultSet resul = stmt.executeQuery();
-            while (resul.next()) {
-                retorno = resul.getInt("id");
-            }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error al coger el id");
-        }
-        return retorno;
-    }
-
-    /**
-     * Actualiza el nombre de un producto en la base de datos.
-     *
-     * @param idProducto El ID del producto a actualizar.
-     * @param nuevoNombre El nuevo nombre del producto.
-     */
-    private void actualizarNombreProducto(int idProducto, String nuevoNombre) {
-        consultas.realizarConexion();
-        con = consultas.getCon();
-        String consulta = "UPDATE PRODUCTOS SET NOMBRE = ? WHERE ID = ?";
-        try {
-            PreparedStatement stmt = con.prepareStatement(consulta);
-            stmt.setString(1, nuevoNombre);
-            stmt.setInt(2, idProducto);
-            stmt.executeUpdate();
-            JOptionPane.showMessageDialog(this, "Nombre actualizado correctamente");
-        } catch (SQLException e) {
-            e.getMessage();
-            JOptionPane.showMessageDialog(this, "Error al actualizar el nombre del producto", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    /**
      * Actualiza el stock de un producto en la base de datos.
      *
      * @param idProducto El ID del producto a actualizar.
@@ -434,9 +443,10 @@ public class GestionProductosVentana extends javax.swing.JFrame {
     private boolean cargarProductos() {
         // Limpia la tabla antes de cargar los productos
         boolean devo = false;
+
+        ArrayList<Producto> listaProductos = new ArrayList<>();
         try {
             modeloTabla.setRowCount(0);
-            ArrayList<Producto> listaProductos;
 
             // Realizar consulta
             listaProductos = Producto.buscarTodos(con);
@@ -459,26 +469,21 @@ public class GestionProductosVentana extends javax.swing.JFrame {
      */
     private void eliminarProducto() {
         int selectedRow = productosTable.getSelectedRow();
-        if (selectedRow != -1) {
-            String nombre = (String) modeloTabla.getValueAt(selectedRow, 0);
-            int respuesta = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar el producto '" + nombre + "'?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
-            if (respuesta == JOptionPane.YES_OPTION) {
-                // Eliminar el producto de la tabla y de la base de datos
-                modeloTabla.removeRow(selectedRow);
-                try {
-                    consultas.realizarConexion();
-                    con = consultas.getCon();
-                    PreparedStatement statement = con.prepareStatement("DELETE FROM PRODUCTOS WHERE NOMBRE = ?");
-                    statement.setString(1, nombre);
-                    statement.executeUpdate();
-                    statement.close();
-                    con.close();
-                } catch (SQLException e) {
-                    JOptionPane.showMessageDialog(this, "Error al eliminar el producto", "Error", JOptionPane.ERROR_MESSAGE);
+        try {
+            if (selectedRow != -1) {
+                String nombre = (String) modeloTabla.getValueAt(selectedRow, 0);
+                Producto producto = (Producto) modeloTabla.getValueAt(selectedRow, 0);
+                int respuesta = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar el producto '" + nombre + "'?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
+                if (respuesta == JOptionPane.YES_OPTION) {
+                    // Eliminar el producto de la tabla y de la base de datos
+                    modeloTabla.removeRow(selectedRow);
+                    producto.eliminar();
                 }
+            } else {
+                JOptionPane.showMessageDialog(this, "Seleccione un producto para eliminar", "Advertencia", JOptionPane.WARNING_MESSAGE);
             }
-        } else {
-            JOptionPane.showMessageDialog(this, "Seleccione un producto para eliminar", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al eliminar el producto", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -524,5 +529,4 @@ public class GestionProductosVentana extends javax.swing.JFrame {
         }
         return devo;
     }
-
 }
