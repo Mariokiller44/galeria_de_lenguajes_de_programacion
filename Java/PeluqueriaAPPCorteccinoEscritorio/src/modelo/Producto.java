@@ -179,6 +179,23 @@ public class Producto {
         }
         return producto;
     }
+    // Métodos estáticos de búsqueda
+    public static Producto buscarPorNombre(String nombre, Connection conexion) {
+        Producto producto = null;
+        try {
+            String sql = "SELECT id FROM productos WHERE NOMBRE = ?";
+            PreparedStatement stmt = conexion.prepareStatement(sql);
+            stmt.setString(1, nombre);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                producto=new Producto(rs.getInt("ID"),conexion);
+                producto.inicializarDesdeBD();
+            }
+        } catch (Exception e) {
+            producto = null;
+        }
+        return producto;
+    }
 
     public static ArrayList<Producto> buscarTodos(Connection conexion) {
         ArrayList<Producto> producto = new ArrayList<>();

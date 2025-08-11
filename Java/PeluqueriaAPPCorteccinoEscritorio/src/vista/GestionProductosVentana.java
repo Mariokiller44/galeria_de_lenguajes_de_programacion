@@ -292,16 +292,12 @@ public class GestionProductosVentana extends javax.swing.JFrame {
 
                     // Agregar el nuevo producto a la tabla y a la base de datos
                     modeloTabla.addRow(new Object[]{nombre, stock});
-                    consultas.realizarConexion();
-                    con = consultas.getCon();
-                    PreparedStatement statement = con.prepareStatement("INSERT INTO PRODUCTOS (NOMBRE, STOCK) VALUES (?, ?)");
-                    statement.setString(1, nombre);
-                    statement.setInt(2, stock);
-                    statement.executeUpdate();
-                    statement.close();
-                    con.close();
-                } catch (NumberFormatException | SQLException e) {
-                    JOptionPane.showMessageDialog(this, "Error al agregar el producto", "Error", JOptionPane.ERROR_MESSAGE);
+                    Producto newP = new Producto(con);
+                    newP.setNombre(nombre);
+                    newP.setStock(stock);
+                    newP.insertar();
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this, "Error al agregar el producto"+e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
@@ -336,9 +332,7 @@ public class GestionProductosVentana extends javax.swing.JFrame {
                                 } else {
                                     // Actualizar la cantidad en la tabla y en la base de datos
                                     modeloTabla.setValueAt(nuevaCantidadStr, filaSeleccionada, 1);
-                                    Producto p = new Producto(con);
-                                    p.setNombre(nombreProducto);
-                                    p.inicializarDesdeBD();
+                                    Producto p = Producto.buscarPorNombre(nombreProducto, con);
                                     actualizarStockProducto(p.getId(), nuevaCantidad);
                                 }
                             } catch (NumberFormatException ex) {
@@ -363,17 +357,16 @@ public class GestionProductosVentana extends javax.swing.JFrame {
                     if (filaSeleccionada != -1) {
                         // Obtener el nombre del producto seleccionado
                         String nombreProducto = (String) modeloTabla.getValueAt(filaSeleccionada, 0);
-
+                        Producto pOld=Producto.buscarPorNombre(nombreProducto, con);
                         // Mostrar un cuadro de diálogo para ingresar el nuevo nombre
                         String nuevoNombre = JOptionPane.showInputDialog("Ingrese el nuevo nombre del producto: ");
                         if (nuevoNombre != null) {
                             if (esNombreValido(nuevoNombre)) {
                                 // Actualizar el nombre en la tabla y en la base de datos
                                 modeloTabla.setValueAt(nuevoNombre, filaSeleccionada, 0);
-                                Producto p = new Producto(con);
-                                p.setNombre(nuevoNombre);
-                                p.inicializarDesdeBD();
-                                p.actualizar();
+                                Producto pNew = pOld;
+                                pNew.setNombre(nuevoNombre);
+                                pNew.actualizar();
                             } else {
                                 JOptionPane.showMessageDialog(null, "El nombre ingresado contiene números y no es válido.");
                             }
@@ -467,24 +460,27 @@ public class GestionProductosVentana extends javax.swing.JFrame {
     /**
      * Elimina un producto de la tabla y de la base de datos.
      */
-    private void eliminarProducto() {
+    private boolean eliminarProducto() {
+        boolean devo = false;
         int selectedRow = productosTable.getSelectedRow();
         try {
             if (selectedRow != -1) {
                 String nombre = (String) modeloTabla.getValueAt(selectedRow, 0);
-                Producto producto = (Producto) modeloTabla.getValueAt(selectedRow, 0);
+                Producto productoElegido = Producto.buscarPorNombre(nombre, con);
                 int respuesta = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar el producto '" + nombre + "'?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
                 if (respuesta == JOptionPane.YES_OPTION) {
                     // Eliminar el producto de la tabla y de la base de datos
                     modeloTabla.removeRow(selectedRow);
-                    producto.eliminar();
+                    productoElegido.eliminar();
                 }
+                devo = true;
             } else {
                 JOptionPane.showMessageDialog(this, "Seleccione un producto para eliminar", "Advertencia", JOptionPane.WARNING_MESSAGE);
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error al eliminar el producto", "Error", JOptionPane.ERROR_MESSAGE);
         }
+        return devo;
     }
 
     /**
@@ -528,5 +524,16 @@ public class GestionProductosVentana extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Ha ocurrido un error en la configuracion. " + e.getMessage());
         }
         return devo;
+    }
+
+    public static void main(String args[]) {
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                con = ConexionBD.conectarSinLogin();
+                new GestionProductosVentana().setVisible(true);
+            }
+        });
     }
 }
