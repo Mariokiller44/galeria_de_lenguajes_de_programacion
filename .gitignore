@@ -1,0 +1,6 @@
+# JDK local
+Java/Luchahorcado/oracleJdk-26/
+
+# Archivos compilados
+Java/Luchahorcado/bin/
+*.class

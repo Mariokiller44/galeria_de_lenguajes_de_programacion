@@ -1,0 +1,2882 @@
+[
+  {
+    "id": 1,
+    "nombreArtistico": "Hulk Hogan",
+    "promocionPrincipal": "WWF/WCW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": "Terry Gene Bollea"
+  },
+  {
+    "id": 2,
+    "nombreArtistico": "The Undertaker",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": "Mark William Calaway"
+  },
+  {
+    "id": 3,
+    "nombreArtistico": "Stone Cold Steve Austin",
+    "promocionPrincipal": "WWF/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": "Steven James Anderson"
+  },
+  {
+    "id": 4,
+    "nombreArtistico": "The Rock",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": "Dwayne Douglas Johnson"
+  },
+  {
+    "id": 5,
+    "nombreArtistico": "Shawn Michaels",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": "Michael Shawn Hickenbottom"
+  },
+  {
+    "id": 6,
+    "nombreArtistico": "Bret Hart",
+    "promocionPrincipal": "WWF/WCW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": "Bret Sergeant Hart"
+  },
+  {
+    "id": 7,
+    "nombreArtistico": "Ric Flair",
+    "promocionPrincipal": "WCW/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": "Richard Morgan Fliehr"
+  },
+  {
+    "id": 8,
+    "nombreArtistico": "Sting",
+    "promocionPrincipal": "WCW/TNA/AEW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": "Steve Borden"
+  },
+  {
+    "id": 9,
+    "nombreArtistico": "Triple H",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": "Paul Michael Levesque"
+  },
+  {
+    "id": 10,
+    "nombreArtistico": "Mick Foley",
+    "promocionPrincipal": "WWF/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": "Michael Francis Foley"
+  },
+  {
+    "id": 11,
+    "nombreArtistico": "Mankind",
+    "promocionPrincipal": "WWF",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": "Michael Francis Foley"
+  },
+  {
+    "id": 12,
+    "nombreArtistico": "Cactus Jack",
+    "promocionPrincipal": "ECW/WCW/WWF",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": "Michael Francis Foley"
+  },
+  {
+    "id": 13,
+    "nombreArtistico": "Dude Love",
+    "promocionPrincipal": "WWF",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": "Michael Francis Foley"
+  },
+  {
+    "id": 14,
+    "nombreArtistico": "Kane",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": "Glenn Thomas Jacobs"
+  },
+  {
+    "id": 15,
+    "nombreArtistico": "Chris Jericho",
+    "promocionPrincipal": "WCW/WWE/AEW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": "Christopher Keith Irvine"
+  },
+  {
+    "id": 16,
+    "nombreArtistico": "Kurt Angle",
+    "promocionPrincipal": "WWE/TNA",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": "Kurt Steven Angle"
+  },
+  {
+    "id": 17,
+    "nombreArtistico": "Eddie Guerrero",
+    "promocionPrincipal": "WCW/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": "Eduardo Gory Guerrero Llanes"
+  },
+  {
+    "id": 18,
+    "nombreArtistico": "Rey Mysterio",
+    "promocionPrincipal": "WCW/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": "Óscar Gutiérrez Rubio"
+  },
+  {
+    "id": 19,
+    "nombreArtistico": "Chris Benoit",
+    "promocionPrincipal": "WCW/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": "Christopher Michael Benoit"
+  },
+  {
+    "id": 20,
+    "nombreArtistico": "Booker T",
+    "promocionPrincipal": "WCW/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": "Booker T. Huffman Jr."
+  },
+  {
+    "id": 21,
+    "nombreArtistico": "Goldberg",
+    "promocionPrincipal": "WCW/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": "William Scott Goldberg"
+  },
+  {
+    "id": 22,
+    "nombreArtistico": "Kevin Nash",
+    "promocionPrincipal": "WCW/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": "Kevin Scott Nash"
+  },
+  {
+    "id": 23,
+    "nombreArtistico": "Scott Hall",
+    "promocionPrincipal": "WWF/WCW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": "Scott Oliver Hall"
+  },
+  {
+    "id": 24,
+    "nombreArtistico": "Razor Ramon",
+    "promocionPrincipal": "WWF",
+    "inicioEtapa": "1990s",
+    "finEtapa": "1990s",
+    "division": "Hombre",
+    "nombreReal": "Scott Oliver Hall"
+  },
+  {
+    "id": 25,
+    "nombreArtistico": "Diesel",
+    "promocionPrincipal": "WWF",
+    "inicioEtapa": "1990s",
+    "finEtapa": "1990s",
+    "division": "Hombre",
+    "nombreReal": "Kevin Scott Nash"
+  },
+  {
+    "id": 26,
+    "nombreArtistico": "Diamond Dallas Page",
+    "promocionPrincipal": "WCW/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": "Page Joseph Falkinburg Jr."
+  },
+  {
+    "id": 27,
+    "nombreArtistico": "Randy Savage",
+    "promocionPrincipal": "WWF/WCW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": "Randy Mario Poffo"
+  },
+  {
+    "id": 28,
+    "nombreArtistico": "Ultimate Warrior",
+    "promocionPrincipal": "WWF/WCW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "1990s",
+    "division": "Hombre",
+    "nombreReal": "James Brian Hellwig"
+  },
+  {
+    "id": 29,
+    "nombreArtistico": "Roddy Piper",
+    "promocionPrincipal": "WWF/WCW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": "Roderick George Toombs"
+  },
+  {
+    "id": 30,
+    "nombreArtistico": "Mr. Perfect",
+    "promocionPrincipal": "WWF/WCW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": "Curtis Michael Hennig"
+  },
+  {
+    "id": 31,
+    "nombreArtistico": "Lex Luger",
+    "promocionPrincipal": "WCW/WWF",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": "Lawrence Wendell Pfohl"
+  },
+  {
+    "id": 32,
+    "nombreArtistico": "Sid Vicious",
+    "promocionPrincipal": "WCW/WWF",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": "Sidney Raymond Eudy"
+  },
+  {
+    "id": 33,
+    "nombreArtistico": "Vader",
+    "promocionPrincipal": "WCW/WWF/AJPW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": "Leon Allen White"
+  },
+  {
+    "id": 34,
+    "nombreArtistico": "Yokozuna",
+    "promocionPrincipal": "WWF",
+    "inicioEtapa": "1990s",
+    "finEtapa": "1990s",
+    "division": "Hombre",
+    "nombreReal": "Rodney Agatupu Anoaʻi"
+  },
+  {
+    "id": 35,
+    "nombreArtistico": "Owen Hart",
+    "promocionPrincipal": "WWF",
+    "inicioEtapa": "1990s",
+    "finEtapa": "1990s",
+    "division": "Hombre",
+    "nombreReal": "Owen James Hart"
+  },
+  {
+    "id": 36,
+    "nombreArtistico": "British Bulldog",
+    "promocionPrincipal": "WWF/WCW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": "David Smith"
+  },
+  {
+    "id": 37,
+    "nombreArtistico": "Jim Neidhart",
+    "promocionPrincipal": "WWF",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": "James Henry Neidhart"
+  },
+  {
+    "id": 38,
+    "nombreArtistico": "Ted DiBiase",
+    "promocionPrincipal": "WWF",
+    "inicioEtapa": "1990s",
+    "finEtapa": "1990s",
+    "division": "Hombre",
+    "nombreReal": "Theodore Marvin DiBiase Sr."
+  },
+  {
+    "id": 39,
+    "nombreArtistico": "Jake Roberts",
+    "promocionPrincipal": "WWF/WCW/AEW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": "Aurelian Jake Smith Jr."
+  },
+  {
+    "id": 40,
+    "nombreArtistico": "Rick Rude",
+    "promocionPrincipal": "WWF/WCW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "1990s",
+    "division": "Hombre",
+    "nombreReal": "Richard Erwin Rood"
+  },
+  {
+    "id": 41,
+    "nombreArtistico": "Big Boss Man",
+    "promocionPrincipal": "WWF/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 42,
+    "nombreArtistico": "Bam Bam Bigelow",
+    "promocionPrincipal": "WWF/ECW/WCW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 43,
+    "nombreArtistico": "Rikishi",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 44,
+    "nombreArtistico": "Billy Gunn",
+    "promocionPrincipal": "WWE/AEW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 45,
+    "nombreArtistico": "Road Dogg",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 46,
+    "nombreArtistico": "X-Pac",
+    "promocionPrincipal": "WWE/WCW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 47,
+    "nombreArtistico": "Chyna",
+    "promocionPrincipal": "WWF",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 48,
+    "nombreArtistico": "Sable",
+    "promocionPrincipal": "WWF/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 49,
+    "nombreArtistico": "Trish Stratus",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 50,
+    "nombreArtistico": "Lita",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 51,
+    "nombreArtistico": "Alundra Blayze",
+    "promocionPrincipal": "WWF/WCW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 52,
+    "nombreArtistico": "Jacqueline",
+    "promocionPrincipal": "WWE/TNA",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 53,
+    "nombreArtistico": "Ivory",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 54,
+    "nombreArtistico": "Molly Holly",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 55,
+    "nombreArtistico": "Victoria",
+    "promocionPrincipal": "WWE/TNA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 56,
+    "nombreArtistico": "Gail Kim",
+    "promocionPrincipal": "WWE/TNA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 57,
+    "nombreArtistico": "Jazz",
+    "promocionPrincipal": "ECW/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 58,
+    "nombreArtistico": "Beth Phoenix",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 59,
+    "nombreArtistico": "Michelle McCool",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 60,
+    "nombreArtistico": "Melina",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 61,
+    "nombreArtistico": "Mickie James",
+    "promocionPrincipal": "WWE/TNA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 62,
+    "nombreArtistico": "Natalya",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 63,
+    "nombreArtistico": "John Cena",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 64,
+    "nombreArtistico": "Randy Orton",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 65,
+    "nombreArtistico": "Batista",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 66,
+    "nombreArtistico": "Brock Lesnar",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 67,
+    "nombreArtistico": "Edge",
+    "promocionPrincipal": "WWE/AEW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 68,
+    "nombreArtistico": "Christian Cage",
+    "promocionPrincipal": "WWE/TNA/AEW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 69,
+    "nombreArtistico": "Jeff Hardy",
+    "promocionPrincipal": "WWE/TNA/AEW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 70,
+    "nombreArtistico": "Matt Hardy",
+    "promocionPrincipal": "WWE/TNA/AEW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 71,
+    "nombreArtistico": "Rob Van Dam",
+    "promocionPrincipal": "ECW/WWE/TNA",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 72,
+    "nombreArtistico": "CM Punk",
+    "promocionPrincipal": "ROH/WWE/AEW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 73,
+    "nombreArtistico": "Daniel Bryan",
+    "promocionPrincipal": "WWE/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 74,
+    "nombreArtistico": "Bryan Danielson",
+    "promocionPrincipal": "ROH/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 75,
+    "nombreArtistico": "AJ Styles",
+    "promocionPrincipal": "TNA/NJPW/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 76,
+    "nombreArtistico": "Samoa Joe",
+    "promocionPrincipal": "ROH/TNA/WWE/AEW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 77,
+    "nombreArtistico": "The Miz",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 78,
+    "nombreArtistico": "Sheamus",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 79,
+    "nombreArtistico": "Dolph Ziggler",
+    "promocionPrincipal": "WWE/TNA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 80,
+    "nombreArtistico": "Nic Nemeth",
+    "promocionPrincipal": "TNA",
+    "inicioEtapa": "2020s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 81,
+    "nombreArtistico": "Kofi Kingston",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 82,
+    "nombreArtistico": "Big E",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 83,
+    "nombreArtistico": "Xavier Woods",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 84,
+    "nombreArtistico": "Roman Reigns",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 85,
+    "nombreArtistico": "Seth Rollins",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 86,
+    "nombreArtistico": "Dean Ambrose",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 87,
+    "nombreArtistico": "Jon Moxley",
+    "promocionPrincipal": "AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 88,
+    "nombreArtistico": "Bray Wyatt",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 89,
+    "nombreArtistico": "Braun Strowman",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 90,
+    "nombreArtistico": "Finn Bálor",
+    "promocionPrincipal": "NJPW/WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 91,
+    "nombreArtistico": "Kevin Owens",
+    "promocionPrincipal": "ROH/WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 92,
+    "nombreArtistico": "Sami Zayn",
+    "promocionPrincipal": "ROH/WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 93,
+    "nombreArtistico": "Shinsuke Nakamura",
+    "promocionPrincipal": "NJPW/WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 94,
+    "nombreArtistico": "Drew McIntyre",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 95,
+    "nombreArtistico": "Cody Rhodes",
+    "promocionPrincipal": "WWE/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 96,
+    "nombreArtistico": "Goldust",
+    "promocionPrincipal": "WWE/AEW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 97,
+    "nombreArtistico": "Damian Priest",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 98,
+    "nombreArtistico": "Gunther",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 99,
+    "nombreArtistico": "LA Knight",
+    "promocionPrincipal": "TNA/WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 100,
+    "nombreArtistico": "Jey Uso",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 101,
+    "nombreArtistico": "Jimmy Uso",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 102,
+    "nombreArtistico": "Solo Sikoa",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 103,
+    "nombreArtistico": "R-Truth",
+    "promocionPrincipal": "WWE/TNA",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 104,
+    "nombreArtistico": "Bobby Lashley",
+    "promocionPrincipal": "WWE/TNA/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 105,
+    "nombreArtistico": "MVP",
+    "promocionPrincipal": "WWE/TNA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 106,
+    "nombreArtistico": "Shelton Benjamin",
+    "promocionPrincipal": "WWE/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 107,
+    "nombreArtistico": "Carlito",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 108,
+    "nombreArtistico": "Rey Fénix",
+    "promocionPrincipal": "AAA/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 109,
+    "nombreArtistico": "Penta El Zero Miedo",
+    "promocionPrincipal": "AAA/AEW/WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 110,
+    "nombreArtistico": "Andrade El Ídolo",
+    "promocionPrincipal": "CMLL/WWE/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 111,
+    "nombreArtistico": "Alberto Del Rio",
+    "promocionPrincipal": "WWE/AAA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 112,
+    "nombreArtistico": "Kalisto",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 113,
+    "nombreArtistico": "Sin Cara",
+    "promocionPrincipal": "CMLL/WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 114,
+    "nombreArtistico": "Santos Escobar",
+    "promocionPrincipal": "AAA/WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 115,
+    "nombreArtistico": "Dominik Mysterio",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 116,
+    "nombreArtistico": "Logan Paul",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2020s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 117,
+    "nombreArtistico": "Bad Bunny",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2020s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 118,
+    "nombreArtistico": "Wade Barrett",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 119,
+    "nombreArtistico": "William Regal",
+    "promocionPrincipal": "WCW/WWE/AEW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 120,
+    "nombreArtistico": "Fit Finlay",
+    "promocionPrincipal": "WCW/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 121,
+    "nombreArtistico": "Mark Henry",
+    "promocionPrincipal": "WWE/AEW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 122,
+    "nombreArtistico": "Big Show",
+    "promocionPrincipal": "WCW/WWE/AEW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 123,
+    "nombreArtistico": "The Great Khali",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 124,
+    "nombreArtistico": "Umaga",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 125,
+    "nombreArtistico": "Mr. Kennedy",
+    "promocionPrincipal": "WWE/TNA",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 126,
+    "nombreArtistico": "Chris Masters",
+    "promocionPrincipal": "WWE/NWA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 127,
+    "nombreArtistico": "John Morrison",
+    "promocionPrincipal": "WWE/TNA/AAA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 128,
+    "nombreArtistico": "Morrison",
+    "promocionPrincipal": "WWE/TNA/AAA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 129,
+    "nombreArtistico": "The Hurricane",
+    "promocionPrincipal": "WCW/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 130,
+    "nombreArtistico": "Tajiri",
+    "promocionPrincipal": "ECW/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 131,
+    "nombreArtistico": "Rhyno",
+    "promocionPrincipal": "ECW/WWE/TNA",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 132,
+    "nombreArtistico": "Tommy Dreamer",
+    "promocionPrincipal": "ECW/WWE/TNA",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 133,
+    "nombreArtistico": "Sabu",
+    "promocionPrincipal": "ECW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 134,
+    "nombreArtistico": "The Sandman",
+    "promocionPrincipal": "ECW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 135,
+    "nombreArtistico": "Tazz",
+    "promocionPrincipal": "ECW/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 136,
+    "nombreArtistico": "Raven",
+    "promocionPrincipal": "ECW/WCW/WWE/TNA",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 137,
+    "nombreArtistico": "Jerry Lynn",
+    "promocionPrincipal": "ECW/ROH/TNA",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 138,
+    "nombreArtistico": "Lance Storm",
+    "promocionPrincipal": "ECW/WCW/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 139,
+    "nombreArtistico": "Mike Awesome",
+    "promocionPrincipal": "ECW/WCW/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 140,
+    "nombreArtistico": "Bubba Ray Dudley",
+    "promocionPrincipal": "ECW/WWE/TNA",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 141,
+    "nombreArtistico": "D-Von Dudley",
+    "promocionPrincipal": "ECW/WWE/TNA",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 142,
+    "nombreArtistico": "Spike Dudley",
+    "promocionPrincipal": "ECW/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 143,
+    "nombreArtistico": "New Jack",
+    "promocionPrincipal": "ECW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 144,
+    "nombreArtistico": "Gangrel",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 145,
+    "nombreArtistico": "Val Venis",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 146,
+    "nombreArtistico": "Ken Shamrock",
+    "promocionPrincipal": "WWF/TNA",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 147,
+    "nombreArtistico": "Steve Blackman",
+    "promocionPrincipal": "WWF/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 148,
+    "nombreArtistico": "D'Lo Brown",
+    "promocionPrincipal": "WWE/TNA",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 149,
+    "nombreArtistico": "Godfather",
+    "promocionPrincipal": "WWF/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 150,
+    "nombreArtistico": "Hardcore Holly",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 151,
+    "nombreArtistico": "Crash Holly",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 152,
+    "nombreArtistico": "Test",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 153,
+    "nombreArtistico": "Albert",
+    "promocionPrincipal": "WWE/NJPW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 154,
+    "nombreArtistico": "Matt Bloom",
+    "promocionPrincipal": "WWE/NJPW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 155,
+    "nombreArtistico": "JBL",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 156,
+    "nombreArtistico": "Farooq",
+    "promocionPrincipal": "WCW/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 157,
+    "nombreArtistico": "Ron Simmons",
+    "promocionPrincipal": "WCW/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 158,
+    "nombreArtistico": "Charlotte Flair",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 159,
+    "nombreArtistico": "Becky Lynch",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 160,
+    "nombreArtistico": "Sasha Banks",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 161,
+    "nombreArtistico": "Mercedes Moné",
+    "promocionPrincipal": "NJPW/AEW",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 162,
+    "nombreArtistico": "Bayley",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 163,
+    "nombreArtistico": "Asuka",
+    "promocionPrincipal": "WWE/Japan",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 164,
+    "nombreArtistico": "Rhea Ripley",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 165,
+    "nombreArtistico": "Bianca Belair",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 166,
+    "nombreArtistico": "Alexa Bliss",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 167,
+    "nombreArtistico": "Liv Morgan",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 168,
+    "nombreArtistico": "Naomi",
+    "promocionPrincipal": "WWE/TNA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 169,
+    "nombreArtistico": "Nia Jax",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 170,
+    "nombreArtistico": "Shayna Baszler",
+    "promocionPrincipal": "UFC/WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 171,
+    "nombreArtistico": "Paige",
+    "promocionPrincipal": "WWE/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 172,
+    "nombreArtistico": "Saraya",
+    "promocionPrincipal": "WWE/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 173,
+    "nombreArtistico": "AJ Lee",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2010s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 174,
+    "nombreArtistico": "Carmella",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 175,
+    "nombreArtistico": "Zelina Vega",
+    "promocionPrincipal": "TNA/WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 176,
+    "nombreArtistico": "Iyo Sky",
+    "promocionPrincipal": "Japan/WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 177,
+    "nombreArtistico": "Kairi Sane",
+    "promocionPrincipal": "Japan/WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 178,
+    "nombreArtistico": "Dakota Kai",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 179,
+    "nombreArtistico": "Raquel Rodriguez",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 180,
+    "nombreArtistico": "Tiffany Stratton",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2020s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 181,
+    "nombreArtistico": "Jade Cargill",
+    "promocionPrincipal": "AEW/WWE",
+    "inicioEtapa": "2020s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 182,
+    "nombreArtistico": "Tegan Nox",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 183,
+    "nombreArtistico": "Piper Niven",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 184,
+    "nombreArtistico": "Shotzi",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 185,
+    "nombreArtistico": "Candice LeRae",
+    "promocionPrincipal": "WWE/Indies",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 186,
+    "nombreArtistico": "Indi Hartwell",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 187,
+    "nombreArtistico": "Mandy Rose",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 188,
+    "nombreArtistico": "Sonya Deville",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 189,
+    "nombreArtistico": "Lana",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 190,
+    "nombreArtistico": "Ronda Rousey",
+    "promocionPrincipal": "UFC/WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 191,
+    "nombreArtistico": "Abyss",
+    "promocionPrincipal": "TNA",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 192,
+    "nombreArtistico": "Christopher Daniels",
+    "promocionPrincipal": "TNA/ROH/AEW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 193,
+    "nombreArtistico": "Kazarian",
+    "promocionPrincipal": "TNA/AEW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 194,
+    "nombreArtistico": "Frankie Kazarian",
+    "promocionPrincipal": "TNA/AEW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 195,
+    "nombreArtistico": "Bobby Roode",
+    "promocionPrincipal": "TNA/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 196,
+    "nombreArtistico": "James Storm",
+    "promocionPrincipal": "TNA",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 197,
+    "nombreArtistico": "Eric Young",
+    "promocionPrincipal": "TNA/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 198,
+    "nombreArtistico": "Moose",
+    "promocionPrincipal": "TNA",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 199,
+    "nombreArtistico": "Eddie Edwards",
+    "promocionPrincipal": "ROH/TNA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 200,
+    "nombreArtistico": "Davey Richards",
+    "promocionPrincipal": "ROH/TNA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 201,
+    "nombreArtistico": "Austin Aries",
+    "promocionPrincipal": "ROH/TNA/WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 202,
+    "nombreArtistico": "Jay Lethal",
+    "promocionPrincipal": "TNA/ROH/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 203,
+    "nombreArtistico": "Low Ki",
+    "promocionPrincipal": "ROH/TNA/NJPW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 204,
+    "nombreArtistico": "Homicide",
+    "promocionPrincipal": "ROH/TNA",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 205,
+    "nombreArtistico": "Amazing Red",
+    "promocionPrincipal": "TNA",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 206,
+    "nombreArtistico": "Petey Williams",
+    "promocionPrincipal": "TNA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 207,
+    "nombreArtistico": "Sonjay Dutt",
+    "promocionPrincipal": "TNA/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 208,
+    "nombreArtistico": "Chris Sabin",
+    "promocionPrincipal": "TNA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 209,
+    "nombreArtistico": "Alex Shelley",
+    "promocionPrincipal": "TNA/WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 210,
+    "nombreArtistico": "Monty Brown",
+    "promocionPrincipal": "TNA/WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 211,
+    "nombreArtistico": "Matt Morgan",
+    "promocionPrincipal": "WWE/TNA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 212,
+    "nombreArtistico": "EC3",
+    "promocionPrincipal": "TNA/WWE/NWA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 213,
+    "nombreArtistico": "Eli Drake",
+    "promocionPrincipal": "TNA/NWA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 214,
+    "nombreArtistico": "Mike Santana",
+    "promocionPrincipal": "TNA/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 215,
+    "nombreArtistico": "Ortiz",
+    "promocionPrincipal": "TNA/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 216,
+    "nombreArtistico": "Josh Alexander",
+    "promocionPrincipal": "TNA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 217,
+    "nombreArtistico": "Speedball Mike Bailey",
+    "promocionPrincipal": "TNA/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 218,
+    "nombreArtistico": "Leon Slater",
+    "promocionPrincipal": "TNA",
+    "inicioEtapa": "2020s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 219,
+    "nombreArtistico": "Mustafa Ali",
+    "promocionPrincipal": "WWE/TNA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 220,
+    "nombreArtistico": "Rich Swann",
+    "promocionPrincipal": "WWE/TNA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 221,
+    "nombreArtistico": "Matt Sydal",
+    "promocionPrincipal": "WWE/ROH/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 222,
+    "nombreArtistico": "Kenny King",
+    "promocionPrincipal": "ROH/TNA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 223,
+    "nombreArtistico": "Awesome Kong",
+    "promocionPrincipal": "TNA/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 224,
+    "nombreArtistico": "Tara",
+    "promocionPrincipal": "WWE/TNA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2010s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 225,
+    "nombreArtistico": "Angelina Love",
+    "promocionPrincipal": "TNA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 226,
+    "nombreArtistico": "Velvet Sky",
+    "promocionPrincipal": "TNA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 227,
+    "nombreArtistico": "Madison Rayne",
+    "promocionPrincipal": "TNA/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 228,
+    "nombreArtistico": "Rosemary",
+    "promocionPrincipal": "TNA",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 229,
+    "nombreArtistico": "Taya Valkyrie",
+    "promocionPrincipal": "AAA/TNA/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 230,
+    "nombreArtistico": "Deonna Purrazzo",
+    "promocionPrincipal": "TNA/AEW",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 231,
+    "nombreArtistico": "Jordynne Grace",
+    "promocionPrincipal": "TNA/WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 232,
+    "nombreArtistico": "Tessa Blanchard",
+    "promocionPrincipal": "TNA",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 233,
+    "nombreArtistico": "Kenny Omega",
+    "promocionPrincipal": "NJPW/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 234,
+    "nombreArtistico": "Hangman Adam Page",
+    "promocionPrincipal": "AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 235,
+    "nombreArtistico": "MJF",
+    "promocionPrincipal": "AEW",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 236,
+    "nombreArtistico": "Darby Allin",
+    "promocionPrincipal": "AEW",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 237,
+    "nombreArtistico": "Orange Cassidy",
+    "promocionPrincipal": "AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 238,
+    "nombreArtistico": "Sammy Guevara",
+    "promocionPrincipal": "AEW",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 239,
+    "nombreArtistico": "Jack Perry",
+    "promocionPrincipal": "AEW",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 240,
+    "nombreArtistico": "Wardlow",
+    "promocionPrincipal": "AEW",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 241,
+    "nombreArtistico": "Powerhouse Hobbs",
+    "promocionPrincipal": "AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 242,
+    "nombreArtistico": "Ricky Starks",
+    "promocionPrincipal": "AEW",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 243,
+    "nombreArtistico": "Malakai Black",
+    "promocionPrincipal": "WWE/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 244,
+    "nombreArtistico": "Buddy Matthews",
+    "promocionPrincipal": "WWE/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 245,
+    "nombreArtistico": "Brody King",
+    "promocionPrincipal": "ROH/AEW",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 246,
+    "nombreArtistico": "PAC",
+    "promocionPrincipal": "WWE/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 247,
+    "nombreArtistico": "Claudio Castagnoli",
+    "promocionPrincipal": "ROH/WWE/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 248,
+    "nombreArtistico": "Cesaro",
+    "promocionPrincipal": "WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 249,
+    "nombreArtistico": "Eddie Kingston",
+    "promocionPrincipal": "AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 250,
+    "nombreArtistico": "Swerve Strickland",
+    "promocionPrincipal": "WWE/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 251,
+    "nombreArtistico": "Keith Lee",
+    "promocionPrincipal": "WWE/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 252,
+    "nombreArtistico": "Adam Cole",
+    "promocionPrincipal": "ROH/WWE/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 253,
+    "nombreArtistico": "Kyle O'Reilly",
+    "promocionPrincipal": "ROH/WWE/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 254,
+    "nombreArtistico": "Bobby Fish",
+    "promocionPrincipal": "ROH/WWE/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 255,
+    "nombreArtistico": "Roderick Strong",
+    "promocionPrincipal": "ROH/WWE/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 256,
+    "nombreArtistico": "FTR Cash Wheeler",
+    "promocionPrincipal": "WWE/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 257,
+    "nombreArtistico": "FTR Dax Harwood",
+    "promocionPrincipal": "WWE/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 258,
+    "nombreArtistico": "Matt Jackson",
+    "promocionPrincipal": "AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 259,
+    "nombreArtistico": "Nick Jackson",
+    "promocionPrincipal": "AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 260,
+    "nombreArtistico": "Jay White",
+    "promocionPrincipal": "NJPW/AEW",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 261,
+    "nombreArtistico": "Juice Robinson",
+    "promocionPrincipal": "NJPW/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 262,
+    "nombreArtistico": "Konosuke Takeshita",
+    "promocionPrincipal": "DDT/AEW",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 263,
+    "nombreArtistico": "Will Ospreay",
+    "promocionPrincipal": "NJPW/AEW",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 264,
+    "nombreArtistico": "Mark Briscoe",
+    "promocionPrincipal": "ROH/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 265,
+    "nombreArtistico": "Jay Briscoe",
+    "promocionPrincipal": "ROH",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 266,
+    "nombreArtistico": "Athena",
+    "promocionPrincipal": "WWE/ROH",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 267,
+    "nombreArtistico": "Toni Storm",
+    "promocionPrincipal": "WWE/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 268,
+    "nombreArtistico": "Hikaru Shida",
+    "promocionPrincipal": "Japan/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 269,
+    "nombreArtistico": "Britt Baker",
+    "promocionPrincipal": "AEW",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 270,
+    "nombreArtistico": "Jamie Hayter",
+    "promocionPrincipal": "AEW",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 271,
+    "nombreArtistico": "Thunder Rosa",
+    "promocionPrincipal": "NWA/AEW",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 272,
+    "nombreArtistico": "Kris Statlander",
+    "promocionPrincipal": "AEW",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 273,
+    "nombreArtistico": "Willow Nightingale",
+    "promocionPrincipal": "AEW",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 274,
+    "nombreArtistico": "Julia Hart",
+    "promocionPrincipal": "AEW",
+    "inicioEtapa": "2020s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 275,
+    "nombreArtistico": "Antonio Inoki",
+    "promocionPrincipal": "NJPW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 276,
+    "nombreArtistico": "Giant Baba",
+    "promocionPrincipal": "AJPW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "1990s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 277,
+    "nombreArtistico": "Mitsuharu Misawa",
+    "promocionPrincipal": "AJPW/NOAH",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 278,
+    "nombreArtistico": "Kenta Kobashi",
+    "promocionPrincipal": "AJPW/NOAH",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 279,
+    "nombreArtistico": "Toshiaki Kawada",
+    "promocionPrincipal": "AJPW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 280,
+    "nombreArtistico": "Akira Taue",
+    "promocionPrincipal": "AJPW/NOAH",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 281,
+    "nombreArtistico": "Keiji Mutoh",
+    "promocionPrincipal": "NJPW/AJPW/NOAH",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 282,
+    "nombreArtistico": "The Great Muta",
+    "promocionPrincipal": "NJPW/WCW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 283,
+    "nombreArtistico": "Masahiro Chono",
+    "promocionPrincipal": "NJPW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 284,
+    "nombreArtistico": "Shinya Hashimoto",
+    "promocionPrincipal": "NJPW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2000s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 285,
+    "nombreArtistico": "Jushin Thunder Liger",
+    "promocionPrincipal": "NJPW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 286,
+    "nombreArtistico": "Yuji Nagata",
+    "promocionPrincipal": "NJPW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 287,
+    "nombreArtistico": "Hiroshi Tanahashi",
+    "promocionPrincipal": "NJPW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 288,
+    "nombreArtistico": "Kazuchika Okada",
+    "promocionPrincipal": "NJPW/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 289,
+    "nombreArtistico": "Tetsuya Naito",
+    "promocionPrincipal": "NJPW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 290,
+    "nombreArtistico": "Kota Ibushi",
+    "promocionPrincipal": "DDT/NJPW/AEW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 291,
+    "nombreArtistico": "Tomohiro Ishii",
+    "promocionPrincipal": "NJPW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 292,
+    "nombreArtistico": "Minoru Suzuki",
+    "promocionPrincipal": "NJPW/NOAH",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 293,
+    "nombreArtistico": "Zack Sabre Jr.",
+    "promocionPrincipal": "NJPW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 294,
+    "nombreArtistico": "KENTA",
+    "promocionPrincipal": "NOAH/NJPW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 295,
+    "nombreArtistico": "KUSHIDA",
+    "promocionPrincipal": "NJPW/WWE",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 296,
+    "nombreArtistico": "Taiji Ishimori",
+    "promocionPrincipal": "NOAH/NJPW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 297,
+    "nombreArtistico": "Hiromu Takahashi",
+    "promocionPrincipal": "NJPW",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 298,
+    "nombreArtistico": "SANADA",
+    "promocionPrincipal": "NJPW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 299,
+    "nombreArtistico": "EVIL",
+    "promocionPrincipal": "NJPW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 300,
+    "nombreArtistico": "Hirooki Goto",
+    "promocionPrincipal": "NJPW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 301,
+    "nombreArtistico": "Shingo Takagi",
+    "promocionPrincipal": "Dragon Gate/NJPW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 302,
+    "nombreArtistico": "YOSHI-HASHI",
+    "promocionPrincipal": "NJPW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 303,
+    "nombreArtistico": "Taichi",
+    "promocionPrincipal": "NJPW",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 304,
+    "nombreArtistico": "HENARE",
+    "promocionPrincipal": "NJPW",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 305,
+    "nombreArtistico": "Great-O-Khan",
+    "promocionPrincipal": "NJPW",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 306,
+    "nombreArtistico": "Dragon Kid",
+    "promocionPrincipal": "Dragon Gate",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 307,
+    "nombreArtistico": "CIMA",
+    "promocionPrincipal": "Dragon Gate",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 308,
+    "nombreArtistico": "Naomichi Marufuji",
+    "promocionPrincipal": "NOAH",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 309,
+    "nombreArtistico": "Go Shiozaki",
+    "promocionPrincipal": "NOAH",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 310,
+    "nombreArtistico": "Jun Akiyama",
+    "promocionPrincipal": "AJPW/NOAH/DDT",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 311,
+    "nombreArtistico": "Katsuhiko Nakajima",
+    "promocionPrincipal": "NOAH",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Hombre",
+    "nombreReal": ""
+  },
+  {
+    "id": 312,
+    "nombreArtistico": "Mayu Iwatani",
+    "promocionPrincipal": "Stardom",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 313,
+    "nombreArtistico": "Giulia",
+    "promocionPrincipal": "Stardom/WWE",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 314,
+    "nombreArtistico": "Syuri",
+    "promocionPrincipal": "Stardom",
+    "inicioEtapa": "2000s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 315,
+    "nombreArtistico": "Utami Hayashishita",
+    "promocionPrincipal": "Stardom",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 316,
+    "nombreArtistico": "Tam Nakano",
+    "promocionPrincipal": "Stardom",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 317,
+    "nombreArtistico": "Saya Kamitani",
+    "promocionPrincipal": "Stardom",
+    "inicioEtapa": "2010s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 318,
+    "nombreArtistico": "Meiko Satomura",
+    "promocionPrincipal": "Japan/WWE",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 319,
+    "nombreArtistico": "Manami Toyota",
+    "promocionPrincipal": "AJW",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2010s",
+    "division": "Mujer",
+    "nombreReal": ""
+  },
+  {
+    "id": 320,
+    "nombreArtistico": "Aja Kong",
+    "promocionPrincipal": "AJW/Japan",
+    "inicioEtapa": "1990s",
+    "finEtapa": "2020s",
+    "division": "Mujer",
+    "nombreReal": ""
+  }
+]

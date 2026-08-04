@@ -1,0 +1,11 @@
+{
+    "java.project.sourcePaths": [
+        "src"
+    ],
+    "java.project.outputPath": "bin",
+    "java.project.referencedLibraries": [
+        "lib/gson-2.8.0.jar",
+        "/srv/containers/nginx-test/html/Proyectos/galeria_de_lenguajes_de_programacion/Java/Luchahorcado/lib/gson-2.8.0.jar"
+    ],
+    "java.autobuild.enabled": true
+}
